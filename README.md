@@ -1,0 +1,213 @@
+# Profile Builder
+
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for managing professional profiles with AI. Collect data from multiple sources, generate a structured profile document, and export platform-ready content for LinkedIn, GitHub, Hashnode, and tailored resumes.
+
+## What It Does
+
+Profile Builder treats your professional profile as a **canonical data layer** — a single source of truth that decouples data collection from presentation.
+
+```
+Sources (resume, LinkedIn, GitHub, blog)
+        ↓
+   Master Profile (structured Markdown sections)
+        ↓
+   Exports (LinkedIn copy, GitHub README, resume, Hashnode bio)
+```
+
+Instead of maintaining separate profiles on every platform, you maintain one master profile and generate platform-specific outputs from it.
+
+## Prerequisites
+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed and configured
+- Node.js (for Playwright MCP, used by LinkedIn review)
+- [`gh` CLI](https://cli.github.com/) (optional — for GitHub review and refresh)
+
+## Installation
+
+Clone this repo and add it to your Claude Code plugins:
+
+```bash
+# Clone the plugin
+git clone https://github.com/vikrantjain/profile-builder.git
+
+# Add to Claude Code (from any project directory)
+claude plugins add /path/to/profile-builder
+```
+
+Or add it directly to your Claude Code settings file (`~/.claude/settings.json`):
+
+```json
+{
+  "plugins": [
+    "/path/to/profile-builder"
+  ]
+}
+```
+
+## Quick Start
+
+1. **Initialize your profile** — run the `/profile-init` command in Claude Code:
+
+   ```
+   /profile-init
+   ```
+
+   This walks you through collecting data from your resume, LinkedIn, GitHub, and blog platforms, then builds all profile sections.
+
+2. **Generate exports** — ask Claude to generate content for a specific platform:
+
+   - *"Generate my LinkedIn content"*
+   - *"Create a resume tailored to this job description"*
+   - *"Generate my GitHub profile README"*
+   - *"Export my Hashnode profile content"*
+
+3. **Review your profiles** — get actionable improvement suggestions:
+
+   - *"Review my LinkedIn profile"*
+   - *"Review my GitHub profile"*
+   - *"Review my Hashnode profile"*
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `/profile-init` | Interactive onboarding. Collects data sources, builds all sections, generates the profile index. Entry point for new users. |
+| `/profile-validate` | Validate profile documents against the template schema. Checks for missing fields, unfilled placeholders, and structural issues. Offers interactive fixes. |
+
+## Skills
+
+### Data Layer
+
+These skills manage the master profile — the structured source of truth.
+
+| Skill | What it does | Example prompts |
+|---|---|---|
+| `profile-section` | Generate or update a single profile section | *"Update my experience section"*, *"Rebuild my skills section"* |
+| `profile-refresh` | Fetch latest data from external platforms (GitHub, Hashnode, Dev.to) | *"Refresh my blog posts"*, *"Sync my open source data"* |
+| `profile-assemble` | Stitch section files into a single `profile.md` | *"Assemble my profile"*, *"Build full profile from sections"* |
+
+### Preferences
+
+| Skill | What it does | Example prompts |
+|---|---|---|
+| `profile-preferences` | Store persistent presentation preferences that shape exports and reviews | *"Remember that I prefer a formal tone"*, *"My preference is to emphasize backend work"* |
+
+### Generate (Profile → Platform Content)
+
+These skills read from the master profile and produce platform-ready content.
+
+| Skill | Output | Example prompts |
+|---|---|---|
+| `linkedin-generate` | `linkedin/` directory with per-section files | *"Generate my LinkedIn content"*, *"Write my LinkedIn headline"* |
+| `resume-generate` | `resume.md` + `resume.json` ([JSON Resume](https://jsonresume.org/) format) | *"Generate a resume for this job"*, *"Make an ATS-optimized resume"* |
+| `github-generate` | `github-readme.md` | *"Generate my GitHub profile README"* |
+| `hashnode-generate` | `hashnode/` directory | *"Export my Hashnode profile content"* |
+
+### Review (Fetch & Assess External Profiles)
+
+These skills fetch your live profile from a platform, compare it against the master profile, and suggest improvements.
+
+| Skill | Requirements | Example prompts |
+|---|---|---|
+| `linkedin-review` | Playwright MCP (bundled in `.mcp.json`) | *"Review my LinkedIn profile"* |
+| `github-review` | `gh` CLI | *"Review my GitHub profile"* |
+| `hashnode-review` | None (uses public GraphQL API) | *"Review my Hashnode profile"* |
+
+## How It Works
+
+### Profile Lifecycle
+
+```
+/profile-init  →  Collect data from sources  →  Build all sections  →  Generate index
+                                                      ↓
+                                            sections/*.md files
+                                                      ↓
+                              profile-assemble  →  profile.md
+                                                      ↓
+                              Generate / Review skills consume profile.md
+```
+
+### File Structure (Generated)
+
+After initialization, your workspace will contain:
+
+```
+profile-index.md          ← Hub file: identity, contact info, section manifest
+sections/
+  identity.md
+  summary.md
+  experience.md
+  skills.md
+  education.md
+  certifications.md
+  blogs.md                ← Dynamic (refreshable from Hashnode/Dev.to)
+  open_source.md          ← Dynamic (refreshable from GitHub)
+  ...
+profile.md                ← Assembled full profile (generated on demand)
+preferences.md            ← Presentation preferences (optional, user-managed)
+```
+
+### Dynamic Sections
+
+Some sections track data from external platforms:
+
+- **blogs** — sourced from Hashnode, Dev.to
+- **open_source** — sourced from GitHub (projects + contributions)
+
+Run *"Refresh my blog posts"* or *"Refresh my open source data"* to pull the latest. Other sections (experience, skills, education, etc.) are static and updated from user-provided data.
+
+## Resume Generation
+
+The `resume-generate` skill produces two formats:
+
+- **`resume.md`** — Clean Markdown resume, optionally tailored to a specific job description
+- **`resume.json`** — [JSON Resume](https://jsonresume.org/) schema, importable into [Reactive Resume](https://rxresu.me/) and other compatible tools
+
+Provide a job description to get a tailored, ATS-optimized resume:
+
+> *"Generate a resume tailored to this job posting: [paste URL or text]"*
+
+## Configuration
+
+### Playwright MCP
+
+The plugin includes an `.mcp.json` that configures Playwright for LinkedIn review. This requires Node.js and runs automatically when the LinkedIn review skill is invoked.
+
+### Preferences
+
+Store persistent preferences that affect how exports and reviews are generated:
+
+> *"Remember that I prefer a conversational tone on LinkedIn"*
+> *"My preference is to always highlight cloud architecture experience"*
+
+Preferences are saved to `preferences.md` and grouped by scope (Global, LinkedIn, Resume, GitHub, Hashnode).
+
+## Project Structure
+
+```
+.claude-plugin/
+  plugin.json                          ← Plugin manifest
+commands/
+  profile-init.md                      ← /profile-init command
+  profile-validate.md                  ← /profile-validate command
+skills/
+  profile-section/SKILL.md             ← Generate/update a single section
+  profile-refresh/SKILL.md             ← Fetch latest from external platforms
+  profile-assemble/SKILL.md            ← Stitch sections into full profile
+  profile-preferences/SKILL.md         ← Manage presentation preferences
+  linkedin-generate/SKILL.md           ← Generate LinkedIn content
+  resume-generate/SKILL.md             ← Generate tailored resume
+  github-generate/SKILL.md             ← Generate GitHub README
+  hashnode-generate/SKILL.md           ← Generate Hashnode content
+  linkedin-review/SKILL.md             ← Review LinkedIn profile
+  github-review/SKILL.md               ← Review GitHub profile
+  hashnode-review/SKILL.md             ← Review Hashnode profile
+profile-template.md                    ← Canonical profile schema
+profile-index-template.md             ← Index/hub file template
+CLAUDE.md                              ← Project instructions for Claude Code
+.mcp.json                              ← MCP server config (Playwright)
+```
+
+## License
+
+MIT
