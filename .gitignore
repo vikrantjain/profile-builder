@@ -1,0 +1,22 @@
+# Generated profile documents
+profile-index.md
+profile.md
+sections/
+
+# Export outputs
+linkedin/
+hashnode/
+resume.md
+resume.json
+github-readme.md
+
+# Review reports
+linkedin-review.md
+github-review.md
+hashnode-review.md
+
+# Temporary/intermediate data
+.profile/
+
+# Claude Code local settings and session data
+.claude/
