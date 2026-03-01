@@ -39,6 +39,15 @@ All other sections (identity, summary, experience, skills, education,
 certifications, patents, languages) are static — maintained from
 user-provided data only.
 
+## Tool Constraints
+
+This skill must **not** use Playwright or any browser automation. All external
+data fetching uses CLI tools and public APIs only:
+
+- **GitHub** — `gh` CLI (via Bash) or GitHub REST API (via WebFetch)
+- **Hashnode** — GraphQL API at `gql.hashnode.com` (via WebFetch)
+- **Dev.to** — REST API at `dev.to/api` (via WebFetch)
+
 ## Workflow
 
 ### 1. Read Source Configuration

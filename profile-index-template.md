@@ -1,5 +1,5 @@
 ---
-template_version: "1.0"
+template_version: "2.0"
 template_name: "Profile Index Template"
 
 placeholder_syntax:

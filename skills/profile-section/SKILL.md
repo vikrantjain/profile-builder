@@ -25,9 +25,15 @@ later generated. When building or updating a section:
   minor, or less relevant.
 - **Preserve all information** — every fact, date, technology, metric, and
   detail must be retained. Do not lose information during rewording.
+- **Do not add information** — never fabricate, infer, or embellish details
+  that are not present in the source data. If the input says "evaluating
+  against production readiness criteria", do not expand that to "evaluating
+  against production readiness criteria across 15+ dimensions". Rewording
+  for clarity is allowed; introducing new claims, numbers, or qualifiers
+  is not.
 - **Improve clarity and conciseness** — reword, tighten, and restructure
   sentences for readability. Better phrasing and shorter sentences are
-  encouraged, as long as no information is lost in the process.
+  encouraged, as long as no information is added or lost in the process.
 - **Never apply resume heuristics** such as limiting to recent roles, dropping
   entries to fit a page length, or omitting details deemed unimportant.
 
@@ -98,23 +104,62 @@ For updates (adding entries to a list section like experience or open_source):
 - Merge new entries with existing entries, preserving order (most recent first).
 - Do not duplicate entries.
 
-### 4. Render the Section
+### 4. Map Input to All Template Fields
+
+Before rendering, systematically map the input data to **every** field defined in
+the template for this section — not just the obvious ones. The user's input may
+use different labels, formatting, or structure than the template expects.
+
+For each field in the template schema (including nested `item_fields`):
+
+1. **Scan the entire input** for data that matches the field's semantic meaning,
+   regardless of how it is labelled. For example:
+   - "Action/Achievement" bullets → `highlights`
+   - Date ranges like "Dec 2025 – Jan 2026" → `duration` (for projects) or
+     `start_date`/`end_date` (for experience)
+   - "Technologies" / "Tech" / "Stack" / "Built with" → `tech_stack`
+   - Role descriptions like "led", "sole developer", "tech lead" → `role`
+   - URLs or repo links → `url`
+
+2. **Attempt every field** — not just required ones. Optional fields (`required: false`)
+   like `role`, `duration`, `tech_stack`, `url`, `location`, `type` carry valuable
+   data that improves downstream exports. Treat them as "fill if extractable",
+   not "skip unless obvious". For required fields with defaults (e.g., `highlights`
+   defaults to `["TBD"]`), extract real values whenever possible and only fall
+   back to the default when the input genuinely contains no relevant data.
+
+3. **Separate description from achievements**: The `description` field captures
+   *what the project/role does*. Quantifiable outcomes, metrics, and impact
+   statements belong in `highlights`, not in `description`. If the input mixes
+   both, split them.
+
+4. **Do not silently discard data** that doesn't map to any field. If the input
+   contains information with no matching template field, include it in the closest
+   relevant field (usually `description`) and note the mismatch.
+
+### 5. Render the Section
 
 Apply the same rendering rules as full profile generation:
 
 - Replace all `{{placeholder}}` tokens with real data.
 - Follow the repeating block patterns for list fields.
 - Preserve Markdown formatting and heading levels.
+- **Match the template's exact formatting for each element** — do not borrow
+  styling from one level and apply it to another. For example, experience
+  entry dates use italics (`*Jan 2021 – Present*`) but project `duration`
+  is rendered as plain text (`· Dec 2025 – Jan 2026`). Render each field
+  exactly as the template specifies, not by analogy with similar fields
+  elsewhere.
 - Do **not** include horizontal rules (`---`) at the start or end of the
   section file — the assembler adds those during stitching.
 - Output only the target section's Markdown — no frontmatter, no other sections.
 
-### 5. Write the Output
+### 6. Write the Output
 
 Write the rendered section to the path specified in the `sections` mapping
 (e.g., `sections/experience.md`).
 
-### 6. Update the Index
+### 7. Update the Index
 
 After writing the section file, update `profile-index.md`:
 
@@ -130,6 +175,7 @@ Before finishing, verify:
 - [ ] No `{{placeholder}}` tokens remain in the output
 - [ ] Output contains only the target section — no other sections leaked in
 - [ ] No `---` at the start or end of the file
+- [ ] `TBD` defaults used only where no extractable data exists in the input
 - [ ] Section file written to the correct `sections/` path
 - [ ] `profile-index.md` manifest updated with current date
 

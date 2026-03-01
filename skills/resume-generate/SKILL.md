@@ -105,6 +105,11 @@ Apply items 2-5 from ATS optimization regardless.
 
 ### 5. Generate Markdown Resume
 
+**TBD filtering:** Profile data may contain `TBD` as a placeholder value in
+any field (indicating data not yet filled in by the user). When rendering
+output, silently skip any value that is exactly `TBD` — do not render it.
+If all items in a list are `TBD`, omit that list/block entirely.
+
 Write the resume as Markdown to `resume.md`. This is a polished, standalone
 resume document — not a plain-text dump of the JSON. Follow these rules:
 

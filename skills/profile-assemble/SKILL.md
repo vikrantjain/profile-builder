@@ -89,6 +89,7 @@ Before finishing, verify:
 - [ ] No empty sections (headings with no content)
 - [ ] Horizontal rules between sections, none trailing
 - [ ] Sections appear in canonical order
+- [ ] If any `TBD` values are present, warn the user which sections have incomplete data
 - [ ] `profile.md` written to workspace root
 
 ## Reference Files

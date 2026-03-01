@@ -104,8 +104,9 @@ fields:
           name:        { required: true,  description: "Project name" }
           description: { required: true,  description: "What the project does or achieved" }
           role:        { required: false, description: "Your role in the project, e.g. tech lead, sole developer" }
+          duration:    { required: false, description: "Project timeframe, e.g. 'Dec 2025 – Jan 2026' or '3 months'. Parsed from date ranges in the input." }
           tech_stack:  { required: false, description: "Project-specific technologies (e.g. React, GraphQL, PostgreSQL)", type: list }
-          highlights:  { required: false, description: "Notable achievements, metrics, or impact", type: list }
+          highlights:  { required: true,  description: "Notable achievements, metrics, or quantifiable impact. Extract from action/achievement bullets, results, outcomes, or metrics in the source data. Use 'TBD' as a single-item list if no achievements can be extracted.", type: list, default: ["TBD"] }
           url:         { required: false, description: "Link to project, repo, or demo (if public)" }
 
   # ── Education ───────────────────────────────────────────
@@ -274,7 +275,7 @@ sections:
 #### Projects
 
 {{#each projects}}
-**{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}**{{#role}} · *{{role}}*{{/role}}
+**{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}**{{#role}} · *{{role}}*{{/role}}{{#duration}} · {{duration}}{{/duration}}
 
 {{description}}
 

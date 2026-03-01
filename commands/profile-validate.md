@@ -64,7 +64,7 @@ For each section file listed in the Profile Sections table:
   fields rendered and non-empty. Specifically:
   - `identity` — must contain full_name, title, email
   - `summary` — must contain a non-trivial summary paragraph
-  - `experience` — each entry must have title, company, start_date, description; nested projects (if present) must each have name and description
+  - `experience` — each entry must have title, company, start_date, description; nested projects (if present) must each have name, description, and highlights (at minimum `["TBD"]`)
   - `skills` — must have at least one category with items
 - **Heading hierarchy** — headings match the expected level from the template
   layout (e.g., experience entries use `###`, section titles use `##`).
@@ -98,7 +98,9 @@ Group all issues into two categories:
   unfilled placeholders, structural violations (boundary `---`, broken heading
   hierarchy).
 - **Warnings** — orphan section files, stale `Last Updated` dates (older than
-  90 days), missing optional sections, `profile.md` out of sync or absent.
+  90 days), missing optional sections, `profile.md` out of sync or absent,
+  `TBD` placeholder values found in section files (signals incomplete data
+  that will be silently skipped by export skills).
 
 Present a summary first:
 

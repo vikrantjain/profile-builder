@@ -96,8 +96,12 @@ generate the section file using the `profile-section` workflow:
 2. Re-read the source file(s) from disk and extract only the data relevant to
    this section. Do not rely on source data remaining in context from step 5 —
    always re-read from disk to avoid context-dependent data loss.
-3. Render the section with the extracted data.
-4. Write to the output path (e.g., `sections/experience.md`).
+3. Map input data to all template fields — follow the field mapping rules in
+   the `profile-section` skill (Step 4), including duration extraction for
+   projects and populating required `highlights` (default `["TBD"]` if no
+   achievements can be extracted).
+4. Render the section with the mapped data.
+5. Write to the output path (e.g., `sections/experience.md`).
 
 Process sections in this order:
 1. identity

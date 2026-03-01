@@ -62,6 +62,11 @@ Consult `${CLAUDE_PLUGIN_ROOT}/skills/linkedin-generate/references/linkedin-cons
 
 ### 5. Transform Content
 
+**TBD filtering:** Profile data may contain `TBD` as a placeholder value in
+any field (indicating data not yet filled in by the user). When rendering
+output, silently skip any value that is exactly `TBD` — do not render it.
+If all items in a list are `TBD`, omit that list/block entirely.
+
 For each target LinkedIn field:
 
 - Convert Markdown formatting to plain text (remove `**`, `#`, `-` bullets).

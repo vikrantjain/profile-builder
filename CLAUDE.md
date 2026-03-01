@@ -35,7 +35,7 @@ The project follows a **separation of schema and workflow**:
 ### Profile Lifecycle
 
 1. **Init** — `/profile-init` command collects data from user sources (resume, GitHub, LinkedIn, blog platforms), generates `profile-index.md` early (with data sources and an empty sections table that is populated incrementally), builds all section files, verifies source coverage (cross-references generated sections against original sources to catch missing information), and validates the output against the template schema. Dynamic section refresh is not automatic — init configures the data sources and informs the user to run `profile-refresh` when ready. This is the entry point for new users. Can be re-run to rebuild from scratch.
-2. **Maintain** — `profile-section` builds or updates individual sections. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms. `profile-refresh` can also be invoked directly by the user at any time.
+2. **Maintain** — `profile-section` builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `highlights`, date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms. `profile-refresh` can also be invoked directly by the user at any time.
 3. **Assemble** — `profile-assemble` stitches existing section files into a single `profile.md` on demand (e.g., before generating a resume or export).
 
 ### Key Files
@@ -50,6 +50,7 @@ The project follows a **separation of schema and workflow**:
 - Templates use a Handlebars-like placeholder syntax (`{{field}}`, `{{#each list}}`, `{{#field}}...{{/field}}`).
 - The `sections` mapping in `profile-template.md` is the single source of truth for which fields belong to which section and where section files are written.
 - Section files must NOT include leading/trailing `---` — horizontal rules are added during assembly.
+- **TBD convention**: Required fields with no extractable data from user input get `TBD` as a placeholder default (e.g., `highlights: ["TBD"]`). Data-layer skills write TBD values as-is. All generate/export skills silently skip any value that is exactly `TBD` during rendering. `profile-validate` warns about TBD values so users know which fields need enrichment.
 
 ## Plugin Structure
 

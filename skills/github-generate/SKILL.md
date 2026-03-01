@@ -51,6 +51,11 @@ This is needed for linking to repositories and for the profile repo name.
 
 ### 4. Generate README Content
 
+**TBD filtering:** Profile data may contain `TBD` as a placeholder value in
+any field (indicating data not yet filled in by the user). When rendering
+output, silently skip any value that is exactly `TBD` — do not render it.
+If all items in a list are `TBD`, omit that list/block entirely.
+
 Consult `${CLAUDE_PLUGIN_ROOT}/skills/github-generate/references/github-readme-conventions.md` for formatting conventions,
 section mapping, and badge syntax.
 

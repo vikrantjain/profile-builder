@@ -45,14 +45,19 @@ in the identity section.
 | `name`            | `experience[].company`       | Employer name                            |
 | `position`        | `experience[].title`         | Job title                                |
 | `location`        | `experience[].location`      | Omit if absent                           |
-| `url`             | `experience[].company_url`   | Omit if absent                           |
+| `url`             | (not in profile schema)      | Omit — no company URL field exists       |
 | `startDate`       | `experience[].start_date`    | ISO 8601: "YYYY-MM" or "YYYY-MM-DD"     |
 | `endDate`         | `experience[].end_date`      | ISO 8601; omit if current role           |
 | `summary`         | `experience[].description`   | Brief role overview (1 sentence)         |
-| `highlights[]`    | `experience[].highlights`    | Array of achievement strings (bullets)   |
+| `highlights[]`    | `experience[].description` (parsed bullets) and/or aggregated from `experience[].projects[].highlights` | Array of achievement strings. Skip any `TBD` values. If all items are `TBD`, omit the array. |
 
-Each highlight should start with an action verb, include metrics where
-possible, and match the tailored content from `resume.md`.
+The profile schema has `highlights` on nested projects (`experience[].projects[].highlights`),
+not on experience entries directly. To populate `work[].highlights[]` in JSON Resume:
+
+1. Parse the role's `description` into bullet points.
+2. Aggregate non-TBD highlights from the role's `projects[].highlights`.
+3. Select the strongest bullets — start with action verbs, include metrics.
+4. Match the tailored content from `resume.md`.
 
 ### education (array) — one entry per degree
 
@@ -61,10 +66,10 @@ possible, and match the tailored content from `resume.md`.
 | `institution`     | `education[].institution`    | School name                             |
 | `studyType`       | `education[].degree`         | e.g., "Bachelor", "Master", "PhD"       |
 | `area`            | `education[].field`          | Field of study                          |
-| `startDate`       | `education[].start_date`     | ISO 8601                                |
-| `endDate`         | `education[].end_date`       | ISO 8601                                |
-| `score`           | `education[].gpa`            | Omit if absent or not relevant          |
-| `courses[]`       | `education[].courses`        | Omit if absent                          |
+| `startDate`       | (not in profile schema)      | Omit — profile only has `graduation_year` |
+| `endDate`         | `education[].graduation_year`| Convert year to ISO 8601: "YYYY"        |
+| `score`           | (not in profile schema)      | Omit                                    |
+| `courses[]`       | (not in profile schema)      | Omit                                    |
 
 ### skills (array) — one entry per category
 
@@ -93,16 +98,24 @@ job description, reorder categories and keywords to front-load JD matches.
 | `language`        | `languages[].language`       | Language name                           |
 | `fluency`         | `languages[].proficiency`    | "Native speaker", "Fluent", "Advanced", "Intermediate", "Elementary" |
 
-### projects (array) — for open source / notable projects
+### projects (array) — for open source and notable experience projects
+
+This array combines two profile sources:
+
+1. **Open source projects** from `open_source.projects[]`
+2. **Notable experience projects** from `experience[].projects[]` (when they
+   are significant enough to highlight independently)
 
 | JSON Resume Field | Profile Source                | Notes                                  |
 |-------------------|------------------------------|----------------------------------------|
-| `name`            | `open_source[].name`         | Project name                           |
-| `description`     | `open_source[].description`  | Brief description                      |
-| `highlights[]`    | `open_source[].highlights`   | Key achievements or contributions      |
-| `url`             | `open_source[].url`          | Repository or project URL              |
-| `startDate`       | `open_source[].start_date`   | ISO 8601; omit if unknown              |
-| `endDate`         | `open_source[].end_date`     | ISO 8601; omit if ongoing              |
+| `name`            | `*.name`                     | Project name                           |
+| `description`     | `*.description`              | Brief description                      |
+| `highlights[]`    | `*.highlights`               | Key achievements. Skip any `TBD` values. If all items are `TBD`, omit the array. |
+| `keywords[]`      | `*.tech_stack`               | Technologies used                      |
+| `url`             | `*.url`                      | Repository or project URL; omit if absent |
+| `startDate`       | `*.duration` (parsed) or `open_source[].start_date` | ISO 8601; omit if unknown |
+| `endDate`         | `*.duration` (parsed) or `open_source[].end_date`   | ISO 8601; omit if ongoing |
+| `roles[]`         | `*.role`                     | e.g., "tech lead", "owner"; omit if absent |
 
 Only include projects that are relevant to the target role (when a JD is
 provided) or that are significant enough for a general resume.
