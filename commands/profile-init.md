@@ -12,10 +12,12 @@ build all profile sections, and generate the profile index.
 
 ### 1. Check for Existing Profile
 
-Check if `profile-index.md` or `sections/` already exist in the workspace.
+Check if `profile-index.json` or `sections/` already exist in the workspace.
 
 - If they exist, warn the user that re-initializing will overwrite existing
   profile data. Ask for confirmation before proceeding.
+- If `sections/` contains `.md` files (legacy format), note that
+  re-initializing will replace them with `.json` files.
 - If they do not exist, proceed.
 
 ### 2. Collect Data Sources
@@ -34,7 +36,7 @@ is built from what is available.
 
 ### 3. Extract Platform Handles
 
-From the provided URLs, extract handles for the Data Sources table:
+From the provided URLs, extract handles for the `sources` array:
 
 - GitHub URL `https://github.com/vikrant` → handle: `vikrant`
 - Hashnode URL `https://vikrant.hashnode.dev` or handle `vikrant` → handle: `vikrant`
@@ -51,18 +53,19 @@ Map each platform to the sections it feeds:
 
 ### 4. Generate Profile Index
 
-Generate `profile-index.md` early so it is available throughout the rest of the
-workflow. Render `${CLAUDE_PLUGIN_ROOT}/profile-index-template.md` with:
+Generate `profile-index.json` early so it is available throughout the rest of
+the workflow. Use the schema defined in
+`${CLAUDE_PLUGIN_ROOT}/profile-index-template.md` to construct the JSON object:
 
-- **Identity/contact header** — name, title, email, links from the data
-  collected so far (may be partial at this stage).
-- **Profile Sections table** — start with an empty table. Each section will be
-  added to this table as it is built in step 6. The `profile-section` workflow
-  updates the index after writing each section file.
-- **Data Sources table** — one row per configured platform with handle and
-  feeds columns, using the handles extracted in step 3.
+- **`identity`** — name, title, email, links from the data collected so far
+  (may be partial at this stage). Optional fields with no data use `null`.
+- **`sections`** — start with an empty array `[]`. Each section will be added
+  as it is built in step 6. The `profile-section` workflow updates the index
+  after writing each section file.
+- **`sources`** — one entry per configured platform with `handle` and `feeds`
+  fields, using the handles extracted in step 3.
 
-Write to `profile-index.md` in the workspace root.
+Write to `profile-index.json` in the workspace root.
 
 ### 5. Read and Parse Data Sources
 
@@ -91,17 +94,19 @@ tailoring; this step must capture everything.
 For each section defined in the `sections` mapping of `${CLAUDE_PLUGIN_ROOT}/profile-template.md`,
 generate the section file using the `profile-section` workflow:
 
-1. Read the field definitions and layout snippet for the section from
-   `${CLAUDE_PLUGIN_ROOT}/profile-template.md`.
+1. Read the field definitions and JSON structure conventions for the section
+   from `${CLAUDE_PLUGIN_ROOT}/profile-template.md`.
 2. Re-read the source file(s) from disk and extract only the data relevant to
    this section. Do not rely on source data remaining in context from step 5 —
    always re-read from disk to avoid context-dependent data loss.
 3. Map input data to all template fields — follow the field mapping rules in
    the `profile-section` skill (Step 4), including duration extraction for
-   projects and populating required `highlights` (default `["TBD"]` if no
-   achievements can be extracted).
-4. Render the section with the mapped data.
-5. Write to the output path (e.g., `sections/experience.md`).
+   projects and populating required `contributions` (default `["TBD"]` if no
+   work items can be extracted). Populate `impact` when quantifiable outcomes
+   exist in the source data.
+4. Build the JSON object with the mapped data — follow the JSON building rules
+   in the `profile-section` skill (Step 5).
+5. Write to the output path (e.g., `sections/experience.json`).
 
 Process sections in this order:
 1. identity
@@ -131,13 +136,13 @@ For each section that has source data, perform the following:
 
 1. Re-read the source file(s) from disk (e.g., the resume file) and identify
    all items relevant to this section.
-2. Read the generated section file from disk.
-3. **Count check** — compare item counts between source and section (e.g.,
-   number of jobs, degrees, certifications, skill categories, patents,
-   languages). A count mismatch is an immediate signal that something was
-   dropped.
+2. Read and parse the generated JSON section file from disk.
+3. **Count check** — compare item counts between source and section JSON
+   arrays (e.g., number of jobs, degrees, certifications, skill categories,
+   patents, languages). A count mismatch is an immediate signal that
+   something was dropped.
 4. **Item-level check** — for each item in the source, verify it appears in
-   the section. Flag any item that is missing or incomplete.
+   the section's JSON data. Flag any item that is missing or incomplete.
 
 Common gaps to watch for:
 
@@ -150,8 +155,8 @@ Common gaps to watch for:
 
 #### 7b. Fix Gaps
 
-For each flagged gap, update the section file to include the missing
-information. Follow the same rendering rules as step 6.
+For each flagged gap, update the section JSON file to include the missing
+information. Follow the same JSON building rules as step 6.
 
 #### 7c. Re-check
 
@@ -167,9 +172,9 @@ Summarize what was created:
 - Number of sections generated.
 - Which data sources were used.
 - Any sections that were skipped due to missing data.
-- Which dynamic sources (blogs, open_source) are configured in the Data
-  Sources table. Inform the user they can run `profile-refresh` to fetch
-  latest data from these platforms when ready.
+- Which dynamic sources (blogs, open_source) are configured in the `sources`
+  array. Inform the user they can run `profile-refresh` to fetch latest data
+  from these platforms when ready.
 
 ### 9. Validate Profile
 

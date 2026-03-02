@@ -28,7 +28,7 @@ Use WebFetch to query the Hashnode public GraphQL API at
 `https://gql.hashnode.com`. No authentication is required for public
 profile data.
 
-Determine the Hashnode username from `sections/identity.md` or ask
+Determine the Hashnode username from `sections/identity.json` or ask
 the user.
 
 Fetch the profile with a query like:
@@ -84,12 +84,14 @@ provide their Hashnode profile URL for a WebFetch-based fallback
 
 ### 2. Read Master Profile
 
-Read the relevant profile sections from `sections/`:
+Read the relevant profile section JSON files from `sections/`. Parse each
+JSON file and access fields directly from the `data` object. If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them.
 
-- `sections/identity.md` — name, links, social profiles
-- `sections/summary.md` — professional summary
-- `sections/skills.md` — tech stack
-- `sections/blogs.md` — published blog posts
+- `sections/identity.json` — name, links, social profiles
+- `sections/summary.json` — professional summary
+- `sections/skills.json` — tech stack
+- `sections/blogs.json` — published blog posts
 
 ### 3. Apply Presentation Preferences
 
@@ -115,7 +117,7 @@ Compare the fetched Hashnode state against the master profile:
 - **About page**: is it comprehensive and up to date? (if fetchable)
 - **Tech stack tags**: do they match the skills in the master profile?
 - **Social links**: are all relevant links present and correct?
-- **Blog posts**: are posts listed in `sections/blogs.md` published on
+- **Blog posts**: are posts listed in `sections/blogs.json` published on
   Hashnode? Are there posts on Hashnode not yet captured in the master
   profile?
 
@@ -153,6 +155,8 @@ conversation.
 
 Before finishing, verify:
 
+- [ ] Master profile sections read from JSON files
+- [ ] TBD values in master profile excluded from gap analysis
 - [ ] All findings reference specific master profile data
 - [ ] Suggestions are actionable and specific
 - [ ] Blog sync differences are listed in both directions

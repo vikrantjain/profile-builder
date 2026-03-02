@@ -106,7 +106,8 @@ fields:
           role:        { required: false, description: "Your role in the project, e.g. tech lead, sole developer" }
           duration:    { required: false, description: "Project timeframe, e.g. 'Dec 2025 – Jan 2026' or '3 months'. Parsed from date ranges in the input." }
           tech_stack:  { required: false, description: "Project-specific technologies (e.g. React, GraphQL, PostgreSQL)", type: list }
-          highlights:  { required: true,  description: "Notable achievements, metrics, or quantifiable impact. Extract from action/achievement bullets, results, outcomes, or metrics in the source data. Use 'TBD' as a single-item list if no achievements can be extracted.", type: list, default: ["TBD"] }
+          contributions: { required: true, description: "What you did — technical work, design decisions, problems solved. Action-oriented bullets describing the work performed. Use 'TBD' as a single-item list if no contributions can be extracted.", type: list, default: ["TBD"] }
+          impact:      { required: false, description: "Quantifiable outcomes — metrics, business results, performance gains, adoption numbers. Numbers-driven bullets. IMPORTANT: Always actively search the source data for measurable outcomes, percentages, scale numbers, time savings, cost reductions, adoption figures, and before/after comparisons. Only omit if genuinely no quantifiable data exists after thorough extraction.", type: list }
           url:         { required: false, description: "Link to project, repo, or demo (if public)" }
 
   # ── Education ───────────────────────────────────────────
@@ -175,7 +176,10 @@ fields:
         role:        { required: true,  description: "owner / maintainer / contributor" }
         status:      { required: false, description: "Project status: active / completed / archived" }
         tech_stack:  { required: false, description: "Primary languages or technologies used", type: list }
-        highlights:  { required: false, description: "Notable achievements e.g. star count, adoption, impact", type: list }
+        contributions: { required: false, description: "What you did — key technical work, features built, problems solved", type: list }
+        impact:      { required: false, description: "Quantifiable outcomes — star count, downloads, adoption numbers, performance gains", type: list }
+    # Note: 'contributions' below is a list of contribution records (objects with project/url/type/description).
+    # This is unrelated to the 'contributions' field inside projects[].item_fields, which is a flat list of strings.
     contributions:
       required: false
       type: list
@@ -203,208 +207,57 @@ fields:
 # independent section files (mode: section) for targeted updates,
 # parallel generation, and smaller-context agents.
 
+json_structure:
+  description: "Each section file is a JSON object with two top-level keys"
+  envelope:
+    section: "The section key name (e.g. 'experience', 'skills')"
+    data: "An object whose keys are the field names defined in the fields block"
+  rules:
+    required_fields_no_data: "Use 'TBD' (string) or ['TBD'] (list). Do not use null for required fields."
+    optional_fields_no_data: "Use null or omit the key entirely. Do not set optional fields to TBD."
+    no_markdown_in_values: "Values are raw data — no **, ##, or - bullet formatting."
+    dates: "Write as user provided (e.g. 'Jan 2021'). No ISO 8601 conversion at the data layer."
+    tbd_rendering: "Generate and assemble skills silently skip values that are exactly 'TBD' or ['TBD'] during rendering. profile-validate warns about TBD values."
+
 sections:
   identity:
-    output: "sections/identity.md"
-    fields: [full_name, title, email, phone, location, avatar_url, github, linkedin, website, twitter]
-    description: "Name, title, contact info, and online presence links"
+    output: "sections/identity.json"
+    fields: [full_name, title, email, phone, location, avatar_url, github, linkedin, website, twitter, years_of_experience]
+    description: "Name, title, contact info, online presence links, and years of experience"
   summary:
-    output: "sections/summary.md"
-    fields: [summary, years_of_experience]
-    description: "Professional bio and years of experience"
+    output: "sections/summary.json"
+    fields: [summary]
+    description: "Professional bio"
   experience:
-    output: "sections/experience.md"
+    output: "sections/experience.json"
     fields: [experience]
     description: "Work history entries with responsibilities, tech stacks, and notable projects"
   skills:
-    output: "sections/skills.md"
+    output: "sections/skills.json"
     fields: [skills]
     description: "Technical and soft skills grouped by category"
   education:
-    output: "sections/education.md"
+    output: "sections/education.json"
     fields: [education]
     description: "Degrees and academic background"
   certifications:
-    output: "sections/certifications.md"
+    output: "sections/certifications.json"
     fields: [certifications]
     description: "Professional certifications and credentials"
   patents:
-    output: "sections/patents.md"
+    output: "sections/patents.json"
     fields: [patents]
     description: "Granted and pending patents"
   blogs:
-    output: "sections/blogs.md"
+    output: "sections/blogs.json"
     fields: [blogs]
     description: "Published blog posts and articles"
   open_source:
-    output: "sections/open-source.md"
+    output: "sections/open-source.json"
     fields: [open_source]
     description: "Open source projects and contributions"
   languages:
-    output: "sections/languages.md"
+    output: "sections/languages.json"
     fields: [languages]
     description: "Spoken and written languages"
-
 ---
-
-# {{full_name}}
-
-**{{title}}**{{#location}} · {{location}}{{/location}}{{#years_of_experience}} · {{years_of_experience}} yrs experience{{/years_of_experience}}
-
-{{email}}{{#phone}} · {{phone}}{{/phone}}{{#github}} · [GitHub]({{github}}){{/github}}{{#linkedin}} · [LinkedIn]({{linkedin}}){{/linkedin}}{{#website}} · [Website]({{website}}){{/website}}{{#twitter}} · [Twitter]({{twitter}}){{/twitter}}
-
----
-
-## Summary
-
-{{summary}}
-
----
-
-## Experience
-
-{{#each experience}}
-### {{title}} — {{company}}{{#location}} · {{location}}{{/location}}
-*{{start_date}} – {{end_date | default "Present"}}*{{#type}} · {{type}}{{/type}}
-
-{{description}}
-
-{{#tech_stack}}**Stack:** {{tech_stack | join ", "}}{{/tech_stack}}
-
-{{#projects}}
-#### Projects
-
-{{#each projects}}
-**{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}**{{#role}} · *{{role}}*{{/role}}{{#duration}} · {{duration}}{{/duration}}
-
-{{description}}
-
-{{#tech_stack}}**Stack:** {{tech_stack | join ", "}}{{/tech_stack}}
-
-{{#highlights}}
-{{#each highlights}}
-- {{.}}
-{{/each}}
-{{/highlights}}
-
-{{/each}}
-{{/projects}}
-
-{{/each}}
-
----
-
-## Skills
-
-{{#each skills.categories}}
-**{{name}}:** {{items | join ", "}}
-
-{{/each}}
-{{#skills.soft}}
-**Soft Skills:** {{skills.soft | join ", "}}
-{{/skills.soft}}
-
----
-
-{{#education}}
-## Education
-
-{{#each education}}
-### {{degree}} in {{field}}
-{{institution}}{{#graduation_year}} · {{graduation_year}}{{/graduation_year}}
-
-{{/each}}
-
----
-
-{{/education}}
-
-{{#certifications}}
-## Certifications
-
-{{#each certifications}}
-- **{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}** — {{issuer}}{{#year}} · {{year}}{{/year}}{{#expiry}} – {{expiry}}{{/expiry}}
-{{/each}}
-
----
-
-{{/certifications}}
-
-{{#patents}}
-## Patents
-
-{{#each patents}}
-### {{#url}}[{{title}}]({{url}}){{/url}}{{^url}}{{title}}{{/url}}
-*{{status | capitalize}}*{{#patent_number}} · {{patent_number}}{{/patent_number}}{{#jurisdiction}} · {{jurisdiction}}{{/jurisdiction}}
-
-{{#abstract}}{{abstract}}{{/abstract}}
-
-{{#filed}}Filed: {{filed}}{{#granted}} · Granted: {{granted}}{{/granted}}{{/filed}}{{^filed}}{{#granted}}Granted: {{granted}}{{/granted}}{{/filed}}
-
-{{#inventors}}**Inventors:** {{inventors | join ", "}}{{/inventors}}
-
-{{/each}}
-
----
-
-{{/patents}}
-
-{{#blogs}}
-## Blog Posts
-
-{{#each blogs}}
-### [{{title}}]({{url}})
-{{#platform}}*{{platform}}*{{/platform}}{{#published_on}} · {{published_on}}{{/published_on}}
-
-{{#excerpt}}{{excerpt}}{{/excerpt}}
-
-{{/each}}
-
----
-
-{{/blogs}}
-
-{{#open_source}}
-## Open Source
-
-{{#open_source.projects}}
-### Projects
-
-{{#each open_source.projects}}
-#### {{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}} · *{{role}}*{{#status}} · `{{status}}`{{/status}}
-
-{{description}}
-
-{{#tech_stack}}**Stack:** {{tech_stack | join ", "}}{{/tech_stack}}
-
-{{#highlights}}
-{{#each highlights}}
-- {{.}}
-{{/each}}
-{{/highlights}}
-
-{{/each}}
-{{/open_source.projects}}
-
-{{#open_source.contributions}}
-### Contributions
-
-{{#each open_source.contributions}}
-- **{{#url}}[{{project}}]({{url}}){{/url}}{{^url}}{{project}}{{/url}}** *({{type}})* — {{description}}
-{{/each}}
-{{/open_source.contributions}}
-
----
-
-{{/open_source}}
-
-{{#languages}}
-## Languages
-
-{{#each languages}}
-- **{{language}}**{{#proficiency}} — {{proficiency}}{{/proficiency}}
-{{/each}}
-
----
-
-{{/languages}}

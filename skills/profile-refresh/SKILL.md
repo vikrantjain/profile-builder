@@ -52,14 +52,14 @@ data fetching uses CLI tools and public APIs only:
 
 ### 1. Read Source Configuration
 
-Read `profile-index.md` and locate the **Data Sources** table. Each row
+Read and parse `profile-index.json`. Locate the `sources` array. Each entry
 contains:
 
-- **platform** — the source type (github, hashnode, devto)
-- **handle** — the user's username on that platform
-- **feeds** — comma-separated list of sections this source feeds
+- **`platform`** — the source type (github, hashnode, devto)
+- **`handle`** — the user's username on that platform
+- **`feeds`** — array of section keys this source feeds
 
-If `profile-index.md` does not exist or has no Data Sources table, inform
+If `profile-index.json` does not exist or has no `sources` array, inform
 the user to generate the profile first or add source configuration to
 their index.
 
@@ -69,7 +69,7 @@ Accept a section name from the user (e.g., `blogs`, `open_source`)
 or `all` to refresh every dynamic section.
 
 If the user says `all`, iterate through each unique section listed in the
-feeds column. Otherwise, filter the sources table to rows whose feeds
+`feeds` arrays. Otherwise, filter the `sources` array to entries whose `feeds`
 include the target section.
 
 ### 3. Fetch Data from Sources
@@ -126,6 +126,11 @@ query {
 }
 ```
 
+If the query returns no publication (null response), the user may have a custom
+domain. Retry with the handle value used as-is in the `host` parameter (e.g.,
+`publication(host: "blog.example.com")`) — the handle field in `sources` may
+contain a full custom domain instead of a bare username.
+
 - Map `publishedAt` to `published_on` (format: Mon YYYY).
 - Map `brief` to `excerpt` (truncate to one sentence if longer).
 - Set `platform` to "Hashnode".
@@ -141,38 +146,56 @@ Use WebFetch.
 
 ### 4. Read Existing Section
 
-Read the current section file from `sections/` (e.g., `sections/blogs.md`).
-If it does not exist, treat this as an initial population.
+Read the current section JSON file from `sections/` (e.g.,
+`sections/blogs.json`). Parse the JSON and extract the data array from the
+`data` object (e.g., `data.blogs` for blogs, `data.open_source.projects` and
+`data.open_source.contributions` for open_source).
+
+If the file does not exist, treat this as an initial population. If it exists
+as a legacy `.md` file, treat the fetched data as the baseline — do not
+attempt to parse old Markdown content.
 
 ### 5. Diff and Merge
 
 Compare fetched data against existing section content:
 
+- All comparisons are done on the parsed JSON arrays.
 - **Match on natural key:** URL for blogs, URL for open_source projects,
   PR URL for contributions.
 - **New entries:** Prepend to the list (most recent first).
 - **Existing entries:** Update factual fields from the source (description,
   star count, language, topics) but preserve any manual enrichments the
-  user has added (hand-written highlights, custom descriptions that
+  user has added (hand-written contributions/impact, custom descriptions that
   differ substantially from the API description).
 - **Entries in profile but not in source:** Keep them. Never auto-remove.
   The user may have intentionally retained historical data.
 
-### 6. Render the Section
+### 6. Build the JSON Object
 
-Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` and extract the Markdown layout snippet for
-the target section. Render the merged data using the same rules as
-`profile-section`:
+Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` and extract the field definitions and
+`json_structure` conventions for the target section. Construct a JSON object
+using the same rules as `profile-section` Step 5:
 
-- Replace all `{{placeholder}}` tokens with real data.
-- Follow repeating block patterns for list fields.
-- Do **not** include `---` at the start or end of the section file.
+```json
+{
+  "section": "<blogs | open_source>",
+  "data": {
+    "<field_name>": "<merged data>"
+  }
+}
+```
+
+- Use field names exactly as defined in `profile-template.md`.
+- List fields → JSON arrays. String fields → JSON strings.
+- No Markdown formatting in values — values are raw data.
+- Optional fields with no data → `null` or omit. Do not set optional fields to `"TBD"`.
 
 ### 7. Write and Update Index
 
-- Write the rendered section to its output path (e.g., `sections/blogs.md`).
-- Update the `last_updated` date for this section in the Profile Sections
-  table of `profile-index.md`.
+- Write the JSON object to its output path (e.g., `sections/blogs.json`).
+- Read and parse `profile-index.json`. Find or add the entry in the `sections`
+  array for this section. Update `last_updated` to the current date in
+  YYYY-MM-DD format and ensure `file` uses the `.json` extension. Write back to `profile-index.json`.
 
 ### 8. Report Changes
 
@@ -196,15 +219,18 @@ Summarize what changed:
 
 Before finishing, verify:
 
-- [ ] No `{{placeholder}}` tokens remain in the output
+- [ ] JSON is valid and well-formed
+- [ ] All required fields present — either with real data or `"TBD"` convention
+- [ ] Optional fields with no data use `null` or are omitted (never `"TBD"`)
+- [ ] No Markdown formatting characters in string values
 - [ ] New entries appear before existing entries (most recent first)
 - [ ] No entries were removed from the existing section
 - [ ] Manual enrichments in existing entries are preserved
-- [ ] Section file written to the correct `sections/` path
-- [ ] `profile-index.md` manifest updated with current date
+- [ ] Section file written to the correct `sections/` path (`.json` extension)
+- [ ] `profile-index.json` sections array updated with current date
 - [ ] Change summary reported to the user
 
 ## Reference Files
 
-- **`profile-index.md`** — Source configuration (Data Sources table) and section manifest
-- **`${CLAUDE_PLUGIN_ROOT}/profile-template.md`** — Field definitions and Markdown layout for rendering
+- **`profile-index.json`** — Source configuration (`sources` array) and section manifest (`sections` array)
+- **`${CLAUDE_PLUGIN_ROOT}/profile-template.md`** — Field definitions, section mapping, and JSON structure conventions

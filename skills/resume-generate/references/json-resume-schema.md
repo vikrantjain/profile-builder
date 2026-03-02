@@ -6,6 +6,11 @@ renderers, or any compatible tool — which handle visual formatting and PDF exp
 
 Schema URL: `https://jsonresume.org/schema`
 
+With JSON section files, all profile fields are accessed directly from the
+parsed JSON `data` object — no Markdown parsing required. For example,
+`sections/experience.json` → `data.experience[]` gives the experience array
+with `title`, `company`, `projects[].contributions`, `projects[].impact`, etc. as structured fields.
+
 ## Schema Structure
 
 ### basics (object)
@@ -49,15 +54,20 @@ in the identity section.
 | `startDate`       | `experience[].start_date`    | ISO 8601: "YYYY-MM" or "YYYY-MM-DD"     |
 | `endDate`         | `experience[].end_date`      | ISO 8601; omit if current role           |
 | `summary`         | `experience[].description`   | Brief role overview (1 sentence)         |
-| `highlights[]`    | `experience[].description` (parsed bullets) and/or aggregated from `experience[].projects[].highlights` | Array of achievement strings. Skip any `TBD` values. If all items are `TBD`, omit the array. |
+| `highlights[]`    | `experience[].description` (parsed bullets) and/or aggregated from `experience[].projects[].contributions` + `experience[].projects[].impact` | Array of achievement strings. Skip any `TBD` values. If all items are `TBD`, omit the array. |
 
-The profile schema has `highlights` on nested projects (`experience[].projects[].highlights`),
+The profile schema has `contributions` and `impact` on nested projects
+(`experience[].projects[].contributions` and `experience[].projects[].impact`),
 not on experience entries directly. To populate `work[].highlights[]` in JSON Resume:
 
 1. Parse the role's `description` into bullet points.
-2. Aggregate non-TBD highlights from the role's `projects[].highlights`.
-3. Select the strongest bullets — start with action verbs, include metrics.
-4. Match the tailored content from `resume.md`.
+2. Aggregate non-TBD `contributions` from the role's projects.
+3. Aggregate `impact` items from the role's projects — these are high-value
+   bullets with quantifiable outcomes and should be prioritized.
+4. Select the strongest bullets — start with action verbs, include metrics.
+   Where possible, combine a contribution with its impact into a single bullet
+   (e.g., "Built X → resulting in Y% improvement").
+5. Match the tailored content from `resume.md`.
 
 ### education (array) — one entry per degree
 
@@ -88,7 +98,7 @@ job description, reorder categories and keywords to front-load JD matches.
 |-------------------|------------------------------|----------------------------------------|
 | `name`            | `certifications[].name`      | Certification name                     |
 | `issuer`          | `certifications[].issuer`    | Issuing organization                   |
-| `date`            | `certifications[].date`      | ISO 8601                               |
+| `date`            | `certifications[].year`      | ISO 8601; convert year to "YYYY"       |
 | `url`             | `certifications[].url`       | Verification URL; omit if absent       |
 
 ### languages (array) — one entry per language
@@ -110,11 +120,11 @@ This array combines two profile sources:
 |-------------------|------------------------------|----------------------------------------|
 | `name`            | `*.name`                     | Project name                           |
 | `description`     | `*.description`              | Brief description                      |
-| `highlights[]`    | `*.highlights`               | Key achievements. Skip any `TBD` values. If all items are `TBD`, omit the array. |
+| `highlights[]`    | `*.contributions` + `*.impact` | Combine contributions and impact into achievement bullets. Skip any `TBD` values. If all items are `TBD`, omit the array. |
 | `keywords[]`      | `*.tech_stack`               | Technologies used                      |
 | `url`             | `*.url`                      | Repository or project URL; omit if absent |
-| `startDate`       | `*.duration` (parsed) or `open_source[].start_date` | ISO 8601; omit if unknown |
-| `endDate`         | `*.duration` (parsed) or `open_source[].end_date`   | ISO 8601; omit if ongoing |
+| `startDate`       | `experience[].projects[].duration` (parsed) | ISO 8601; omit for open source projects or if unknown |
+| `endDate`         | `experience[].projects[].duration` (parsed) | ISO 8601; omit for open source projects or if ongoing |
 | `roles[]`         | `*.role`                     | e.g., "tech lead", "owner"; omit if absent |
 
 Only include projects that are relevant to the target role (when a JD is
@@ -138,6 +148,6 @@ Parse from the profile's natural-language dates (e.g., "Jan 2021" → "2021-01")
 ## Content Consistency
 
 The JSON Resume content must match the tailored content in `resume.md`:
-- Same highlights/bullets, same summary, same skill ordering
+- Same contributions/impact bullets, same summary, same skill ordering
 - The two files represent the same resume in different formats
 - Do not add content to one that is missing from the other

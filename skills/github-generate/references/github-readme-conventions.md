@@ -29,13 +29,13 @@ Markdown.
 
 | Profile Section | GitHub README Element |
 |----------------|---------------------|
-| `sections/identity.md` → full_name, title | Heading + intro line |
-| `sections/summary.md` | Introduction paragraph |
-| `sections/skills.md` → categories | Tech stack badges or list |
-| `sections/open-source.md` → projects | Featured projects section |
-| `sections/open-source.md` → contributions | Contributions section |
-| `sections/blogs.md` | Recent blog posts list |
-| `sections/identity.md` → github, linkedin, website, twitter | Contact/social links |
+| `sections/identity.json` → full_name, title | Heading + intro line |
+| `sections/summary.json` | Introduction paragraph |
+| `sections/skills.json` → categories | Tech stack badges or list |
+| `sections/open-source.json` → projects | Featured projects section |
+| `sections/open-source.json` → contributions | Contributions section |
+| `sections/blogs.json` | Recent blog posts list |
+| `sections/identity.json` → github, linkedin, website, twitter | Contact/social links |
 
 ## Badge Format (shields.io)
 

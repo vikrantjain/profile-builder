@@ -9,7 +9,7 @@ Profile Builder treats your professional profile as a **canonical data layer** �
 ```
 Sources (resume, LinkedIn, GitHub, blog)
         ↓
-   Master Profile (structured Markdown sections)
+   Master Profile (structured JSON sections)
         ↓
    Exports (LinkedIn copy, GitHub README, resume, Hashnode bio)
 ```
@@ -120,11 +120,11 @@ These skills fetch your live profile from a platform, compare it against the mas
 ```
 /profile-init  →  Collect data from sources  →  Build all sections  →  Generate index
                                                       ↓
-                                            sections/*.md files
+                                            sections/*.json files
                                                       ↓
-                              profile-assemble  →  profile.md
+                              profile-assemble  →  profile.md (optional)
                                                       ↓
-                              Generate / Review skills consume profile.md
+                              Generate / Review skills consume sections/*.json directly
 ```
 
 ### File Structure (Generated)
@@ -132,16 +132,16 @@ These skills fetch your live profile from a platform, compare it against the mas
 After initialization, your workspace will contain:
 
 ```
-profile-index.md          ← Hub file: identity, contact info, section manifest
+profile-index.json        ← Hub file: identity, section manifest, data sources
 sections/
-  identity.md
-  summary.md
-  experience.md
-  skills.md
-  education.md
-  certifications.md
-  blogs.md                ← Dynamic (refreshable from Hashnode/Dev.to)
-  open_source.md          ← Dynamic (refreshable from GitHub)
+  identity.json
+  summary.json
+  experience.json
+  skills.json
+  education.json
+  certifications.json
+  blogs.json              ← Dynamic (refreshable from Hashnode/Dev.to)
+  open-source.json        ← Dynamic (refreshable from GitHub)
   ...
 profile.md                ← Assembled full profile (generated on demand)
 preferences.md            ← Presentation preferences (optional, user-managed)
@@ -203,7 +203,8 @@ skills/
   github-review/SKILL.md               ← Review GitHub profile
   hashnode-review/SKILL.md             ← Review Hashnode profile
 profile-template.md                    ← Canonical profile schema
-profile-index-template.md             ← Index/hub file template
+profile-layout.md                     ← Markdown rendering template (used by profile-assemble)
+profile-index-template.md             ← JSON schema for profile-index.json
 CLAUDE.md                              ← Project instructions for Claude Code
 .mcp.json                              ← MCP server config (Playwright)
 ```

@@ -116,5 +116,5 @@ Before finishing, verify:
 - [ ] `preferences.md` exists and has valid structure
 - [ ] `## Global` heading is present
 - [ ] Platform headings use valid names (LinkedIn, Resume, GitHub, Hashnode)
-- [ ] No empty sections (heading with no bullet items) except `## Global`
+- [ ] No empty sections (heading with no bullet items) — `## Global` may be empty only when the file is first created
 - [ ] User confirmed the saved/updated/removed preference

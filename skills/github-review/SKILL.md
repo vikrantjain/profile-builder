@@ -43,13 +43,15 @@ page and extract visible content.
 
 ### 2. Read Master Profile
 
-Read the relevant profile sections from `sections/`:
+Read the relevant profile section JSON files from `sections/`. Parse each
+JSON file and access fields directly from the `data` object. If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them.
 
-- `sections/identity.md` — bio, links
-- `sections/summary.md` — professional summary
-- `sections/skills.md` — tech stack
-- `sections/open-source.md` — projects and contributions
-- `sections/blogs.md` — blog posts
+- `sections/identity.json` — bio, links
+- `sections/summary.json` — professional summary
+- `sections/skills.json` — tech stack
+- `sections/open-source.json` — projects and contributions
+- `sections/blogs.json` — blog posts
 
 ### 3. Apply Presentation Preferences
 
@@ -73,7 +75,7 @@ Compare the fetched GitHub state against the master profile:
 - **Bio**: is the GitHub bio aligned with the profile summary?
 - **Profile README**: does it reflect current skills, projects, and
   contributions from the master profile?
-- **Pinned repos**: are the most notable repos from `sections/open-source.md`
+- **Pinned repos**: are the most notable repos from `sections/open-source.json`
   pinned?
 - **Missing repos**: are repos listed in the profile actually present on
   GitHub?
@@ -109,6 +111,8 @@ in the conversation.
 
 Before finishing, verify:
 
+- [ ] Master profile sections read from JSON files
+- [ ] TBD values in master profile excluded from gap analysis
 - [ ] All findings reference specific master profile data
 - [ ] Suggestions are actionable and specific
 - [ ] Report written to `github-review.md`

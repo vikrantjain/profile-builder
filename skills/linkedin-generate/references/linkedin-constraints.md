@@ -16,6 +16,7 @@
 | Certification Name | 255 | |
 | Project Name | 255 | |
 | Project Description | 2,000 | |
+| Language Name | 100 | One entry per language; proficiency level selectable |
 
 ## Formatting Rules
 
@@ -30,17 +31,17 @@
 
 | Profile Section | LinkedIn Field | Notes |
 |----------------|----------------|-------|
-| `sections/identity.md` → full_name | First Name + Last Name | Usually already set |
-| `sections/identity.md` → title | Headline | Condense to 220 chars |
-| `sections/identity.md` → location | Location | City, Country format |
-| `sections/summary.md` → summary | About | Expand for LinkedIn's 2,600 char limit |
-| `sections/experience.md` → each entry | Experience | One entry per role |
-| `sections/education.md` → each entry | Education | One entry per degree |
-| `sections/skills.md` → categories.items | Skills | Flatten all categories into a single list |
-| `sections/certifications.md` → each entry | Licenses & Certifications | |
-| `sections/open-source.md` → projects | Projects | Map open_source.projects to LinkedIn Projects section |
-| `sections/patents.md` → each entry | Patents | LinkedIn has a dedicated patents section |
-| `sections/languages.md` → each entry | Languages | |
+| `sections/identity.json` → full_name | First Name + Last Name | Usually already set |
+| `sections/identity.json` → title | Headline | Condense to 220 chars |
+| `sections/identity.json` → location | Location | City, Country format |
+| `sections/summary.json` → summary | About | Expand for LinkedIn's 2,600 char limit |
+| `sections/experience.json` → each entry | Experience | One entry per role |
+| `sections/education.json` → each entry | Education | One entry per degree |
+| `sections/skills.json` → categories.items | Skills | Flatten all categories into a single list |
+| `sections/certifications.json` → each entry | Licenses & Certifications | |
+| `sections/open-source.json` → projects | Projects | Map open_source.projects to LinkedIn Projects section |
+| `sections/patents.json` → each entry | Patents | LinkedIn has a dedicated patents section |
+| `sections/languages.json` → each entry | Languages | |
 
 ## Best Practices for LinkedIn Content
 

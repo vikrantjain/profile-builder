@@ -23,34 +23,38 @@ The profile document is a **canonical data layer** that decouples data collectio
 
 ## Project Overview
 
-This is a Claude Code plugin (`profile-builder`) for managing professional profiles. It provides skills for generating, updating, and assembling Markdown profile documents, plus downstream skills for exporting to platforms and reviewing external profiles. There is no build system, test suite, or runtime — the project consists entirely of YAML/Markdown templates, Claude Code skill definitions, and utility scripts.
+This is a Claude Code plugin (`profile-builder`) for managing professional profiles. It provides skills for generating structured JSON profile data, rendering it into Markdown documents, and exporting to platforms, plus skills for reviewing external profiles. There is no build system, test suite, or runtime — the project consists entirely of schema definitions, Markdown layout templates, Claude Code skill definitions, and utility scripts.
 
 ## Architecture
 
 The project follows a **separation of schema and workflow**:
 
-- **Templates** (`profile-template.md`, `profile-index-template.md`) are pure declarative data contracts — field definitions, section mappings, placeholder syntax, and Markdown layouts. They contain no procedural instructions.
+- **Schema** (`profile-template.md`) is the pure declarative data contract — field definitions, section mappings, JSON structure conventions, and placeholder syntax. It contains no procedural instructions and no Markdown layout.
+- **Layout** (`profile-layout.md`) is the Markdown rendering template — used exclusively by `profile-assemble` to render JSON section data into the assembled `profile.md`. Contains `{{placeholder}}` syntax but no field definitions.
+- **Index schema** (`profile-index-template.md`) defines the JSON structure for `profile-index.json`.
 - **Skills** (`skills/*/SKILL.md`) contain the workflow logic — how to gather data, render templates, write output files, and coordinate between modes.
 
 ### Profile Lifecycle
 
-1. **Init** — `/profile-init` command collects data from user sources (resume, GitHub, LinkedIn, blog platforms), generates `profile-index.md` early (with data sources and an empty sections table that is populated incrementally), builds all section files, verifies source coverage (cross-references generated sections against original sources to catch missing information), and validates the output against the template schema. Dynamic section refresh is not automatic — init configures the data sources and informs the user to run `profile-refresh` when ready. This is the entry point for new users. Can be re-run to rebuild from scratch.
-2. **Maintain** — `profile-section` builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `highlights`, date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms. `profile-refresh` can also be invoked directly by the user at any time.
-3. **Assemble** — `profile-assemble` stitches existing section files into a single `profile.md` on demand (e.g., before generating a resume or export).
+1. **Init** — `/profile-init` command collects data from user sources (resume, GitHub, LinkedIn, blog platforms), generates `profile-index.json` early (with data sources and an empty sections array that is populated incrementally), builds all section files, verifies source coverage (cross-references generated sections against original sources to catch missing information), and validates the output against the template schema. Dynamic section refresh is not automatic — init configures the data sources and informs the user to run `profile-refresh` when ready. This is the entry point for new users. Can be re-run to rebuild from scratch.
+2. **Maintain** — `profile-section` builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `contributions` (work done) and `impact` (quantifiable outcomes), date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms (if source configuration exists in `profile-index.json`). `profile-refresh` can also be invoked directly by the user at any time.
+3. **Assemble** — `profile-assemble` reads JSON section files, renders them through the `profile-layout.md` template, and produces a single `profile.md` on demand (e.g., before generating a resume or export).
 
 ### Key Files
 
-- `profile-template.md` — The canonical schema. Contains `fields` (field definitions with types/hints), `sections` (maps each section to an output file and its dependent fields), `placeholder_syntax` (templating reference), and the full Markdown layout below the frontmatter.
-- `profile-index-template.md` — Template for the hub file that lists identity/contact info and a manifest table of generated section files.
+- `profile-template.md` — The canonical field schema. Contains `fields` (field definitions with types/hints), `sections` (maps each section to a `.json` output file and its dependent fields), `json_structure` (envelope format and data rules), and `placeholder_syntax` (templating reference). No Markdown layout.
+- `profile-layout.md` — The Markdown rendering template. Contains the full `{{placeholder}}` layout for all sections. Used exclusively by `profile-assemble` to render JSON section data into `profile.md`.
+- `profile-index-template.md` — JSON schema definition for `profile-index.json` (the manifest and configuration hub).
 - `preferences.md` — User presentation preferences. Controls tone, emphasis, and framing in exports and reviews. Not used by data-layer skills. Created at runtime by the `profile-preferences` skill.
-- Generated output (not checked in): `profile.md`, `profile-index.md`, `sections/*.md`.
+- Generated output (not checked in): `profile.md`, `profile-index.json`, `sections/*.json`.
 
-### Template Conventions
+### Data Format
 
-- Templates use a Handlebars-like placeholder syntax (`{{field}}`, `{{#each list}}`, `{{#field}}...{{/field}}`).
-- The `sections` mapping in `profile-template.md` is the single source of truth for which fields belong to which section and where section files are written.
-- Section files must NOT include leading/trailing `---` — horizontal rules are added during assembly.
-- **TBD convention**: Required fields with no extractable data from user input get `TBD` as a placeholder default (e.g., `highlights: ["TBD"]`). Data-layer skills write TBD values as-is. All generate/export skills silently skip any value that is exactly `TBD` during rendering. `profile-validate` warns about TBD values so users know which fields need enrichment.
+- Section files are **structured JSON**, not rendered Markdown. Each section file uses a `{ "section": "<key>", "data": { ... } }` envelope. Field names match the schema in `profile-template.md` exactly.
+- The `sections` mapping in `profile-template.md` is the single source of truth for which fields belong to which section and where section files are written (`.json` paths).
+- The Markdown rendering layout lives in `profile-layout.md` and is used only by `profile-assemble`. It uses Handlebars-like placeholder syntax (`{{field}}`, `{{#each list}}`, `{{#field}}...{{/field}}`).
+- JSON values are raw data — no Markdown formatting characters (`**`, `##`, `- ` bullets) in string values.
+- **TBD convention**: Required fields with no extractable data use `"TBD"` (string) or `["TBD"]` (list) in JSON. Optional fields with no data use `null` or are omitted — never set to TBD. Data-layer skills write TBD values as-is. All generate/export skills silently skip any value that is exactly `"TBD"` during rendering. `profile-validate` warns about TBD values so users know which fields need enrichment.
 
 ## Plugin Structure
 
@@ -58,12 +62,15 @@ This is a Claude Code plugin with auto-discovered skills:
 
 ```
 .claude-plugin/plugin.json         — Plugin manifest
+profile-template.md                — Canonical field schema (fields, sections, json_structure)
+profile-layout.md                  — Markdown rendering template (used by profile-assemble)
+profile-index-template.md          — JSON schema for profile-index.json
 commands/profile-init.md           — /profile-init command (interactive onboarding)
 commands/profile-validate.md       — /profile-validate command (validate & fix profile docs)
 skills/profile-preferences/        — Add/update/remove presentation preferences
 skills/profile-section/            — Generate/update a single section
 skills/profile-refresh/            — Fetch latest data from external platforms for dynamic sections
-skills/profile-assemble/           — Stitch sections into complete profile
+skills/profile-assemble/           — Render JSON sections through layout into complete profile
 skills/linkedin-generate/          — Generate copy-paste-ready LinkedIn content
 skills/resume-generate/            — Generate tailored, ATS-optimized resume (Markdown + JSON Resume)
 skills/github-generate/            — Generate GitHub profile README
@@ -80,7 +87,7 @@ Skills use YAML frontmatter with `name` and `description` (third-person, with tr
 ### Commands
 
 - `/profile-init` — Interactive onboarding. Collects data sources, builds all sections, configures data sources, generates index. Entry point for new users.
-- `/profile-validate` — Validate profile documents against the template schema. Checks for missing fields, unfilled placeholders, structural issues. Offers interactive fixes with user approval.
+- `/profile-validate` — Validate profile documents against the template schema. Checks JSON validity, required fields, type correctness, TBD values, and legacy `.md` files. Offers interactive fixes with user approval.
 
 ### Skill Categories
 
@@ -108,7 +115,7 @@ Some profile sections track data that lives on external platforms and changes ov
 - **blogs** — sourced from Hashnode, Dev.to
 - **open_source** — sourced from GitHub (projects + contributions)
 
-These are called **dynamic sections**. Their source configuration (platform + handle) is stored in the **Data Sources** table of the user's `profile-index.md`, not in the plugin templates.
+These are called **dynamic sections**. Their source configuration (platform + handle) is stored in the `sources` array of the user's `profile-index.json`, not in the plugin templates.
 
 `profile-refresh` fetches latest data from configured sources and updates the corresponding section files. It can be invoked directly by the user or called internally by `profile-section` when building a dynamic section. It is never called by `profile-assemble` or any export/review skill — those consume section files as-is.
 
@@ -134,6 +141,7 @@ Manage preferences via:
 
 ### Output Paths
 
+- `profile.md` — Assembled full profile document (Markdown, generated on demand by `profile-assemble`)
 - `linkedin/` — LinkedIn export files (one per section: headline.md, about.md, experience.md, skills.md, etc.)
 - `resume.md` — Generated resume (Markdown, content-only)
 - `resume.json` — Generated resume (JSON Resume schema, for import into Reactive Resume and compatible tools)

@@ -22,13 +22,17 @@ profile against the master data, use the `github-review` skill instead.
 
 ### 1. Read Profile Data
 
-Read the relevant profile sections from `sections/`. Key sections:
+Read the relevant profile section JSON files from `sections/`. Parse each
+JSON file and access fields directly from the `data` object. Key sections:
 
-- `sections/identity.md` — name, title, GitHub URL, social links
-- `sections/summary.md` — professional bio (adapt for GitHub tone)
-- `sections/skills.md` — tech stack for badges
-- `sections/open-source.md` — projects and contributions to highlight
-- `sections/blogs.md` — recent blog posts (if available)
+- `sections/identity.json` — name, title, GitHub URL, social links
+- `sections/summary.json` — professional bio (adapt for GitHub tone)
+- `sections/skills.json` — tech stack for badges
+- `sections/open-source.json` — projects and contributions to highlight
+- `sections/blogs.json` — recent blog posts (if available)
+
+If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them.
 
 ### 2. Apply Presentation Preferences
 
@@ -66,7 +70,10 @@ Build the README with these sections (skip any that lack data):
    summary, appropriate for GitHub's developer audience
 3. **Tech Stack**: Skills rendered as shields.io badges grouped by category
 4. **Featured Projects**: Top 3-5 repositories with name, description, and
-   link. Source from `sections/open-source.md` projects
+   link. Source from `sections/open-source.json` projects. For each featured
+   project, surface one or two notable `contributions` bullets describing key
+   work, and any `impact` metrics (star count, downloads, adoption) as
+   supporting details below the project link
 5. **Contributions**: Notable open source contributions (if available)
 6. **Recent Blog Posts**: Links to recent posts (if available)
 7. **Connect**: Social links (LinkedIn, website, Twitter) as badges or links

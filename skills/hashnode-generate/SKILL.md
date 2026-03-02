@@ -33,13 +33,17 @@ Ask or infer what the user needs:
 
 ### 2. Read Profile Sections
 
-Read the relevant profile section files from `sections/`. Consult
-`profile-index.md` to discover available sections. If section files do not
-exist, read `profile.md` instead. Key sections:
+Read the relevant profile section JSON files from `sections/`. Consult
+`profile-index.json` to discover available sections and their file paths.
+Parse each JSON file and access fields directly from the `data` object.
+If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them.
+Key sections:
 
-- `sections/identity.md` — name, links, social profiles
-- `sections/summary.md` — professional bio (adapt for Hashnode tone)
-- `sections/skills.md` — tech stack for Hashnode tags
+- `sections/identity.json` — name, links, social profiles
+- `sections/summary.json` — professional bio (adapt for Hashnode tone)
+- `sections/skills.json` — tech stack for Hashnode tags
+- `sections/blogs.json` — recent blog posts (link in about page if available)
 
 ### 3. Apply Presentation Preferences
 
@@ -80,7 +84,9 @@ For each target Hashnode field:
   summary into a brief overview.
 - **About page**: full Markdown page. Expand the professional summary
   with skills, notable achievements, and links. Hashnode renders full
-  Markdown here, so use headings, lists, bold, and links freely.
+  Markdown here, so use headings, lists, bold, and links freely. If
+  `sections/blogs.json` has entries, include a "Recent Posts" section
+  with links to the most recent articles.
 - **Tech stack**: map skills from the profile to Hashnode's tag format.
 - **Social links**: extract GitHub, LinkedIn, Twitter/X, website URLs
   from identity data.

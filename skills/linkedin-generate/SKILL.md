@@ -33,9 +33,16 @@ Ask or infer what the user needs:
 
 ### 2. Read Profile Sections
 
-Read the relevant profile section files from `sections/`. Consult
-`profile-index.md` to discover available sections. If section files do not
-exist, read `profile.md` instead.
+Read the relevant profile section JSON files from `sections/`. Consult
+`profile-index.json` to discover available sections and their file paths.
+Parse each JSON file and access fields directly from the `data` object.
+For example: `data.full_name` from `sections/identity.json`,
+`data.experience` array from `sections/experience.json`.
+
+If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them.
+
+**TBD filtering applies during transformation (step 5), not here.**
 
 ### 3. Apply Presentation Preferences
 
@@ -74,6 +81,12 @@ For each target LinkedIn field:
 - Trim or rewrite content to fit within character limits.
 - Adapt tone: LinkedIn About section should be first-person, conversational.
 - Include character count after each field so the user knows remaining budget.
+- **Flatten project data into experience descriptions**: LinkedIn has no nested
+  project structure. For experience entries with `projects[]`, incorporate each
+  project's `contributions` and `impact` bullets into the job description text.
+  Lead with impact items (quantifiable outcomes) as they are highest value for
+  LinkedIn. Combine contribution + impact into concise bullets where possible
+  (e.g., "Built X, resulting in Y% improvement").
 
 ### 6. Verify Preferences Compliance
 
@@ -96,6 +109,7 @@ For a full export, generate these files:
 - `linkedin/certifications.md` — Certifications (if data exists)
 - `linkedin/open-source.md` — Open source projects (if data exists)
 - `linkedin/patents.md` — Patents (if data exists)
+- `linkedin/languages.md` — Languages (if data exists)
 
 For a single section or field, write only the relevant file.
 

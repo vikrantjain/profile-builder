@@ -1,5 +1,5 @@
 # Generated profile documents
-profile-index.md
+profile-index.json
 profile.md
 sections/
 
@@ -9,6 +9,7 @@ hashnode/
 resume.md
 resume.json
 github-readme.md
+preferences.md
 
 # Review reports
 linkedin-review.md

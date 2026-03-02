@@ -38,14 +38,15 @@ Determine what the user needs:
 
 ### 2. Read Profile Data
 
-Read the relevant profile sections from `sections/`. If section files do not
-exist, read `profile.md` instead. At minimum, read:
+Read the relevant profile section JSON files from `sections/`. Parse each
+JSON file and access fields directly from the `data` object. If required section JSON files do not exist, inform the user and suggest
+running `/profile-init` or `profile-section` to generate them. At minimum, read:
 
-- `sections/identity.md` — name, contact info
-- `sections/summary.md` — professional bio
-- `sections/experience.md` — work history
-- `sections/skills.md` — technical and soft skills
-- `sections/education.md` — degrees
+- `sections/identity.json` — name, contact info
+- `sections/summary.json` — professional bio
+- `sections/experience.json` — work history
+- `sections/skills.json` — technical and soft skills
+- `sections/education.json` — degrees
 
 Optionally read certifications, open source, patents based on relevance.
 
@@ -132,12 +133,12 @@ field mapping from profile data to JSON Resume fields.
 Map the tailored content to JSON Resume sections:
 
 - **basics**: name, label (title), email, phone, url, location, profiles
-- **work**: one entry per role with name, position, startDate, endDate, summary, highlights
+- **work**: one entry per role with name, position, startDate, endDate, summary, highlights (from contributions + impact)
 - **education**: institution, studyType, area, startDate, endDate, score
 - **skills**: one entry per category with name, level, keywords
 - **certificates**: name, issuer, date, url
 - **languages**: language, fluency
-- **projects**: name, description, highlights, startDate, endDate, url
+- **projects**: name, description, highlights (from contributions + impact), startDate, endDate, url
 
 Omit empty sections entirely (do not include sections with empty arrays).
 

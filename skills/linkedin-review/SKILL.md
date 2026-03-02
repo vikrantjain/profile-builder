@@ -55,7 +55,7 @@ content via copy-paste and skip to Phase 2.
 
 #### 1.1 Navigate to Profile
 
-Navigate to the user's LinkedIn profile URL (from `sections/identity.md`
+Navigate to the user's LinkedIn profile URL (from `sections/identity.json`
 or as provided by the user). Take a page snapshot to confirm the profile
 loaded and to identify which sections are present.
 
@@ -125,9 +125,12 @@ Read each section file saved in `.profile/tmp/{YYYY-MM-DD}/playwright/`.
 
 #### 2.2 Read Master Profile
 
-Read the relevant profile sections from `sections/` to use as background
-context — the master profile tells you what the user has done, achieved,
-and is capable of, which informs how well their LinkedIn represents them.
+Read the relevant profile section JSON files from `sections/`. Parse each
+JSON file and access fields directly from the `data` object. The master
+profile tells you what the user has done, achieved, and is capable of,
+which informs how well their LinkedIn represents them. If required
+section JSON files do not exist, inform the user and suggest running
+`/profile-init` or `profile-section` to generate them.
 
 #### 2.3 Apply Presentation Preferences
 
@@ -255,7 +258,9 @@ comparison. Flag only items that would meaningfully improve profile impact:
 - Significant inconsistencies (different job titles, conflicting dates)
 
 Do not flag minor wording differences or data that the user may have
-intentionally omitted from LinkedIn.
+intentionally omitted from LinkedIn. Exclude any master profile value that
+is exactly `"TBD"` or `["TBD"]` from gap analysis — these are unfilled
+placeholders, not real content.
 
 Sections that exist only on LinkedIn (Recommendations, Volunteer Experience,
 Honors & Awards, Publications) have no master profile counterpart — they get
@@ -310,6 +315,7 @@ Before finishing, verify:
 - [ ] All expandable sections were expanded before scraping (no truncated content)
 - [ ] Each scraped section saved to its own file in `.profile/tmp/{YYYY-MM-DD}/playwright/`
 - [ ] Browser closed after scraping — analysis used only local files
+- [ ] TBD values in master profile excluded from gap analysis
 - [ ] Quality review is the primary focus — every section assessed for impact
 - [ ] Concrete rewrite suggestions are provided (not just "improve X")
 - [ ] Before/after examples included for headline, about, and at least

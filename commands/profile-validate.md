@@ -5,40 +5,47 @@ description: "Validate profile documents against the template schema and interac
 
 # Profile Validate
 
-Check all profile documents (`profile-index.md`, section files, and `profile.md`
-if assembled) against the canonical template schema for completeness, structural
-correctness, and unfilled placeholders. Present findings and offer interactive
-fixes with user approval.
+Check all profile documents (`profile-index.json`, section JSON files, and
+`profile.md` if assembled) against the canonical template schema for
+completeness, structural correctness, and data integrity. Present findings
+and offer interactive fixes with user approval.
 
 ## Workflow
 
 ### 1. Pre-flight Check
 
-Verify `profile-index.md` exists in the workspace root.
+Verify `profile-index.json` exists in the workspace root.
 
 - If it does not exist, inform the user and suggest running `/profile-init`
   first. Stop here.
 - If it exists, proceed.
 
 Load the canonical schema from `${CLAUDE_PLUGIN_ROOT}/profile-template.md` —
-specifically the `fields`, `sections`, and `placeholder_syntax` blocks from the
-frontmatter plus the Markdown layout below it.
+specifically the `fields`, `sections`, and `json_structure` blocks from the
+frontmatter.
 
-Load `${CLAUDE_PLUGIN_ROOT}/profile-index-template.md` for index structure
+Load `${CLAUDE_PLUGIN_ROOT}/profile-index-template.md` for index JSON schema
 reference.
+
+Check if `sections/` contains any `.md` files (legacy format). If found,
+report them as warnings: "These sections are in the old Markdown format.
+Run `profile-section` to regenerate them in JSON format, or run
+`/profile-init` to rebuild all sections."
 
 ### 2. Validate Profile Index
 
-Read `profile-index.md` and check:
+Read and parse `profile-index.json`. Verify it is valid JSON, then check:
 
-- **Identity header** — `full_name`, `title`, and `email` are present and
-  non-empty in the header block.
-- **Profile Sections table** — table exists with `Section`, `File`, and
-  `Last Updated` columns. Each row has all three columns filled.
-- **Date validity** — `Last Updated` values are valid date strings
+- **`identity` object** — `full_name`, `title`, and `email` are present and
+  non-empty strings.
+- **`sections` array** — each entry has `name` (string), `key` (string),
+  `file` (string), and `last_updated` (string) fields, all non-empty.
+- **File paths** — `file` values end in `.json`. Flag any `.md` paths
+  as legacy format warnings.
+- **Date validity** — `last_updated` values are valid date strings
   (YYYY-MM-DD format).
-- **Data Sources table** (if present) — has `Platform`, `Handle`, and
-  `Feeds Sections` columns with valid entries.
+- **`sources` array** (if present) — each entry has `platform` (string),
+  `handle` (string), and `feeds` (array of strings) fields with valid values.
 
 ### 3. Validate Preferences File
 
@@ -53,28 +60,45 @@ If `preferences.md` does not exist, skip this step (preferences are optional).
 
 ### 4. Validate Section Files
 
-For each section file listed in the Profile Sections table:
+For each section entry in the `sections` array:
 
-- **Existence** — file exists on disk at the referenced path.
-- **No unfilled placeholders** — no `{{...}}` tokens remain in the file
-  content.
-- **No boundary horizontal rules** — file does not start or end with `---`.
-- **Required fields present** — for sections with required fields per the
-  `fields` schema in `profile-template.md`, verify the content includes those
-  fields rendered and non-empty. Specifically:
-  - `identity` — must contain full_name, title, email
-  - `summary` — must contain a non-trivial summary paragraph
-  - `experience` — each entry must have title, company, start_date, description; nested projects (if present) must each have name, description, and highlights (at minimum `["TBD"]`)
-  - `skills` — must have at least one category with items
-- **Heading hierarchy** — headings match the expected level from the template
-  layout (e.g., experience entries use `###`, section titles use `##`).
+- **Existence** — file exists on disk at the referenced path (should be
+  `.json`).
+- **JSON validity** — file parses as valid JSON (no syntax errors, no
+  trailing commas).
+- **Envelope structure** — top-level object has `"section"` and `"data"`
+  keys.
+- **Section key match** — the `"section"` value matches the expected section
+  name from the matching `sections` array entry (e.g., `"experience"` for the
+  experience section file).
+- **Required fields present** — for each required field in the section's
+  field schema (from `profile-template.md`), verify the field exists in the
+  `"data"` object and is not `null`. Fields with `"TBD"` values count as
+  present but are flagged as warnings.
+- **Type correctness** — verify list fields (`type: list`) are JSON arrays,
+  object fields are JSON objects, string fields are strings.
+- **Section-specific checks:**
+  - `identity` — `data.full_name`, `data.title`, `data.email` are non-null
+    strings
+  - `summary` — `data.summary` is a non-empty string
+  - `experience` — `data.experience` is a non-empty array; each entry has
+    `title`, `company`, `start_date`, `description`; each project (if
+    present) has `name`, `description`, and `contributions` (at minimum
+    `["TBD"]`); `impact` is optional
+  - `skills` — `data.skills.categories` is a non-empty array with at least
+    one item having `name` and `items` fields
+- **No Markdown in values** — scan string values for Markdown formatting
+  characters (`**`, `##`, `- ` at start of string). Flag as warnings.
+- **TBD scan** — scan all string values and array contents for the exact
+  string `"TBD"`. Collect and report as warnings.
 
 Additionally check:
 
 - **Required sections exist** — `identity`, `summary`, `experience`, and
   `skills` must have corresponding section files on disk.
-- **Orphan detection** — scan `sections/` directory for `.md` files not listed
-  in the index manifest. These are orphan files.
+- **Orphan detection** — scan `sections/` directory for `.json` files not
+  listed in the index `sections` array. These are orphan files. Also scan for
+  `.md` files — report separately as legacy format files.
 
 ### 5. Validate Assembled Profile
 
@@ -85,7 +109,6 @@ If `profile.md` exists in the workspace root:
   heading or end of file with no content in between.
 - **Section order** — sections appear in the canonical order defined in the
   `sections` mapping of `profile-template.md`.
-- **No boundary horizontal rules** — file does not start or end with `---`.
 
 If `profile.md` does not exist, skip this step (it is generated on demand by
 `profile-assemble`).
@@ -94,13 +117,13 @@ If `profile.md` does not exist, skip this step (it is generated on demand by
 
 Group all issues into two categories:
 
-- **Errors** — missing required section files, missing required fields,
-  unfilled placeholders, structural violations (boundary `---`, broken heading
-  hierarchy).
-- **Warnings** — orphan section files, stale `Last Updated` dates (older than
-  90 days), missing optional sections, `profile.md` out of sync or absent,
-  `TBD` placeholder values found in section files (signals incomplete data
-  that will be silently skipped by export skills).
+- **Errors** — missing required section files, invalid JSON, missing
+  envelope keys, missing required fields, type mismatches.
+- **Warnings** — orphan files, legacy `.md` files, stale `last_updated`
+  dates (older than 90 days), missing optional sections, `profile.md` out
+  of sync or absent, `TBD` placeholder values (signals incomplete data
+  that will be silently skipped by export skills), Markdown formatting
+  in JSON string values.
 
 Present a summary first:
 
@@ -137,17 +160,16 @@ For each **fixable** issue, in order of severity (errors first):
 3. Apply the fix and confirm.
 
 Examples of fixable issues:
-- Remove leading/trailing `---` from section files.
 - Remove orphan files from `sections/`.
-- Add missing section rows to the index manifest table.
-- Update stale `Last Updated` dates after confirming content is current.
+- Add missing section entries to the index `sections` array.
+- Update stale `last_updated` dates after confirming content is current.
+- Update section `file` paths from `.md` to `.json` (if files were migrated).
 
 For **non-fixable** issues (missing data that requires user input), provide
 actionable guidance:
 - Missing required section → "Run `profile-section` for `<section>` to
   generate it."
-- Unfilled placeholders → "Run `profile-section` for `<section>` to
-  regenerate, or edit the file manually."
+- Invalid JSON → "Run `profile-section` for `<section>` to regenerate."
 - Missing required fields within a section → "Run `profile-section` for
   `<section>` with the missing data."
 

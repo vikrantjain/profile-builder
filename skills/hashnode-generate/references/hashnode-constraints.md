@@ -6,12 +6,12 @@ Field limits and formatting rules for Hashnode profile sections.
 
 | Hashnode Field | Character Limit | Markdown | Master Profile Source |
 |----------------|----------------|----------|----------------------|
-| Name           | 50             | No       | `full_name` from `sections/identity.md` |
-| Tagline        | 150            | No       | Derived from `title` or first line of `sections/summary.md` |
-| Bio            | 200            | No       | Condensed from `sections/summary.md` |
-| About (page)   | No hard limit  | Yes (full Markdown) | Expanded from `sections/summary.md`, `sections/skills.md` |
-| Location       | 50             | No       | `location` from `sections/identity.md` |
-| Tech Stack     | Tags (multi-select) | No  | Mapped from `sections/skills.md` categories |
+| Name           | 50             | No       | `full_name` from `sections/identity.json` |
+| Tagline        | 150            | No       | Derived from `title` or first line of `sections/summary.json` |
+| Bio            | 200            | No       | Condensed from `sections/summary.json` |
+| About (page)   | No hard limit  | Yes (full Markdown) | Expanded from `sections/summary.json`, `sections/skills.json` |
+| Location       | 50             | No       | `location` from `sections/identity.json` |
+| Tech Stack     | Tags (multi-select) | No  | Mapped from `sections/skills.json` categories |
 
 ## Social Links
 
@@ -25,7 +25,7 @@ Hashnode supports these social link fields in profile settings:
 - Facebook URL
 - YouTube URL
 
-All are optional. Extract matching URLs from the `sections/identity.md`
+All are optional. Extract matching URLs from the `sections/identity.json`
 contact and social fields.
 
 ## Formatting Rules
