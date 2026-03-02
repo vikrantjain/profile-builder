@@ -78,20 +78,66 @@ For each target LinkedIn field:
 
 - Convert Markdown formatting to plain text (remove `**`, `#`, `-` bullets).
 - Replace Markdown bullet points with `•` characters.
-- Trim or rewrite content to fit within character limits.
-- Adapt tone: LinkedIn About section should be first-person, conversational.
 - Include character count after each field so the user knows remaining budget.
-- **Flatten project data into experience descriptions**: LinkedIn has no nested
-  project structure. For experience entries with `projects[]`, incorporate each
-  project's `contributions` and `impact` bullets into the job description text.
-  Lead with impact items (quantifiable outcomes) as they are highest value for
-  LinkedIn. Combine contribution + impact into concise bullets where possible
-  (e.g., "Built X, resulting in Y% improvement").
+- **Headline: construct, don't trim**: Do not take the profile's `title` field
+  and shorten it to 220 chars. Construct the headline from `title`, `summary`,
+  and the most distinctive aspects of the user's experience. Apply the Headline
+  Strategy from the linkedin-constraints reference: choose a formula pattern,
+  include 3–5 searchable keywords, lead with role or differentiator in the
+  first ~60 chars. Aim for 160–210 chars.
+- **About: write a narrative, not a summary restatement**: Do not restate
+  `summary.json` in prose. Apply the About Strategy from the linkedin-constraints
+  reference: hook (first 2–3 lines must stand alone before "see more"), body
+  drawing from experience highlights and domain context, optional distinctive
+  positioning, and a concrete call to action. Pull achievement highlights from
+  `experience.json`, not just `summary.json`. Use the full 2,600-char budget
+  — a thin About is a missed opportunity.
+- **Experience: flatten, then order, then cap**: For each experience entry:
+  1. **Flatten** — LinkedIn has no nested project structure. Incorporate each
+     project's `contributions` and `impact` bullets from `projects[]` into the
+     job description as flat bullets. Combine contribution + impact into a single
+     concise bullet where it reads naturally (e.g., "Designed X, targeting Y%
+     improvement").
+  2. **Order** — Sort the resulting bullets by impact, most impressive first.
+     Do not preserve the source order. `impact` bullets (quantifiable outcomes)
+     generally rank higher than `contributions` bullets.
+  3. **Cap** — Limit to 3–5 bullets per role. If many projects contributed bullets,
+     keep the 3–5 that best represent the user's contribution. More bullets dilute
+     rather than reinforce impact.
+- **Preserve source qualifiers**: If an impact value is qualified in the source
+  (e.g., "projected", "expected", "targeted", "estimated", "almost"), retain
+  that qualifier in the output. Do not present projections as delivered results.
+- **Match verb to contribution scope**: Use the verb that reflects what the
+  person actually did — "designed", "co-developed", "led architecture for" — not
+  an inflated verb that implies sole ownership or completed delivery (e.g., avoid
+  "secured", "delivered", "built" when the source says "designed" or "helped develop").
+- **Skills: curate for impact, not completeness**: Do not flatten all skills
+  from the profile into the output unchanged. Instead:
+  1. Identify the user's professional identity from their title, summary, and
+     most recent/senior experience. Use this to anchor slot 1–5 choices.
+  2. Apply the Skills Strategy from the linkedin-constraints reference: order by
+     role-defining → core domain → adjacent → soft/leadership. Drop skills that
+     are obscure, redundant, or unlikely to be searched by recruiters.
+  3. Normalize each skill name to the canonical LinkedIn/industry term
+     (e.g., "Machine Learning" not "ML", "Node.js" not "NodeJS").
+  4. Deduplicate across profile categories before ordering.
+  5. Cap at 50. Prefer a tight, high-signal list over an exhaustive one.
+  6. Briefly note the curation rationale (e.g., "Prioritized X, Y, Z as
+     role-defining; dropped [obscure tool] as low recruiter search value") so
+     the user understands the choices and can override if needed.
 
-### 6. Verify Preferences Compliance
+### 6. Verify Before Writing
 
-Before writing output, re-read the applicable preferences and verify each one
-is reflected in the generated content. If any preference was missed or
+Before writing output, run two checks and revise content if either fails:
+
+**Content fidelity** — For every quantified claim that was qualified in the
+source (projected, expected, targeted, estimated, almost), confirm the qualifier
+is preserved in the output. For every action verb, confirm it matches the actual
+contribution scope in the source — not inflated. Revise any bullet that fails
+this check.
+
+**Preferences compliance** — Re-read the applicable preferences and verify each
+one is reflected in the generated content. If any preference was missed or
 contradicted, revise the content before proceeding.
 
 ### 7. Write Output
@@ -136,6 +182,11 @@ Before finishing, verify:
 - [ ] Content written to `linkedin/`
 - [ ] Content displayed in conversation for easy copy-paste
 - [ ] Output honors all applicable presentation preferences (global + LinkedIn-specific)
+- [ ] Source qualifiers preserved where present (projected/expected/targeted/estimated/almost)
+- [ ] Action verbs match actual contribution scope — no inflation beyond what the source data supports
+- [ ] Headline was constructed from title + summary + experience (not just trimmed from the title field)
+- [ ] About opens with a distinctive hook — not "I am a [title] with X years of experience"
+- [ ] Skills list was curated and ordered by impact (not an exhaustive category flatten)
 
 ## Reference Files
 
