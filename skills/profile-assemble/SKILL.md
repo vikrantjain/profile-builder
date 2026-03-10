@@ -1,12 +1,18 @@
 ---
 name: profile-assemble
 description: >
-  This skill should be used when the user asks to "assemble my profile",
-  "stitch sections together", "build full profile from sections",
-  "combine profile sections", "create profile from section files",
-  "merge profile sections", "finalize my profile", or wants to combine
-  individually generated section files into a single complete Markdown
-  profile document (profile.md).
+  MUST be consulted whenever the user wants to produce a complete profile.md
+  from section JSON files. This skill contains the only correct placeholder
+  substitution rules, section ordering, TBD filtering logic, and layout
+  template references — assembling without it will produce broken output.
+  Trigger on any request to combine, merge, stitch, compile, or render all
+  profile sections into one unified Markdown document — including "put it all
+  together", "generate profile.md", "build the complete profile", "I need the
+  full profile document", "render sections into markdown", or any variation
+  where the user has finished updating individual sections and now wants the
+  single assembled result. Even if the request seems simple, always consult
+  this skill because the rendering pipeline has specific rules that cannot
+  be guessed.
 ---
 
 # Profile Assemble
@@ -16,9 +22,13 @@ Markdown layout template, and produce a single complete profile document.
 
 ## When to Use
 
-Invoke this skill after sections have been generated or updated independently
-via the `profile-section` skill and a unified profile document is needed — for
-example, to export for LinkedIn, produce a resume, or generate platform-ready content.
+Invoke this skill when individually generated JSON section files need to be
+combined into the unified `profile.md` document. Typical triggers: the user
+has just finished creating or updating sections and wants to see the full
+profile, or they explicitly ask for the assembled document.
+
+Do not invoke this skill from within export or review skills — those read
+section files directly and do not need an assembled profile.md.
 
 ## Workflow
 

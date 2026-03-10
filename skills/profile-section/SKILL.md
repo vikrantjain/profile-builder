@@ -1,11 +1,21 @@
 ---
 name: profile-section
 description: >
-  This skill should be used when the user asks to "generate a section",
-  "update experience section", "rebuild my skills section", "regenerate
-  certifications", "add a project to my experience", "update my blog posts",
-  "refresh open source section", or wants to generate or update a single
-  profile section independently without regenerating the entire profile.
+  MUST be consulted whenever the user wants to create, update, or add data to
+  any single profile section. This skill contains the required JSON envelope
+  format, field mapping rules, TBD placeholder conventions, and schema
+  validation logic — writing section data without it will produce invalid
+  output. Sections include experience, skills, education, certifications,
+  patents, blogs, open source, identity, summary, and languages. Trigger on
+  any of these: "update my experience", "add a new job/role/position",
+  "I got promoted", "earned a certification", "add a patent", "update my
+  education", "rebuild my skills", "add an open source project", "I started
+  contributing to...", "regenerate my summary", "update my identity/email/title",
+  or any request where the user provides professional data (resume snippets,
+  job details, skill lists, project info) and wants it captured into their
+  profile. Even seemingly simple additions like "add my new cert" require this
+  skill because the JSON schema, field semantics, and index update rules are
+  non-obvious and must be followed exactly.
 ---
 
 # Profile Section
@@ -42,9 +52,17 @@ the ambiguity — let the user decide what to remove.
 
 ## When to Use
 
-Invoke this skill when only one section of the profile needs to be created or
-refreshed. For first-time setup of all sections, use the `/profile-init`
-command. For rendering section files into a full Markdown document, use the
+Invoke this skill when the user wants to create, update, or add entries to a
+single section of their profile. Common scenarios:
+
+- User provides new data (a resume snippet, job details, certification info)
+  and wants it captured into the profile
+- User wants to update an existing section with new information (new role,
+  new project, updated skills)
+- User asks to regenerate a section from scratch
+
+For first-time setup of all sections at once, use the `/profile-init` command.
+For rendering section files into a full Markdown document, use the
 `profile-assemble` skill.
 
 ## Available Sections
@@ -175,6 +193,30 @@ Rules for building the data object:
 - **No Markdown formatting in values** — values are raw data. Do not include
   `**bold**`, `## headings`, `- bullets`, or any other Markdown syntax in
   string values. Just write the plain text.
+
+### Example Output
+
+A completed `sections/education.json` looks like this:
+
+```json
+{
+  "section": "education",
+  "data": {
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "Stanford University",
+        "year": "2018",
+        "specialization": "Distributed Systems",
+        "honors": null
+      }
+    ]
+  }
+}
+```
+
+Note: `honors` is optional and set to `null` (not `"TBD"`). Required fields
+with no data would use `"TBD"` instead.
 
 ### 6. Write the Output
 
