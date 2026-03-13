@@ -18,6 +18,7 @@ hashnode-review.md
 
 # Temporary/intermediate data
 .profile/
+*-workspace/
 
 # Claude Code local settings and session data
 .claude/

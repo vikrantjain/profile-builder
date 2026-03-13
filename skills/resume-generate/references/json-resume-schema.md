@@ -130,13 +130,30 @@ This array combines two profile sources:
 Only include projects that are relevant to the target role (when a JD is
 provided) or that are significant enough for a general resume.
 
+### publications (array) — for patents
+
+The JSON Resume schema has no native `patents` section. Map patents to
+`publications`, which is the closest semantic fit (patents are published
+intellectual property with identifiers, dates, and issuing bodies).
+
+| JSON Resume Field | Profile Source                | Notes                                  |
+|-------------------|------------------------------|----------------------------------------|
+| `name`            | `patents[].title`            | Patent title                           |
+| `publisher`       | `"United States Patent and Trademark Office"` or appropriate office | Issuing patent office |
+| `releaseDate`     | `patents[].grant_date`       | ISO 8601; use grant date if available  |
+| `url`             | `patents[].url` or construct from patent number | e.g., `https://patents.google.com/patent/US10585682B2` |
+| `summary`         | `patents[].patent_number`    | Include patent number (e.g., "US Patent US10585682B2") |
+
+Only include patents that appear in `resume.md`. If resume.md has a Patents
+section, resume.json must have a corresponding `publications` array.
+
 ## Sections to Omit
 
 Omit these JSON Resume sections entirely (do not include empty arrays):
 
 - `volunteer` — unless the profile has volunteer data
 - `awards` — unless the profile has awards data
-- `publications` — unless the profile has publications data
+- `publications` — unless patents are included in the resume (see patents mapping above)
 - `interests` — not typically included in professional resumes
 - `references` — "Available upon request" convention; omit from JSON
 
