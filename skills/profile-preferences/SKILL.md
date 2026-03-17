@@ -1,27 +1,48 @@
 ---
 name: profile-preferences
 description: >
-  This skill should be used when the user asks to "remember that",
-  "my preference is", "when generating exports", "stop presenting",
-  "forget the preference about", "update my preference", "add a
-  presentation preference", "remove preference", "show my preferences",
-  "list preferences", or wants to add, update, remove, or view
-  presentation preferences that affect how profile data is presented
-  in exports and reviews.
+  Save, update, remove, or list persistent presentation preferences that
+  control how profile data appears in exports and reviews. This skill manages
+  the preferences.md file — the central store for user directives about tone,
+  voice, emphasis, framing, inclusions, exclusions, and platform-specific
+  style rules. MUST be used whenever the user wants to persistently change
+  how their profile content is presented: "remember that...", "my preference
+  is...", "always/never...", "I want exports to sound...", "don't mention X",
+  "emphasize Y", "tone down Z", "I am an introvert so...", "present my
+  experience as 20+ years", "use first person for LinkedIn", "forget the
+  preference about...", "show my preferences", "remove preference". Trigger
+  for any directive about presentation style, personality-driven framing, or
+  data display rules — even without the word "preference". Do not trigger for
+  generating content, updating profile data, assembling documents, or reviewing
+  external profiles.
 ---
 
 # Profile Preferences
 
 Manage persistent presentation preferences that shape how profile data is
-transformed for downstream exports (LinkedIn, resume, GitHub, Hashnode) and
-reviews. Preferences do NOT affect the raw profile data layer — only how
-data is presented in output documents.
+presented in exports (LinkedIn, resume, GitHub, Hashnode) and reviews.
+Preferences control tone, emphasis, framing, inclusions, and exclusions.
+They do NOT affect the raw profile data layer — only downstream output.
 
-## When to Use
+## Presentation vs Operational
 
-Invoke this skill when the user expresses a presentation directive — tone,
-emphasis, framing, inclusions, exclusions — or asks to view, update, or
-remove an existing preference.
+This skill handles **presentation preferences** — directives about how profile
+content should appear in generated output. Examples:
+
+- "Use a confident but not boastful tone" → presentation (affects export output)
+- "Emphasize my cloud architecture experience" → presentation
+- "Don't mention my role at CompanyX" → presentation (exclusion)
+- "Lead with impact metrics in work experience" → presentation (framing)
+
+These are NOT presentation preferences and should NOT be saved here:
+
+- "Always commit after making changes" → operational instruction for Claude
+- "Use vim keybindings" → tool preference
+- "Run tests before pushing" → workflow preference
+
+When ambiguous, ask: "Should I save this as a presentation preference that
+affects your profile exports, or is this a general instruction for how I
+should work?"
 
 ## Workflow
 
@@ -29,19 +50,19 @@ remove an existing preference.
 
 Infer from the user's message:
 
-- **Add** — user says "remember that...", "my preference is...", "always...",
-  "never...", "when generating...", "I prefer..."
-- **Update** — user says "change the preference about...", "actually, make
-  it...", "update the one about..."
-- **Remove** — user says "forget the preference about...", "remove...",
-  "stop applying the rule about..."
-- **List** — user says "what are my preferences?", "show my preferences"
+- **Add** — "remember that...", "my preference is...", "always/never...",
+  "I want exports to...", "emphasize...", "tone down...", "don't mention..."
+- **Update** — "change the preference about...", "actually make it...",
+  "update the one about..."
+- **Remove** — "forget the preference about...", "remove...", "stop
+  applying the rule about..."
+- **List** — "what are my preferences?", "show preferences"
 
 ### 2. Read Existing Preferences
 
 Read `preferences.md` from the workspace root. If it does not exist:
 
-- For **add**: create it with this structure:
+- For **add**: create it with this initial structure:
 
   ```markdown
   # Presentation Preferences
@@ -54,18 +75,18 @@ Read `preferences.md` from the workspace root. If it does not exist:
   ## Global
   ```
 
-- For **update/remove/list**: inform the user that no preferences file
-  exists yet and offer to create one.
+- For **update/remove/list**: inform the user no preferences file exists yet
+  and offer to create one.
 
 ### 3. Determine Scope
 
-Ask or infer what platform(s) the preference applies to:
+Infer the platform from context. Only ask if genuinely ambiguous.
 
-- "in LinkedIn" or "for LinkedIn" → add under `## LinkedIn`
-- "in resume" or "for resume" → add under `## Resume`
-- "on GitHub" → add under `## GitHub`
-- "on Hashnode" → add under `## Hashnode`
-- No platform mentioned → add under `## Global`
+- "in LinkedIn", "for LinkedIn", "LinkedIn should..." → `## LinkedIn`
+- "in resume", "for resume", "resume should..." → `## Resume`
+- "on GitHub", "GitHub README should..." → `## GitHub`
+- "on Hashnode", "Hashnode profile should..." → `## Hashnode`
+- No platform mentioned → `## Global`
 
 Platform headings map to skills:
 - `## Global` → all export and review skills
@@ -74,47 +95,63 @@ Platform headings map to skills:
 - `## GitHub` → `github-generate`, `github-review`
 - `## Hashnode` → `hashnode-generate`, `hashnode-review`
 
-### 4. Execute the Operation
+### 4. Check for Conflicts
+
+Before adding or updating, scan existing preferences for:
+
+- **Duplicates** — a preference that already says the same thing. If found,
+  tell the user it already exists rather than adding a duplicate.
+- **Overlaps** — a global preference that covers what the user is adding as
+  platform-specific (or vice versa). Flag it: "You already have a global
+  preference for formal tone. Want to keep the global one, replace it with
+  this LinkedIn-specific one, or have both?"
+- **Contradictions** — a preference that directly conflicts (e.g., "use
+  casual tone" globally + "use formal tone" for LinkedIn is fine and
+  intentional, but "use casual tone" + "use formal tone" in the same
+  scope is a conflict). Ask the user which one to keep.
+
+### 5. Execute the Operation
 
 #### Add
 
-1. Locate the target section heading (`## Global`, `## LinkedIn`, etc.).
-   If the heading does not exist, create it.
-2. Append the preference as a bullet item under that heading.
-3. Write the directive in clear, imperative language.
-4. Confirm to the user what was saved and which skills will apply it.
+1. Locate the target section heading. Create it if missing.
+2. Append the preference as a bullet item.
+3. Write the directive in clear, imperative language — short and specific.
+4. Confirm what was saved and which skills will apply it.
+
+**Good preference format:**
+- `- Lead each work experience entry with a quantified impact statement.`
+- `- Omit the CompanyX internship from all exports.`
+- `- Use first person in narrative sections (About, Summary).`
+
+**Avoid vague preferences:**
+- `- Make it sound good.` → too vague to act on
+- `- Be professional.` → not specific enough
+
+If the user's phrasing is vague, distill it into something actionable and
+confirm: "I'll save this as: '...' — does that capture what you mean?"
 
 #### Update
 
-1. Locate the preference to update — by content match based on the user's
-   description.
-2. Replace the directive text. Move to a different section if scope changed.
+1. Locate the preference by content match.
+2. Replace the text. Move to a different section if scope changed.
 3. Confirm the change.
 
 #### Remove
 
-1. Locate the preference — by content match.
+1. Locate the preference by content match.
 2. Remove the bullet item.
-3. If the section heading has no remaining items, remove the heading too
-   (except `## Global` which should always exist).
+3. If the section has no remaining items, remove the heading too (except
+   `## Global` which always exists).
 4. Confirm removal.
 
 #### List
 
-1. Read and display all preferences grouped by section.
-2. If no preferences exist, say so.
+1. Display all preferences grouped by section.
+2. For each platform section, note which skills consume it.
+3. If no preferences exist, say so.
 
-### 5. Confirm
+### 6. Confirm
 
-After any mutation, display the updated preference and its scope.
-For add/update, note which export and review skills will apply it.
-
-## Output Checklist
-
-Before finishing, verify:
-
-- [ ] `preferences.md` exists and has valid structure
-- [ ] `## Global` heading is present
-- [ ] Platform headings use valid names (LinkedIn, Resume, GitHub, Hashnode)
-- [ ] No empty sections (heading with no bullet items) — `## Global` may be empty only when the file is first created
-- [ ] User confirmed the saved/updated/removed preference
+After any mutation, display the saved preference and its scope. For add/update,
+note which export and review skills will apply it.
