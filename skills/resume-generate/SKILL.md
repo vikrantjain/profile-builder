@@ -180,11 +180,13 @@ Draw from `summary.json`, `experience.json` (recent role highlights), and
 `skills.json` to compose this — not from any single source.
 
 **Tool/framework attribution**: When mentioning specific tools or frameworks in
-the summary, verify which projects actually used them by checking the `tech_stack`
-of individual projects — not the role-level `tech_stack`. A role may list many
-technologies across all its projects, but specific claims (e.g., "leveraging X
-to deliver Y") must match the project where Y actually happened. Misattributing
-tools to the wrong achievements is a content fidelity violation.
+the summary, prefer the project-level `skills` field (what the person personally
+applied) over the project-level `tech_stack` (what the whole team used). If
+`skills` is present, use it as the authoritative signal for personal
+attribution. If absent, fall back to the project's `tech_stack`. Specific claims (e.g., "leveraging X to
+deliver Y") must match the project where Y actually happened — not a different
+project within the same role. Misattributing tools to the wrong achievements is
+a content fidelity violation.
 
 #### Experience Bullets
 
@@ -370,8 +372,7 @@ preserved — do not present projections as delivered results. For every action
 verb, confirm it matches the actual contribution scope — "designed" should not
 become "delivered", "helped develop" should not become "built." For every
 tool or framework mentioned in connection with a specific achievement, verify
-it appears in that project's `tech_stack` — not just the role's top-level
-tech stack or a different project within the same role.
+it appears in that project's `skills` or `tech_stack` — not a different project within the same role.
 
 **Preferences compliance** — Re-read the applicable preferences and verify each
 one is reflected in the generated content. If any preference was missed or

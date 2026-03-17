@@ -20,8 +20,6 @@
 
 {{description}}
 
-{{#tech_stack}}**Stack:** {{tech_stack | join ", "}}{{/tech_stack}}
-
 {{#projects}}
 #### Projects
 
@@ -31,6 +29,8 @@
 {{description}}
 
 {{#tech_stack}}**Stack:** {{tech_stack | join ", "}}{{/tech_stack}}
+
+{{#skills}}**Skills applied:** {{skills | join ", "}}{{/skills}}
 
 {{#contributions}}
 {{#each contributions}}

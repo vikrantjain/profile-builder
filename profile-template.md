@@ -95,7 +95,6 @@ fields:
       start_date:    { required: true,  description: "Start month and year, e.g. Jan 2021" }
       end_date:      { required: false, description: "End month and year. Omit if current role" }
       description:   { required: true,  description: "Key responsibilities and achievements. Use bullet points." }
-      tech_stack:    { required: false, description: "Broad technologies, platforms, or infrastructure used across this role (e.g. AWS, Kubernetes, CI/CD). Project-specific stacks go in each project entry.", type: list }
       projects:
         required: false
         type: list
@@ -106,6 +105,7 @@ fields:
           role:        { required: false, description: "Your role in the project, e.g. tech lead, sole developer" }
           duration:    { required: false, description: "Project timeframe, e.g. 'Dec 2025 – Jan 2026' or '3 months'. Parsed from date ranges in the input." }
           tech_stack:  { required: false, description: "Project-specific technologies (e.g. React, GraphQL, PostgreSQL)", type: list }
+          skills:      { required: false, description: "Skills personally applied by you in this project — may overlap with tech_stack but limited to what you directly worked with. Include concrete tools (e.g. Python, MCP) and practice-level skills not captured as technologies (e.g. Vibe coding, Prompt Engineering).", type: list }
           contributions: { required: true, description: "What you did — technical work, design decisions, problems solved. Action-oriented bullets describing the work performed. Use 'TBD' as a single-item list if no contributions can be extracted.", type: list, default: ["TBD"] }
           impact:      { required: false, description: "Quantifiable outcomes — metrics, business results, performance gains, adoption numbers. Numbers-driven bullets. IMPORTANT: Always actively search the source data for measurable outcomes, percentages, scale numbers, time savings, cost reductions, adoption figures, and before/after comparisons. Only omit if genuinely no quantifiable data exists after thorough extraction.", type: list }
           url:         { required: false, description: "Link to project, repo, or demo (if public)" }

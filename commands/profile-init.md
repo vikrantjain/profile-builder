@@ -107,6 +107,11 @@ generate the section file using the `profile-section` workflow:
 4. Build the JSON object with the mapped data — follow the JSON building rules
    in the `profile-section` skill (Step 5).
 5. Write to the output path (e.g., `sections/experience.json`).
+6. Update `profile-index.json` — add or update the section's entry in the
+   `sections` array with `name`, `key`, `file`, and `last_updated`. If the
+   section is `identity`, also sync the top-level `identity` object with the
+   section data. Follow the index update rules in the `profile-section` skill
+   (Step 7).
 
 Process sections in this order:
 1. identity

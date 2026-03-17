@@ -136,6 +136,7 @@ For each field in the template schema (including nested `item_fields`):
    - Date ranges like "Dec 2025 – Jan 2026" → `duration` (for projects) or
      `start_date`/`end_date` (for experience)
    - "Technologies" / "Tech" / "Stack" / "Built with" → `tech_stack`
+   - Phrases like "I used", "I personally worked with", "my tools", "skills I applied" → `skills` (what the person directly used, which may overlap with or be a subset of `tech_stack`; also captures practice-level skills not listed as technologies, e.g., "Vibe coding", "Prompt Engineering")
    - Role descriptions like "led", "sole developer", "tech lead" → `role`
    - URLs or repo links → `url`
 
@@ -204,19 +205,18 @@ A completed `sections/education.json` looks like this:
   "data": {
     "education": [
       {
-        "degree": "Master of Science in Computer Science",
+        "degree": "Master of Science",
+        "field": "Computer Science",
         "institution": "Stanford University",
-        "year": "2018",
-        "specialization": "Distributed Systems",
-        "honors": null
+        "graduation_year": "2018"
       }
     ]
   }
 }
 ```
 
-Note: `honors` is optional and set to `null` (not `"TBD"`). Required fields
-with no data would use `"TBD"` instead.
+Note: `graduation_year` is optional and could be omitted or set to `null` —
+never to `"TBD"`. Required fields with no data would use `"TBD"` instead.
 
 ### 6. Write the Output
 
@@ -234,6 +234,11 @@ After writing the section file, update `profile-index.json`:
   current date in YYYY-MM-DD format and ensure its `file` path uses the `.json` extension. If no
   entry exists for this section, add one with `name`, `key`, `file`, and
   `last_updated`.
+- **Identity sync:** If the target section is `identity`, also update the
+  top-level `identity` object in `profile-index.json` with the corresponding
+  fields from the section data (`full_name`, `title`, `email`, `phone`,
+  `location`, `github`, `linkedin`, `website`, `twitter`). This keeps the
+  lightweight identity snapshot in sync with `sections/identity.json`.
 - Write the updated JSON back to `profile-index.json`.
 - If `profile-index.json` does not exist, inform the user to run
   `/profile-init` first to create the index.

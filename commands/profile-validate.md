@@ -46,6 +46,11 @@ Read and parse `profile-index.json`. Verify it is valid JSON, then check:
   (YYYY-MM-DD format).
 - **`sources` array** (if present) — each entry has `platform` (string),
   `handle` (string), and `feeds` (array of strings) fields with valid values.
+- **Schema version** — compare `profile_version` in the index against
+  `template_version` in `profile-template.md`. If they differ, flag as a
+  warning: "Profile was built with schema vX.X but current template is vY.Y.
+  Section files may have outdated field names or missing new fields. Schema
+  drift checks in step 4 will identify specific issues."
 
 ### 3. Validate Preferences File
 
@@ -84,13 +89,30 @@ For each section entry in the `sections` array:
   - `experience` — `data.experience` is a non-empty array; each entry has
     `title`, `company`, `start_date`, `description`; each project (if
     present) has `name`, `description`, and `contributions` (at minimum
-    `["TBD"]`); `impact` is optional
+    `["TBD"]`); `skills` and `impact` are optional
   - `skills` — `data.skills.categories` is a non-empty array with at least
     one item having `name` and `items` fields
 - **No Markdown in values** — scan string values for Markdown formatting
   characters (`**`, `##`, `- ` at start of string). Flag as warnings.
 - **TBD scan** — scan all string values and array contents for the exact
   string `"TBD"`. Collect and report as warnings.
+- **Schema drift** — compare the keys present in the section's `"data"`
+  object (including nested `item_fields` keys within list entries) against
+  the field definitions for that section in `profile-template.md`:
+  - **Unknown keys** — keys in the JSON that do not match any field in the
+    current template. These may be removed or renamed fields. Flag as
+    warnings: "Unknown field `<key>` in `<file>` — not defined in current
+    template. May be a renamed or removed field."
+  - **Missing new required fields** — required fields in the template that
+    are absent from the JSON (not present at all, not even as TBD). These
+    may be fields added in a newer template version. Flag as errors:
+    "Required field `<key>` missing from `<file>` — added in current
+    template schema."
+  - **Rename candidates** — when an unknown key and a missing field have
+    similar names or identical types (e.g., `year` unknown + `graduation_year`
+    missing), flag them together as a likely rename: "Possible rename:
+    `<old_key>` → `<new_key>` in `<file>`." This helps the user and the
+    interactive fix step offer targeted migrations.
 
 Additionally check:
 
@@ -164,6 +186,17 @@ Examples of fixable issues:
 - Add missing section entries to the index `sections` array.
 - Update stale `last_updated` dates after confirming content is current.
 - Update section `file` paths from `.md` to `.json` (if files were migrated).
+- **Rename fields** — for rename candidates identified in schema drift
+  detection, rename the JSON key in-place (preserving the value). E.g.,
+  rename `year` → `graduation_year` in `sections/education.json`.
+- **Remove unknown fields** — for unknown keys with no rename candidate,
+  offer to remove them from the JSON. Show the current value so the user
+  can judge whether the data should be moved elsewhere first.
+- **Backfill missing required fields** — for new required fields with no
+  rename candidate, add them with the TBD default (`"TBD"` or `["TBD"]`).
+- **Update schema version** — after all drift fixes are applied, update
+  `profile_version` in `profile-index.json` to match the current
+  `template_version`.
 
 For **non-fixable** issues (missing data that requires user input), provide
 actionable guidance:

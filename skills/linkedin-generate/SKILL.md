@@ -97,7 +97,10 @@ For each target LinkedIn field:
      project's `contributions` and `impact` bullets from `projects[]` into the
      job description as flat bullets. Combine contribution + impact into a single
      concise bullet where it reads naturally (e.g., "Designed X, targeting Y%
-     improvement").
+     improvement"). When attributing specific tools or frameworks to an
+     achievement, prefer the project's `skills` field (what the person personally
+     applied) over its `tech_stack` (what the whole team used). If `skills` is
+     absent, fall back to `tech_stack`.
   2. **Order** — Sort the resulting bullets by impact, most impressive first.
      Do not preserve the source order. `impact` bullets (quantifiable outcomes)
      generally rank higher than `contributions` bullets.
