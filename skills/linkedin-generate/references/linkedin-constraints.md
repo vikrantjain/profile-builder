@@ -94,6 +94,10 @@ Use the canonical LinkedIn / industry-standard name, not variations:
   legacy technology unless it is genuinely still a key part of the user's work.
 - **Favor searchable skills**: Recruiters search by well-known terms. An obscure
   skill that nobody searches for occupies a slot that a high-value skill could use.
+- **Include AI development tools**: Vendor AI tools like Cursor, Amazon Q,
+  Claude Code, and ChatGPT are increasingly searched by recruiters because they
+  signal hands-on AI-augmented development capability. These belong in the
+  adjacent/supporting tier, not dropped as "usage tools."
 - **Avoid redundancy**: Don't add both "JavaScript" and "ES6" — pick the canonical
   one. Don't add both "AWS" and "Amazon EC2", "Amazon S3" unless slots permit.
 - **Recency signal**: Skills from recent roles and projects carry more credibility
