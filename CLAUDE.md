@@ -164,6 +164,6 @@ Some skills include reference docs and scripts:
 
 ### External Dependencies
 
-- **Playwright MCP** — configured in `.mcp.json` at workspace root; required by `linkedin-review` for fetching LinkedIn profiles via browser automation
+- **Playwright MCP** — configured in `.mcp.json` inside the `linkedin-review` skill directory; required by `linkedin-review` for fetching LinkedIn profiles via browser automation
 - **`gh` CLI** — used by `github-review` and `profile-refresh` for fetching GitHub profile data
 - **Hashnode GraphQL API** — public API at `gql.hashnode.com`, used by `hashnode-review` and `profile-refresh` via WebFetch (no authentication required)
