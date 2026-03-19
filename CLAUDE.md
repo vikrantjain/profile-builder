@@ -67,6 +67,7 @@ profile-layout.md                  — Markdown rendering template (used by prof
 profile-index-template.md          — JSON schema for profile-index.json
 commands/profile-init.md           — /profile-init command (interactive onboarding)
 commands/profile-validate.md       — /profile-validate command (validate & fix profile docs)
+commands/linkedin-rec.md           — /linkedin-rec command (generate recommendation request message)
 skills/profile-preferences/        — Add/update/remove presentation preferences
 skills/profile-section/            — Generate/update a single section
 skills/profile-refresh/            — Fetch latest data from external platforms for dynamic sections
@@ -88,6 +89,7 @@ Skills use YAML frontmatter with `name` and `description` (third-person, with tr
 
 - `/profile-init` — Interactive onboarding. Collects data sources, builds all sections, configures data sources, generates index. Entry point for new users.
 - `/profile-validate` — Validate profile documents against the template schema. Checks JSON validity, required fields, type correctness, TBD values, and legacy `.md` files. Offers interactive fixes with user approval.
+- `/linkedin-rec` — Generate a recommendation request message for a former colleague. Takes `[Name], [Company], [optional: project]` as arguments. Reads experience, identity, summary, and preferences to craft a personalized, concise message.
 
 ### Skill Categories
 
