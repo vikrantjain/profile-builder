@@ -19,13 +19,21 @@ to LinkedIn's character limits and plain-text constraints.
 
 ## Core Philosophy
 
-LinkedIn is a positioning platform, not a data display. The master profile is a
-comprehensive datastore; LinkedIn content is a curated signal about who this
-person is and why someone should connect, hire, or collaborate with them. Every
-field — from headline to skills list — should be constructed to create a clear
-professional identity, not reformatted from the profile. A headline is not a
-trimmed title. An About is not a restated summary. A skills list is not a
-category flatten. Each field has a strategic job to do.
+LinkedIn is both a positioning platform and a professional network. The master
+profile is a comprehensive datastore; LinkedIn content should create a clear
+professional identity while preserving the networking value of the full career
+history. Every field — from headline to skills list — should be constructed
+strategically, not reformatted from the profile. A headline is not a trimmed
+title. An About is not a restated summary. A skills list is not a category
+flatten. Each field has a strategic job to do.
+
+**Positioning vs. networking tradeoff** — Some fields (headline, about, skills)
+are pure positioning: curate aggressively. But experience entries also serve a
+networking function — former colleagues search by company name to reconnect, and
+organization names improve discoverability. This means LinkedIn should include
+all roles from the profile, even early-career ones, while adjusting the depth
+of description by seniority (see Experience section). This is a key difference
+from resume generation, where irrelevant roles are cut entirely.
 
 ## Workflow
 
@@ -137,22 +145,49 @@ the full 2,600-char budget — a thin About is a missed opportunity.
 
 #### Experience
 
+**Include every role from the profile.** Unlike resumes, LinkedIn serves a
+networking purpose — former colleagues find each other by searching company
+names. Dropping a role means losing that reconnection path. This is especially
+true for well-known organizations or roles where meaningful work was done,
+regardless of seniority level.
+
+**Minimum coverage rule**: Every role must reference at least 1 bullet per
+2 projects (rounded up). A role with 5 projects needs at least 3 bullets.
+A role with 2 projects needs at least 1. A role with 1 project needs 1.
+Multiple projects can share a bullet (e.g., "Designed services integration
+layers for financial systems including the Child Trust Fund and GFAS"),
+but every project with quantifiable impact, business results, international
+exposure, or methodology significance must be represented. The role's
+generic `description` field is a fallback only when `projects[]` is empty.
+
+**Character budget**: LinkedIn allows 2,000 chars per entry. An entry under
+500 chars with projects left unrepresented is a red flag — expand before
+moving to the next role.
+
 For each experience entry:
 
-1. **Flatten** — LinkedIn has no nested project structure. Incorporate each
-   project's `contributions` and `impact` bullets from `projects[]` into the
-   job description as flat bullets. Combine contribution + impact into a single
+1. **Flatten** — LinkedIn has no nested project structure. For each project
+   in `projects[]`, extract the best `contributions` and `impact` items and
+   convert into flat bullets. Combine contribution + impact into a single
    concise bullet where it reads naturally (e.g., "Designed X, targeting Y%
-   improvement"). When attributing specific tools or frameworks to an
-   achievement, prefer the project's `skills` field (what the person personally
-   applied) over its `tech_stack` (what the whole team used). If `skills` is
-   absent, fall back to `tech_stack`.
-2. **Order** — Sort the resulting bullets by impact, most impressive first.
+   improvement"). Multiple lower-impact projects can share a bullet (e.g.,
+   "Designed services integration layers for financial systems including the
+   Child Trust Fund and Global Fund Administration System"). When attributing
+   specific tools or frameworks to an achievement, prefer the project's
+   `skills` field (what the person personally applied) over its `tech_stack`
+   (what the whole team used). If `skills` is absent, fall back to
+   `tech_stack`. This applies to **every role** including early-career
+   entries — do not skip the flatten step for any role.
+2. **Verify coverage** — Count how many source projects have at least one
+   item in the output. If coverage is below the minimum (1 per 2 projects,
+   rounded up), add bullets or merge missing projects into existing bullets
+   before proceeding.
+3. **Order** — Sort the resulting bullets by impact, most impressive first.
    Do not preserve the source order. `impact` bullets (quantifiable outcomes)
    generally rank higher than `contributions` bullets.
-3. **Cap** — Limit to 3-5 bullets per role. If many projects contributed bullets,
-   keep the 3-5 that best represent the user's contribution. More bullets dilute
-   rather than reinforce impact.
+4. **Fit to budget** — The hard cap is 2,000 chars per entry. Condense
+   bullets as needed to fit, but do not drop projects to meet the cap —
+   shorten wording instead.
 
 #### Skills
 
