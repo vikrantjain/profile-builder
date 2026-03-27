@@ -7,11 +7,11 @@ Field limits and formatting rules for Hashnode profile sections.
 | Hashnode Field | Character Limit | Markdown | Master Profile Source |
 |----------------|----------------|----------|----------------------|
 | Name           | 50             | No       | `full_name` from `sections/identity.json` |
-| Tagline        | 150            | No       | Derived from `title` or first line of `sections/summary.json` |
-| Bio            | 200            | No       | Condensed from `sections/summary.json` |
-| About (page)   | No hard limit  | Yes (full Markdown) | Expanded from `sections/summary.json`, `sections/skills.json` |
+| Tagline        | 150            | No       | Constructed from `title`, `summary`, `skills`, and `blogs` topics |
+| Bio            | 200            | No       | Constructed from `summary`, `experience`, and `blogs` context |
+| About (page)   | No hard limit  | Yes (full Markdown) | Structured from `summary`, `experience`, `skills`, `open-source`, `blogs` |
 | Location       | 50             | No       | `location` from `sections/identity.json` |
-| Tech Stack     | Tags (multi-select) | No  | Mapped from `sections/skills.json` categories |
+| Tech Stack     | Tags (multi-select) | No  | Curated from `sections/skills.json`, weighted by blog relevance |
 
 ## Social Links
 
@@ -32,32 +32,52 @@ contact and social fields.
 
 ### Tagline
 - Plain text only, no Markdown or HTML.
-- One-liner that describes the user's professional identity.
-- Should be punchy and keyword-rich (visible on blog post cards).
+- Appears on every blog post card next to the author name — this is the most
+  frequently seen field across the platform.
+- Should signal what the person builds and writes about — not their corporate
+  title or employer.
+- Include the engineering identity plus 1-2 technology or domain signals.
+- Aim for 100-140 chars: long enough to be distinctive, short enough for
+  mobile rendering.
 
 ### Bio
 - Plain text, no Markdown.
 - Appears below the name on the profile page.
-- Keep concise — this is a preview, not the full story.
+- Should complement (not repeat) the tagline with career depth and a
+  differentiator.
+- A reader should finish the bio thinking "this person has real experience."
 
 ### About Page
 - Full Markdown supported: headings, bold, italic, lists, links, code blocks, images.
 - This is the user's long-form profile page on Hashnode.
-- Can include sections like "About Me", "Tech Stack", "Open Source", "Connect".
+- Structure as a scannable document with clear sections — technical readers
+  skim before they commit to reading.
+- Recommended sections: opening paragraph, "What I Write About", tech stack,
+  featured work/open source, recent posts, connect links.
+- Sections without data should be omitted, not left as empty headers.
 - No character limit, but keep it scannable (avoid walls of text).
 
 ### Tech Stack Tags
 - Hashnode uses a tag system for tech stack.
 - Each tag is a single technology name (e.g., "JavaScript", "Docker", "AWS").
-- Map from the skills categories in the master profile.
-- Prefer widely-used tag names that match Hashnode's existing tag taxonomy.
+- Curate to 5-10 core technologies that define the writer's stack.
+- Prioritize technologies the user actively writes about or builds with.
+- Use canonical tag names that match Hashnode's existing tag taxonomy.
+- Skip ubiquitous tools (Git, VS Code) that add no signal.
 
 ## Best Practices
 
-- **Tagline**: include your primary role and 1-2 key technologies
-  (e.g., "Full-Stack Engineer | Go & Kubernetes").
-- **Bio**: mention years of experience, current focus, and one differentiator.
-- **About page**: use headings to break content into sections. Link to
-  your blog posts, GitHub repos, and other profiles.
-- **Tech stack**: select 5-10 core technologies. Too many dilutes the signal.
-- **Social links**: fill in all that apply — they appear as icons on the profile.
+- **Tagline**: lead with what you build, not where you work. Include 1-2
+  technologies or domains that signal what readers can expect from your posts.
+  Good: "Platform engineer | Go, Kubernetes, and distributed systems"
+  Weak: "Senior Software Engineer at Acme Corp"
+- **Bio**: add career depth (years, domains, scale) and one differentiator
+  (open source maintainer, patent holder, specific domain expertise). Mention
+  the writing angle if blog data exists.
+- **About page**: build as a structured document, not a prose dump. Open with
+  a technical hook. Include "What I Write About" to help readers decide to
+  follow. Link to open source projects and recent posts.
+- **Tech stack**: select technologies that define your perspective as a writer.
+  Too many dilutes the signal; too few misses discoverability.
+- **Social links**: fill in all that apply — they appear as icons on the profile
+  and cross-link the writer's presence.
