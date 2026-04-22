@@ -81,7 +81,7 @@
 ## Certifications
 
 {{#each certifications}}
-- **{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}** — {{issuer}}{{#year}} · {{year}}{{/year}}{{#expiry}} – {{expiry}}{{/expiry}}
+- **{{#url}}[{{name}}]({{url}}){{/url}}{{^url}}{{name}}{{/url}}** — {{issuer}}{{#year}} · {{year}}{{/year}}{{#expiry}} – {{expiry}}{{/expiry}}{{#id}} · ID: {{id}}{{/id}}
 {{/each}}
 
 ---

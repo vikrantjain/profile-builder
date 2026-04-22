@@ -131,6 +131,7 @@ fields:
       issuer:  { required: true,  description: "Issuing organization" }
       year:    { required: false, description: "Year obtained" }
       expiry:  { required: false, description: "Expiry year, or 'No expiry' if lifetime credential" }
+      id:      { required: false, description: "Certificate ID or credential number (e.g. ABC-123456)" }
       url:     { required: false, description: "Credential verification URL" }
 
   # ── Patents ─────────────────────────────────────────────
