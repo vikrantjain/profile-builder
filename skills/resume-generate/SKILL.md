@@ -281,7 +281,9 @@ Write the resume to `resume.md` following these formatting rules:
 ```
 # Full Name
 
-Contact line (email | phone | location | links)
+email | location
+
+[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)
 
 ---
 
@@ -317,10 +319,19 @@ Name — Issuer, YYYY
 
 #### Formatting Rules
 
-- **Header**: `# Full Name` as the document title. Contact info on a single
-  line below, separated by ` | `. Include email, phone (if available),
-  location, and profile URLs (LinkedIn, GitHub). Use a horizontal rule `---`
-  to separate the header from the body.
+- **Header**: Three-line block followed by a horizontal rule `---`:
+  1. `# Full Name` as the document title.
+  2. Contact line: `email | location` (include phone before location only if the
+     user has provided one in their identity section; omit otherwise).
+  3. Profile links line: every profile URL the user has in their identity
+     section, rendered as Markdown links and separated by ` | `. Use the bare
+     domain+path as the link text (no `https://` prefix) so the rendered resume
+     stays scannable while the link remains clickable. Example shape (the
+     specific platforms vary per user — include whatever they have, omit what
+     they don't, and don't restrict to a fixed set):
+     `[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)`.
+     Separate the contact line and the profile links line with a blank line so
+     they render as distinct lines.
 - **Section headings**: `## Section Name` for main sections. Use the standard
   headings: Professional Summary, Skills, Experience, Education, Certifications.
 - **Experience entries**: `### Job Title` as sub-heading, with company, location,
