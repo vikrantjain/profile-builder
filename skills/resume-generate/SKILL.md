@@ -162,6 +162,16 @@ Use the profile's `title` and `summary` to infer the target identity. Prioritize
 
 This is where raw profile data becomes a persuasion document.
 
+**Proportional emphasis.** Tailoring chooses *which* real experiences to
+surface — it does not inflate a tool's weight beyond its actual share of the
+candidate's work. A tool that appears in a small fraction of projects
+(roughly under a third within the foregrounded roles) belongs in the skills
+list and in the bullets where it actually applied — not in the summary's
+identity statement or as the lead of the first skill group, even if the JD
+names it. Reframing means choosing the right lens on real work; it does not
+mean restructuring the candidate's identity around a JD requirement. When
+matching evidence is thin, surface it honestly and leave the gap visible.
+
 **TBD filtering:** Profile data may contain `TBD` as a placeholder value in
 any field (indicating data not yet filled in by the user). Silently skip any
 value that is exactly `TBD`. If all items in a list are `TBD`, omit that
@@ -385,6 +395,14 @@ become "delivered", "helped develop" should not become "built." For every
 tool or framework mentioned in connection with a specific achievement, verify
 it appears in that project's `skills` or `tech_stack` — not a different project within the same role.
 
+**Proportional emphasis** — For each tool foregrounded in the summary's
+identity statement or as the lead of the first skill group, count the
+projects in the foregrounded roles where it actually appears. If under
+roughly a third, demote it: keep it in the skills list and in the bullets
+where it applied, but pull it out of the summary/lead position. The rule
+governs anchoring, not inclusion — a minority-share tool still belongs
+wherever it was genuinely used.
+
 **Preferences compliance** — Re-read the applicable preferences and verify each
 one is reflected in the generated content. If any preference was missed or
 contradicted, revise before proceeding.
@@ -417,6 +435,7 @@ Before finishing, verify:
 - [ ] Skills were curated for the target role (not a full flatten of profile categories)
 - [ ] ATS optimization applied (standard headings, plain formatting, keywords present)
 - [ ] All content is factual — sourced from the master profile, not fabricated
+- [ ] Foregrounded skills/tools reflect their real share of the candidate's work (no minority-share tool anchors the summary or leads skills)
 - [ ] Source qualifiers preserved (projected/expected/targeted/estimated/almost)
 - [ ] Action verbs match actual contribution scope — no inflation
 - [ ] Length matches requested page count (1 page ≈ 400 words, 2 pages ≈ 700-900 words)

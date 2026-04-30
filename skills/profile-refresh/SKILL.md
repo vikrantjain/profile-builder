@@ -1,12 +1,19 @@
 ---
 name: profile-refresh
 description: >
-  This skill should be used when the user asks to "refresh my blogs", "refresh
-  open source", "fetch latest blog posts", "update blogs from hashnode", "sync
-  my open source data", "pull latest from github", "refresh sources", or wants
-  to fetch the latest data from external platforms (GitHub, Hashnode, Dev.to)
-  and update the corresponding profile sections. Also called by profile-section
-  when building or updating dynamic sections (blogs, open_source).
+  Pulls new entries from external platforms (GitHub, Hashnode, Dev.to) into
+  the user's profile sections. Use when the user asks to "refresh my blogs",
+  "refresh open source", "fetch latest blog posts", "update blogs from
+  hashnode", "sync my open source data", "pull latest from github", or
+  "refresh sources". By default this is additive: only new entries are
+  added. Existing open_source projects and contributions are preserved
+  exactly as the user curated them — re-refreshing their fields requires an
+  explicit opt-in request (e.g., "rescan readme for {repo}", "update
+  description for {repo} from github"). Existing blog entries get factual
+  fields (title, url, published_on, platform) updated from the API while
+  manually enriched fields like excerpt are preserved. Also called by
+  profile-section when building or updating dynamic sections (blogs,
+  open_source).
 ---
 
 # Profile Refresh
@@ -28,6 +35,10 @@ sections from external sources:
 - **Do not fabricate data** — only write what the API returns. If a field is
   missing from the API response, set it to `null` (optional) or `"TBD"`
   (required) rather than inventing a value.
+- **Open source projects/contributions are not re-refreshed by default** —
+  existing entries are left as the user has curated them; refresh's job is to
+  surface new work. Opt-in re-refresh is available on explicit request (see
+  "Diff and Merge"). Blogs continue to update factual fields from the API.
 
 ## When to Use
 
@@ -91,192 +102,74 @@ platform-specific method below. If a fetch fails, report the error for that
 source and continue with the remaining sources — a single failure should not
 block the entire refresh.
 
-#### GitHub
+Each platform has a recipe doc in `references/`. Read the relevant doc
+**before issuing any API call** — it carries the parameter choices, filters,
+pagination logic, and field mappings. The summaries below cover only the
+load-bearing decisions a workflow-level reader needs to see; everything else
+lives in the reference.
 
-**Tool selection:** Try the `gh` CLI first (via Bash). If it is not installed
-or not authenticated (`gh auth status` fails), fall back to the GitHub REST
-API via WebFetch. Both approaches hit the same endpoints — the only difference
-is the transport.
+#### GitHub — see `references/github.md`
 
-To detect availability, run:
+Feeds `open_source` (projects + contributions). Recipe covers:
 
-```bash
-gh auth status 2>&1
-```
+- Tool selection: prefer `gh` CLI; fall back to REST API via WebFetch if `gh`
+  is missing or unauthenticated.
+- Repository fetch (with `--paginate --slurp`), fork/archived filtering,
+  star-then-recency sort.
+- Topics fetch — top ~10 repos only.
+- README fetch — used by the README enrichment step (see "README enrichment
+  for tech_stack" below in this section).
+- Contributions fetch — merged PRs to repos the user does not own.
+- Field mapping for `open_source.projects` and `open_source.contributions`.
 
-If this exits non-zero or the command is not found, use WebFetch for all
-GitHub calls.
+Two workflow-level constraints to keep in mind without opening the recipe:
 
-**Repositories** (feeds: open_source):
+- **Topics and README fetches are capped at ~10 repos** to avoid burning API
+  budget.
+- **Unauthenticated WebFetch is rate-limited at 60 req/hour.** If you hit a
+  403, suggest `gh auth login` and continue with what you have.
 
-*With `gh` CLI:*
+##### README enrichment for tech_stack
 
-```bash
-gh api "/users/{handle}/repos?per_page=100&sort=updated&direction=desc" \
-  --paginate --slurp \
-  --jq '[.[][] | {name, description, html_url, language, stargazers_count, fork, archived, updated_at, created_at}]'
-```
+> **Timing:** Invoked from Section 5 (Diff and Merge) *after* the existing
+> section file has been read and the new-vs-existing diff is known. Do not
+> fetch READMEs as part of the initial repo fetch — most repos are usually
+> already in the profile, and fetching their READMEs only to discard the
+> data wastes API budget.
 
-Key points about `--paginate` and `--slurp`:
-- `--paginate` follows `Link` headers to fetch all pages automatically.
-- `--slurp` collects all pages into a single JSON array of arrays, which the
-  `--jq` filter then flattens with `.[][]`.
-- Without `--slurp`, each page outputs a separate JSON array — concatenated
-  output is not valid JSON.
+README enrichment runs in only two cases:
 
-*With WebFetch (fallback):*
+1. **New project** being added during refresh — the project is in the API
+   response but not in the existing section file, so `tech_stack` is being
+   created from scratch and there is nothing to overwrite. Fetch the README
+   so the user gets a meaningful starting list instead of a single language
+   tag.
+2. **Existing project**, but only when the user **explicitly asks** for it.
+   Trigger phrases: "refresh open source and check the readmes", "enrich
+   tech stack from github readmes", "rescan readme for {repo}", "update
+   tech stack for {repo}". When opt-in is triggered, fetch the README for
+   the targeted repos and merge extracted tech into the existing
+   `tech_stack` per "Opt-in re-refresh of existing open_source entries" in
+   Section 5. If the user does not name specific repos, default to the top
+   ~10 by stars.
 
-Fetch `https://api.github.com/users/{handle}/repos?per_page=100&sort=updated&direction=desc`.
-The response is a JSON array. If the response includes a `Link` header with
-`rel="next"`, follow it to fetch subsequent pages. Concatenate all page arrays
-into one. Extract the same fields: `name`, `description`, `html_url`,
-`language`, `stargazers_count`, `fork`, `archived`, `updated_at`, `created_at`.
+In a default refresh, do **not** fetch READMEs for existing projects and do
+**not** modify their `tech_stack`. Silently rewriting curated lists on every
+refresh would destroy the user's work.
 
-Filter and sort the results:
+For the README fetch recipe, what to extract, and how to combine it with
+language + topics, see the "README — fetch and tech_stack extraction"
+section of `references/github.md`.
 
-- **Exclude forks** unless `stargazers_count > 0` (indicates the fork has
-  independent traction). When in doubt, include the fork — the user can remove
-  it manually.
-- **Include archived repos** with `status: "archived"` in the output.
-- **Sort** by `stargazers_count` descending, then `updated_at` descending.
+#### Hashnode — see `references/hashnode.md`
 
-For repos that appear significant (stars > 5 or non-fork), optionally fetch
-topics in a follow-up call since the list endpoint does not return them:
+Feeds `blogs`. Recipe covers the GraphQL query, pagination, the
+custom-domain fallback, and field mapping.
 
-```bash
-gh api "/repos/{handle}/{repo_name}/topics" --jq '.names'
-```
+#### Dev.to — see `references/devto.md`
 
-Or via WebFetch: `https://api.github.com/repos/{handle}/{repo_name}/topics`
-(returns `{ "names": [...] }`).
-
-Only do this for the top ~10 repos to avoid excessive API calls.
-
-**Contributions** (feeds: open_source):
-
-Fetch merged PRs to repos the user does not own.
-
-*With `gh` CLI:*
-
-```bash
-gh api "/search/issues" \
-  --method GET \
-  -f "q=author:{handle} type:pr is:merged -user:{handle}" \
-  -f "sort=created" -f "order=desc" -f "per_page=30" \
-  --jq '.items | [.[] | {title, html_url, created_at, repository_url}]'
-```
-
-Using `-f` flags for query parameters avoids URL-encoding issues with spaces
-and special characters.
-
-*With WebFetch (fallback):*
-
-Fetch `https://api.github.com/search/issues?q=author:{handle}+type:pr+is:merged+-user:{handle}&sort=created&order=desc&per_page=30`.
-Extract `items` array from the response, then pick `title`, `html_url`,
-`created_at`, and `repository_url` from each item.
-
-The `repository_url` field provides the repo API URL from which you can
-extract the project name (last path segment).
-
-- Only include merged PRs to repos the user does not own.
-- Extract: project name (from `repository_url`), PR URL (`html_url`), title.
-- The search API returns at most 1000 results; 30 per page is a reasonable
-  default for profile purposes.
-
-**Note on unauthenticated requests:** The GitHub REST API allows unauthenticated
-requests but enforces a lower rate limit (60 requests/hour vs 5000 with a
-token). WebFetch calls are unauthenticated unless custom headers are added. If
-you hit a 403 rate limit via WebFetch, inform the user and suggest installing
-and authenticating the `gh` CLI (`gh auth login`) for higher limits.
-
-**Field mapping to template:**
-
-| API field | Template field (`open_source.projects`) |
-|-----------|----------------------------------------|
-| `name` | `name` |
-| `description` | `description` |
-| `html_url` | `url` |
-| `language` | `tech_stack` (wrap in array: `[language]`) |
-| `stargazers_count` | `impact` (e.g., `["{count} stars"]`) |
-| `fork: false` + owned | `role`: `"owner"` |
-| `archived: true` | `status`: `"archived"` |
-| `archived: false` | `status`: `"active"` |
-
-| API field | Template field (`open_source.contributions`) |
-|-----------|----------------------------------------------|
-| last path segment of `repository_url` | `project` |
-| `html_url` | `url` |
-| `title` | `description` |
-| (always PR) | `type`: `"PR"` |
-
-#### Hashnode
-
-Use WebFetch to query the Hashnode GraphQL API.
-
-**Endpoint:** `https://gql.hashnode.com`
-
-**Query:**
-
-```graphql
-query {
-  publication(host: "{handle}.hashnode.dev") {
-    posts(first: 50) {
-      edges {
-        node {
-          title
-          url
-          publishedAt
-          brief
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-  }
-}
-```
-
-**Pagination:** If `pageInfo.hasNextPage` is `true`, send a follow-up query
-with `posts(first: 50, after: "{endCursor}")` to fetch the next page. Repeat
-until `hasNextPage` is `false` or you have fetched 200 posts (safety cap).
-
-**Custom domain fallback:** If the query returns `null` for `publication`,
-the user may have a custom domain. Retry with the handle value used as-is in
-the `host` parameter (e.g., `publication(host: "blog.example.com")`) — the
-handle field in `sources` may contain a full custom domain instead of a bare
-username.
-
-**Field mapping to template:**
-
-| API field | Template field (`blogs` item) |
-|-----------|------------------------------|
-| `title` | `title` |
-| `url` | `url` |
-| `publishedAt` | `published_on` (format: `Mon YYYY`) |
-| `brief` | `excerpt` (truncate to one sentence if longer) |
-| (hardcoded) | `platform`: `"Hashnode"` |
-
-#### Dev.to
-
-Use WebFetch.
-
-**Endpoint:** `https://dev.to/api/articles?username={handle}&per_page=100`
-
-**Pagination:** Dev.to supports `page` parameter. If the response returns
-exactly `per_page` items, fetch the next page with `&page=2`, etc. Stop when
-a page returns fewer items than `per_page` or you reach page 5 (safety cap).
-
-**Field mapping to template:**
-
-| API field | Template field (`blogs` item) |
-|-----------|------------------------------|
-| `title` | `title` |
-| `url` | `url` |
-| `published_at` | `published_on` (format: `Mon YYYY`) |
-| `description` | `excerpt` |
-| (hardcoded) | `platform`: `"Dev.to"` |
+Feeds `blogs`. Recipe covers the REST endpoint, pagination, and field
+mapping.
 
 ### 4. Read Existing Section
 
@@ -305,35 +198,61 @@ done on the parsed JSON arrays.
 | Contributions (PRs) | `url` |
 
 **New entries** (in source, not in profile): Prepend to the list so the most
-recent items appear first.
+recent items appear first. For new open_source projects, build `tech_stack`
+using language + topics + README extraction (see "Combining into `tech_stack`
+for a new project" in `references/github.md`). For new blog entries and
+contributions, populate all factual fields from the API.
 
-**Updated entries** (in both source and profile): Update only **factual fields**
-from the API — these are fields the API is authoritative for:
+**Open source — existing entries are not refreshed by default.**
 
-| Section | Factual fields (always update from API) |
-|---------|----------------------------------------|
-| blogs | `title`, `url`, `published_on`, `platform` |
-| open_source projects | `description` (see below), `url`, `tech_stack`, `status` |
-| open_source projects | `impact` entries that are purely star/fork counts |
-| contributions | `project`, `url`, `type` |
+For open_source projects and contributions that already exist in the section
+file (matched by `url`), leave the entry **completely untouched** during a
+default refresh. Do not update `description`, `tech_stack`, `impact`,
+`status`, `role`, or any other field — even if the API value differs.
 
-**Detecting manual enrichments:** Before overwriting a field, compare the
-existing value against the API value:
+The reasoning: a project's GitHub metadata is authoritative on the day it
+was first added, but the user almost always edits these fields afterward to
+reframe the project for their profile (sharper description, curated
+`tech_stack`, manually added `impact` metrics, role notes). Re-applying API
+values on every refresh would silently overwrite that work. The user is the
+authority on how their existing projects are presented; refresh's job is
+just to surface new work.
 
-- If the existing `description` contains content that the API description
-  does not (extra sentences, technical details, context the user added), keep
-  the existing value — it has been manually enriched.
-- If the existing value is identical to or a substring of the API value, update
-  it from the API (the source has more current data).
-- `contributions` and `impact` arrays that contain entries not derivable from
-  the API (hand-written work descriptions, manually added metrics) are always
-  preserved. Only auto-generated impact values like star counts are updated.
-- When in doubt, preserve the existing value. It is safer to keep stale manual
-  content than to overwrite the user's work.
+**Opt-in re-refresh of existing open_source entries.**
+
+If the user explicitly asks to refresh a specific project (e.g., "update the
+description on {repo} from github", "rescan readme for {repo}", "refresh
+star count for {repo}"), do refresh the requested fields for the requested
+projects only. Two flavors:
+
+- *Field-targeted re-refresh* (`description`, `status`, star-count `impact`):
+  overwrite the named field from the API value. Leave other fields alone.
+- *Tech stack re-enrichment* ("rescan readme", "enrich tech stack"): fetch
+  the README and merge extracted tech into the existing `tech_stack` as a
+  union. Deduplicate case-insensitively (`React` and `react` are the same;
+  `Next.js` and `nextjs` are the same). When a duplicate is found, **prefer
+  the existing entry's casing** — it reflects how the user has chosen to
+  present the technology. Append new entries to the end, preserving existing
+  order. Never remove entries from `tech_stack` on re-enrichment — a tech
+  the user added by hand may not appear in the current README but was still
+  used.
+
+**Blogs — existing entries: update factual fields, preserve enrichments.**
+
+For blog entries that exist in both source and profile, update **factual
+fields** the API is authoritative for: `title`, `url`, `published_on`,
+`platform`. Preserve manually enriched fields (e.g., a hand-edited
+`excerpt`).
+
+Detecting manual enrichments on `excerpt`: if the existing value contains
+content the API value does not (extra sentences, hand-written framing),
+keep the existing value. If the existing value is identical to or a
+substring of the API value, update from the API. When in doubt, preserve.
 
 **Missing entries** (in profile, not in source): Keep them. Never auto-remove.
 The user may have intentionally retained historical data, or the item may have
-been removed from the platform but still belongs in the profile.
+been removed from the platform but still belongs in the profile. The user
+can manually remove entries (or ask you to remove them) if needed.
 
 **Duplicates across sources** (e.g., same blog post on Hashnode and Dev.to):
 Match by URL. If two entries have the same URL, keep one. If they have
@@ -365,6 +284,20 @@ Rules:
 
 ### 7. Write and Update Index
 
+**No-op detection:** Before writing, compare the merged JSON object against
+the existing section file content. If they are identical (no entries added,
+no entries updated), this is a no-op refresh:
+
+- Do **not** rewrite the section file. Leaving it untouched preserves its
+  mtime and avoids spurious diffs in version control.
+- Do **not** bump `last_updated` in `profile-index.json`. Bumping it on a
+  no-op would falsely imply the data changed today; if a user later sorts
+  sections by `last_updated` to find stale data, the field needs to mean
+  "data last actually changed," not "last checked."
+- Skip straight to Step 8 (Report Changes).
+
+**On actual change:**
+
 - Write the JSON object to its output path (e.g., `sections/blogs.json`).
 - Read and parse `profile-index.json`. Find or add the entry in the `sections`
   array for this section. Update `last_updated` to the current date in
@@ -374,12 +307,26 @@ Rules:
 
 ### 8. Report Changes
 
-Summarize what changed:
+Summarize the refresh outcome. The shape of the report depends on whether
+anything changed:
 
-- Number of new entries added.
-- Number of existing entries updated (with which fields changed).
+**No-op refresh** (nothing added, nothing updated):
+
+> Checked {sources}. No new entries found. Section unchanged since
+> {existing last_updated}. Total entries: {N}.
+
+**Refresh with changes:**
+
+- Number of new entries added (with brief identifiers, e.g., "1 new
+  contribution: camunda/connectors#7022").
+- Number of existing entries updated, with which fields changed. For
+  open_source this counts only opt-in re-refresh changes — default refresh
+  never touches existing entries.
 - Total entries in the section after merge.
-- Any sources that failed to fetch (with the error — e.g., "GitHub: 403 rate
+
+**Failures (always report regardless of changes):**
+
+- Any sources that failed to fetch, with the error (e.g., "GitHub: 403 rate
   limit exceeded", "Hashnode: no publication found for handle 'xyz'").
 
 ## Error Handling
@@ -402,9 +349,9 @@ previous data is preserved.
 
 | Scenario | Action |
 |----------|--------|
-| Entry in source, not in profile | Add (prepend) |
-| Entry in both, factual fields changed | Update factual fields |
-| Entry in both, has manual enrichments | Preserve enriched fields, update only factual fields |
+| New entry in source, not in profile | Add (prepend). New open_source projects get `tech_stack` from language + topics + README. |
+| Existing open_source entry (in both) | Leave untouched (default). Opt-in re-refresh per Section 5. |
+| Existing blog entry (in both) | Update factual fields from API; preserve manual `excerpt` enrichments |
 | Entry in profile, not in source | Keep (never auto-remove) |
 | Duplicate URLs across sources | Deduplicate, prefer the richer entry |
 | All sources failed | Preserve existing section file unchanged |
@@ -413,16 +360,12 @@ previous data is preserved.
 
 Before finishing, verify:
 
-- [ ] JSON is valid and well-formed
-- [ ] All required fields present — either with real data or `"TBD"` convention
-- [ ] Optional fields with no data use `null` or are omitted (never `"TBD"`)
+- [ ] JSON is valid and well-formed; required/optional field conventions respected (`"TBD"` only for required fields without data; optional fields use `null` or omission)
 - [ ] No Markdown formatting characters in string values
-- [ ] New entries appear before existing entries (most recent first)
-- [ ] No entries were removed from the existing section
-- [ ] Manual enrichments in existing entries are preserved
-- [ ] Section file written to the correct `sections/` path (`.json` extension)
-- [ ] `profile-index.json` sections array updated with current date
-- [ ] Change summary reported to the user
+- [ ] New entries prepended (most recent first); no entries removed
+- [ ] If the merged content equals the existing file: no rewrite, no `last_updated` bump, no-op reported
+- [ ] If content changed: section file written to the correct `sections/` path (`.json` extension) and `last_updated` bumped in `profile-index.json`
+- [ ] Change summary reported to the user (per the Section 8 templates)
 
 ## Reference Files
 
