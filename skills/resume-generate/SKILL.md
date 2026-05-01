@@ -1,50 +1,71 @@
 ---
 name: resume-generate
 description: >-
-  This skill generates a high-impact, strategically crafted resume tailored to
-  a specific job description or target role. Use when the user asks to "generate
-  a resume", "create a resume", "build a resume for this job", "tailor my resume",
-  "make a resume from my profile", "make an ATS-optimized resume", "generate
-  resume JSON", "create a CV", "write my curriculum vitae", "prepare a job
-  application", "customize resume for this role", "update my resume", "shorten
-  my resume", "resume for [company]", or wants a polished resume document
-  produced from their profile data. Also trigger when the user provides a job
-  description or job link and asks to apply, prepare application materials, or
-  just says "resume for this". Trigger for any resume editing, refinement, or
-  regeneration request — not just first-time generation.
+  This skill generates an honest, well-organized resume from the user's profile
+  data, drawing on all available sections. Use when the user asks to "generate
+  a resume", "create a resume", "build a resume for this job", "make a resume
+  from my profile", "make an ATS-optimized resume", "generate resume JSON",
+  "create a CV", "write my curriculum vitae", "prepare a job application",
+  "update my resume", "shorten my resume", "resume for [company]", or wants a
+  polished resume document produced from their profile data. Also trigger when
+  the user provides a job description or job link and asks to apply, prepare
+  application materials, or just says "resume for this". Trigger for any resume
+  editing, refinement, or regeneration request — not just first-time generation.
+  When a JD is provided, customize only to the extent that the match is honest
+  and the resume does not read as tailored — a resume is not a cover letter.
 ---
 
 # Resume Generate
 
-Generate a high-impact, strategically crafted resume — not a data dump of profile
-sections. The profile is a datastore; the resume is a persuasion document. Every
-line should earn its place by demonstrating fit for the target role.
+Generate an honest, well-organized resume from the user's profile data. The
+resume reflects who the candidate actually is — not a version reshaped to mirror
+a job description. A job description, when provided, informs which true things
+to surface first; it does not change what is true.
 
-The primary output is `resume.md` — a PDF-ready Markdown document with
-professional formatting that converts cleanly to PDF for immediate use.
-Optionally, also generates `resume.json` in the
-[JSON Resume](https://jsonresume.org/schema) open standard for import into
-Reactive Resume or other resume builder tools.
+**Resume is not a cover letter.** A cover letter argues fit by speaking directly
+to a JD's language and priorities. A resume is a factual record of the
+candidate's career that the reader can trust. Customization that makes the
+resume read as written-for-this-JD undermines that trust. When tailoring would
+require reframing the candidate's identity, restructuring their narrative around
+JD keywords, or making the resume look bespoke for one role, do not do it.
 
-## When to Use
-
-Invoke this skill to produce a resume document. The user may provide a job
-description to tailor the resume, or request a general-purpose resume. For
-LinkedIn-specific content formatting, use the `linkedin-generate` skill instead.
+The primary output is `resume.md` — a PDF-ready Markdown document. Also
+generates `resume.json` in the [JSON Resume](https://jsonresume.org/schema)
+open standard for import into Reactive Resume or compatible tools. For
+LinkedIn-specific content formatting, use the `linkedin-generate` skill
+instead.
 
 ## Core Philosophy
 
-The profile sections are raw material — a comprehensive datastore of everything
-the user has done. A resume is not a reformatted view of that data. It is a
-**strategically composed narrative** that:
+The profile sections are the source of truth — a comprehensive record of the
+candidate's career across identity, summary, experience, skills, education,
+certifications, open source, patents, blogs, and languages. The resume is a
+condensed, well-ordered view of that record, drawing on **all** relevant
+sections rather than only experience and skills.
 
-- **Selects** the most relevant achievements from a larger pool
-- **Reframes** contributions in the language of the target role
-- **Prioritizes** impact and outcomes over responsibilities
-- **Omits** anything that doesn't strengthen the candidacy
+A JD (when provided) is used for two things only:
+- **Selection** — which true achievements, projects, and skills to surface
+  given the role's focus
+- **Ordering** — which to lead with so the most relevant evidence is easy to find
 
-A 20-year career with 8 roles and 30 projects might produce a resume with 4 roles
-and 12 bullets. The craft is in choosing which 12 and making each one count.
+A JD is **not** used to:
+- Reframe contributions in JD-specific language
+- Inflate the role of a tool, technology, or domain beyond its real share
+  of the candidate's work
+- Reshape the candidate's identity around the role
+- Insert keywords that don't reflect genuine experience
+
+The honesty test: if the same candidate applied to a different but plausible
+role, the resume should still read as a faithful representation of them — not
+as a different document constructed for a different job. If a tailoring choice
+would fail that test, do not make it. When in doubt, prefer the version that
+reads as the candidate's own resume rather than one written for a JD.
+
+A 20-year career with 8 roles and 30 projects might produce a resume with all
+8 roles listed but only 12-18 bullets across them — recent and relevant roles
+get more, older or less-relevant roles get one or two. The craft is in
+choosing which bullets — using the candidate's own words and framing — not in
+rewriting them to echo a JD.
 
 ## Workflow
 
@@ -75,9 +96,9 @@ Determine what the user needs:
 
 ### 2. Read Profile Data
 
-If `resume.md` already exists, note it but always regenerate from profile
-sections — fresh tailoring requires starting from the full data pool, not
-a previously narrowed resume. The existing file will be overwritten.
+If `resume.md` already exists, always regenerate from profile sections —
+selection should start from the full data pool, not from a previously narrowed
+resume. The existing file will be overwritten.
 
 Read `profile-index.json` to discover available sections and their file paths.
 Then read the relevant section JSON files from `sections/`. Parse each JSON file
@@ -93,8 +114,10 @@ If required section JSON files do not exist, inform the user and suggest running
 - `sections/education.json` — degrees
 
 Also read certifications, open source, patents, blogs, and languages if they
-exist in the index — these may contain material worth surfacing depending on
-role relevance.
+exist in the index. **Read all available sections by default** — a resume that
+ignores half the candidate's profile under-represents them. Decide what to
+include based on space and relevance, but the decision should be informed by
+having seen everything.
 
 ### 3. Apply Presentation Preferences
 
@@ -128,15 +151,18 @@ for formatting rules, tailoring strategy, and ATS optimization guidelines.
    - Success signals (what "great" looks like in this role)
    - Cultural/soft skill signals (leadership, collaboration, autonomy)
 
-2. **Map profile to requirements** — For each JD requirement, identify the
-   strongest matching evidence from the profile. Some profile data will map to
-   multiple requirements; some requirements may have no direct match. This
-   mapping drives every subsequent decision.
+2. **Map profile to requirements honestly** — For each JD requirement, identify
+   the strongest **genuine** matching evidence from the profile. Some
+   requirements will have strong matches, some weak, some none. Record this
+   honestly — do not invent matches. Requirements with no honest match stay
+   unmatched; the resume does not paper over the gap.
 
-3. **Identify the narrative angle** — What story does this resume tell? The
-   user may be a backend engineer applying for a platform role, or a tech lead
-   applying for an architect position. The angle determines which experiences
-   to foreground and how to frame them.
+3. **Decide selection and ordering, not reframing** — The mapping informs which
+   real experiences to surface and in what order. It does **not** authorize
+   rewriting bullets to echo JD language, restructuring the candidate's
+   identity, or promoting a minor skill to a defining one. If the candidate's
+   actual narrative does not naturally align with the JD, the right answer is
+   often a thinner match — not a manufactured one.
 
 **When a role description is provided** (e.g., "architect at Oracle", "senior
 SRE at a startup"):
@@ -147,8 +173,9 @@ SRE at a startup"):
    A "startup architect" values breadth and speed; an "Oracle architect" values
    enterprise scale and standards.
 
-2. **Map and angle** — Same as JD-based flow above. The inferred requirements
-   serve the same purpose as extracted JD requirements.
+2. **Map honestly, then select and order** — Same as the JD-based flow above:
+   match real evidence to inferred requirements, leave honest gaps visible,
+   and use the result for selection and ordering only.
 
 **When no target is provided:**
 
@@ -160,34 +187,43 @@ Use the profile's `title` and `summary` to infer the target identity. Prioritize
 
 ### 5. Craft the Resume Content
 
-This is where raw profile data becomes a persuasion document.
+This step turns the curated material into the resume. Two principles govern
+every decision:
 
-**Proportional emphasis.** Tailoring chooses *which* real experiences to
-surface — it does not inflate a tool's weight beyond its actual share of the
-candidate's work. A tool that appears in a small fraction of projects
-(roughly under a third within the foregrounded roles) belongs in the skills
-list and in the bullets where it actually applied — not in the summary's
-identity statement or as the lead of the first skill group, even if the JD
-names it. Reframing means choosing the right lens on real work; it does not
-mean restructuring the candidate's identity around a JD requirement. When
-matching evidence is thin, surface it honestly and leave the gap visible.
+**Proportional emphasis.** A tool or skill that appears in a small fraction
+of the candidate's foregrounded projects (roughly under a third) belongs in
+the skills list and in the bullets where it actually applied — not in the
+summary's identity statement or as the lead of the first skill group, even
+if the JD names it. When matching evidence is thin, leave the gap visible.
 
-**TBD filtering:** Profile data may contain `TBD` as a placeholder value in
-any field (indicating data not yet filled in by the user). Silently skip any
-value that is exactly `TBD`. If all items in a list are `TBD`, omit that
-list/block entirely.
+**Use the candidate's own words.** Bullets, summary lines, and skill names
+should sound like the candidate. Light editing for clarity, brevity, or
+active voice is fine. Wholesale rewording to match JD vocabulary is the
+signature of a tailored resume and erodes credibility.
+
+**TBD filtering.** Profile data may contain `TBD` as a placeholder value.
+Silently skip any value that is exactly `TBD`. If all items in a list are
+`TBD`, omit that list/block entirely.
 
 #### Professional Summary
 
-Do not copy the profile's `summary` field verbatim. Construct a 2-3 sentence
-summary that:
-- Opens with a role-aligned identity statement (e.g., "Platform engineer with
-  12 years building distributed systems at scale")
-- Highlights 2-3 differentiators most relevant to the target role
-- Closes with a scope/impact signal (team size, system scale, business outcome)
+Construct a 2-3 sentence summary grounded in the candidate's actual identity
+from `summary.json`. The summary should:
+- Open with the candidate's real identity (their actual title, years, and
+  domain) — not a JD-aligned identity. If the candidate is a backend engineer
+  applying to a platform role, the summary still describes a backend engineer
+  whose work is relevant to platform problems — not a "platform engineer."
+- Highlight 2-3 genuine differentiators. When a JD is provided, prefer
+  differentiators that happen to be JD-relevant *and* truly central to the
+  candidate. Do not promote a minor capability to a differentiator just
+  because the JD asks for it.
+- Close with a real scope/impact signal (team size, system scale, business
+  outcome) drawn from the profile.
 
 Draw from `summary.json`, `experience.json` (recent role highlights), and
-`skills.json` to compose this — not from any single source.
+`skills.json` to compose this — staying close to the candidate's own framing.
+Light editing for length and flow is fine; do not rewrite the candidate's
+identity statement to match a JD.
 
 **Tool/framework attribution**: When mentioning specific tools or frameworks in
 the summary, prefer the project-level `skills` field (what the person personally
@@ -221,49 +257,80 @@ For each role to include:
    reducing end-to-end latency by 40%"). A combined bullet is stronger than
    two separate ones.
 
-4. **Reframe for the target role** — Adjust framing to speak the JD's
-   language. If the JD emphasizes "scalability" and the source says "handled
-   increased load", reframe to "scaled system to handle 10x traffic growth."
-   Reframing means choosing the right lens — never fabricate or exaggerate.
+4. **Edit lightly, do not reframe** — Tighten bullets for clarity, brevity, and
+   active voice. Preserve the candidate's own terminology and framing. Do not
+   substitute JD vocabulary for the candidate's vocabulary unless the two
+   genuinely refer to the same thing in the candidate's domain (e.g., "K8s"
+   and "Kubernetes" are interchangeable; "handled increased load" and
+   "architected for scalability" are not). When a quantifiable impact is
+   already present in the source, lead with it; do not invent or estimate
+   numbers that aren't there.
 
-5. **Select and order** — Pick 3-5 strongest bullets per role. Lead with the
-   most impressive. Recent roles get more bullets; older roles get fewer.
-   For a 1-2 page resume, total experience bullets across all roles should
-   be roughly 12-20.
+5. **Select and order** — Recent or directly relevant roles get 3-5 of their
+   strongest bullets, leading with the most impressive. Older or less
+   relevant roles get 1-2. For a 1-2 page resume, total experience bullets
+   across all roles should be roughly 12-20.
 
-6. **Cut roles that don't contribute** — If a role adds nothing relevant to
-   the target position, omit it entirely. A gap in employment history is
-   better than a filler role that dilutes the narrative.
+6. **Keep employment continuity; trim the bullets, not the role** — If a role
+   adds little to the target position, keep the role line (title, company,
+   dates) and reduce it to one or two bullets rather than dropping it.
+   Silently omitting a role creates an apparent employment gap, which on an
+   honest resume looks worse than a thin entry. Only drop very early or
+   short roles that the candidate has already pruned from their own profile
+   narrative.
 
 #### Skills Section
 
-Do not flatten all profile skill categories into the resume unchanged.
+`skills.json` is the source of truth — it is the candidate's curated record
+of what they have actually worked on. Project `tech_stack` lists in
+`experience.json` describe the whole project's stack and may include
+technologies the candidate did not personally use, so do **not** pull from
+`tech_stack` into the Skills section.
 
-1. **Select for relevance** — Include skills that match JD requirements first,
-   then skills that support the narrative angle, then notable adjacent skills.
-   Omit skills that are irrelevant to the target role.
-2. **Match JD terminology** — Use the exact terms from the JD where they
-   refer to the same skill (e.g., if JD says "Kubernetes" don't write "K8s").
-3. **Group strategically** — Group by what makes sense for the target role
-   (e.g., "Cloud & Infrastructure", "Languages", "Data & ML"), not necessarily
-   by how the profile categorizes them.
-4. **Order within groups** — Most relevant skills first within each group.
+1. **Start from `skills.json`** — Use its categories and items as the
+   complete pool. Do not introduce skills from elsewhere.
+
+2. **Curate within categories, don't drop categories** — Within each
+   category, drop only items that are genuinely obsolete and would not be
+   claimed today (e.g., Active Server Pages from 20 years ago) or items
+   irrelevant to any plausible reading of the candidate's current
+   profession.
+
+   Do **not** drop entire categories just because a JD doesn't emphasize
+   them. For an architect or engineer, categories like Databases, Messaging,
+   Monitoring, Build & Testing, and Application Servers are part of the
+   professional baseline — omitting them under-represents the candidate and
+   makes the resume read as JD-shaped. A category is dropped only when it
+   is genuinely outside the candidate's domain (rare).
+
+3. **Use canonical terminology** — Where the JD and the profile refer to
+   the same skill with different names, use the canonical industry term
+   (e.g., "Kubernetes" rather than "K8s"). Do not substitute a JD-specific
+   phrase for a skill the candidate would not naturally describe that way.
+
+4. **Order within and across groups** — Within each group, list the
+   strongest or most relevant items first. When a JD is provided, the most
+   JD-relevant group can lead; otherwise default to the candidate's
+   `skills.json` order.
 
 #### Other Sections
 
 - **Education**: Include degrees. Keep minimal unless education is a JD
   requirement (e.g., "PhD required").
-- **Certifications**: Include only those relevant to the target role.
-  Prioritize certifications the JD mentions or implies.
+- **Certifications**: Include those relevant to the target role; prioritize
+  ones the JD mentions or implies. Drop certifications that have nothing to
+  do with the role.
 - **Open Source**: Default to including when the target role values hands-on
   building — startups, IC architect roles, platform engineering, developer
-  tools. Open source projects signal a builder who ships beyond their day job.
-  Omit only when space is tight and the projects add no relevant signal (e.g.,
-  applying for a pure management role, or the projects are in unrelated tech).
-  When included, add a brief "Open Source" or "Projects" section after
-  Experience with project name, one-line description, and tech stack.
+  tools. Omit only when space is tight and the projects add no relevant
+  signal. When included, add a brief "Open Source" or "Projects" section
+  after Experience with project name, one-line description, and tech stack.
 - **Patents**: Include if relevant to the role or domain. De-emphasize if
   the user's preferences say so.
+- **Blogs / Publications**: Include a short section when blog posts or
+  technical articles demonstrate domain expertise relevant to the role
+  (e.g., a backend candidate's distributed-systems writing). List 2-4 of
+  the most relevant pieces with title and venue. Omit when nothing matches.
 - **Languages**: Include if the role involves international work or the JD
   mentions language requirements.
 
@@ -274,9 +341,12 @@ Consult `${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/resume-conventi
 and keyword gap analysis steps.
 
 Key points: use standard section headings, plain formatting (no tables/columns),
-spell out acronyms on first use, consistent "Mon YYYY" dates, and run a keyword
-gap analysis against the JD to weave in missing terms the user genuinely
-possesses. When no JD is provided, still apply formatting and acronym rules.
+spell out acronyms on first use, consistent "Mon YYYY" dates. When a JD is
+provided, run a keyword gap analysis and weave in only the missing terms the
+candidate **genuinely possesses** — never insert keywords for skills the
+candidate does not actually have. A keyword the candidate cannot defend in an
+interview is a liability, not an optimization. When no JD is provided, still
+apply formatting and acronym rules.
 
 ### 6. Generate Markdown Resume
 
@@ -377,8 +447,8 @@ publications/patents, languages, projects), date formats, and which sections
 to omit.
 
 Key rules:
-- Map the **tailored** content (not raw profile data) — the JSON Resume must
-  match `resume.md` exactly: same bullets, same summary, same skill ordering.
+- Map the **selected** content — the JSON Resume must match `resume.md`
+  exactly: same bullets, same summary, same skill ordering.
 - Omit empty sections entirely (no empty arrays).
 - Patents map to `publications` (closest semantic fit in JSON Resume schema).
 
@@ -395,6 +465,20 @@ become "delivered", "helped develop" should not become "built." For every
 tool or framework mentioned in connection with a specific achievement, verify
 it appears in that project's `skills` or `tech_stack` — not a different project within the same role.
 
+**Tailoring honesty test** — Re-read the resume imagining the candidate sent
+it for a *different but plausible* role with no edits. Does it still read as
+a faithful representation of the candidate? If it reads as obviously
+written-for-one-JD (identity reshaped, JD vocabulary woven throughout, a
+single tool dominating the summary, claims that strain credibility), the
+tailoring has gone too far. Pull back: restore the candidate's natural
+framing, demote over-promoted skills, remove inserted JD keywords that don't
+reflect genuine experience.
+
+**Section coverage** — Confirm the resume draws on all relevant sections
+available in the profile, not just experience and skills. Education,
+certifications, open source, patents, and languages should be considered
+and included where they add real signal.
+
 **Proportional emphasis** — For each tool foregrounded in the summary's
 identity statement or as the lead of the first skill group, count the
 projects in the foregrounded roles where it actually appears. If under
@@ -407,9 +491,10 @@ wherever it was genuinely used.
 one is reflected in the generated content. If any preference was missed or
 contradicted, revise before proceeding.
 
-**Narrative coherence** — Read the resume top to bottom. Does it tell a coherent
-story about why this person is a strong fit? Are there jarring jumps, redundant
-bullets, or sections that feel disconnected from the target role?
+**Narrative coherence** — Read the resume top to bottom. Does it read as a
+coherent professional record? Are there jarring jumps, redundant bullets, or
+formatting inconsistencies? The goal is a clear, honest read — not a
+JD-shaped argument.
 
 ### 9. Present to User
 
@@ -418,29 +503,27 @@ Confirm files written and summarize what was generated:
 - `resume.json` — importable into [Reactive Resume](https://rxresu.me/) or
   other JSON Resume compatible tools for visual formatting
 
-Provide a brief summary: roles included, word count, and tailoring strategy
-(which JD requirements were addressed, which profile strengths were
-foregrounded, and any JD requirements with no matching profile evidence).
-Do not dump the full resume into the conversation — the user can read the
-files directly. Show content inline only if the user asks to see it.
+Provide a brief summary: roles included, word count, and (if a JD was
+provided) which profile strengths were foregrounded and which JD
+requirements have no matching profile evidence. Do not dump the full resume
+into the conversation — the user can read the files directly. Show content
+inline only if the user asks to see it.
 
 ## Output Checklist
 
 Before finishing, verify:
 
-- [ ] Resume tells a coherent story about fit for the target role (not a data dump)
-- [ ] Resume is tailored to the JD or role description (if provided)
-- [ ] Professional summary was constructed (not copied from summary.json)
-- [ ] Experience bullets were selected by relevance and impact (not all bullets included)
-- [ ] Skills were curated for the target role (not a full flatten of profile categories)
-- [ ] ATS optimization applied (standard headings, plain formatting, keywords present)
-- [ ] All content is factual — sourced from the master profile, not fabricated
-- [ ] Foregrounded skills/tools reflect their real share of the candidate's work (no minority-share tool anchors the summary or leads skills)
-- [ ] Source qualifiers preserved (projected/expected/targeted/estimated/almost)
-- [ ] Action verbs match actual contribution scope — no inflation
+- [ ] Reads as the candidate's own resume — would still feel honest if sent for a different but plausible role
+- [ ] All available profile sections were considered (experience, skills, education, certifications, open source, patents, blogs, languages); included where they add real signal
+- [ ] JD use (if any) limited to selection and ordering — no JD-driven reframing of identity, bullets, or skill names
+- [ ] Summary uses the candidate's real identity; bullets use the candidate's own language with light editing only
+- [ ] Skills include only what the candidate genuinely has — no inserted JD keywords for missing skills
+- [ ] Foregrounded skills/tools reflect their real share of the candidate's work
+- [ ] Source qualifiers preserved (projected/expected/targeted/estimated/almost); action verbs match actual contribution scope
+- [ ] Employment continuity preserved — no silent role drops creating apparent gaps
+- [ ] ATS-clean: standard headings, plain formatting, consistent "Mon YYYY" dates, no decorative elements
 - [ ] Length matches requested page count (1 page ≈ 400 words, 2 pages ≈ 700-900 words)
-- [ ] `resume.md` formatting is PDF-ready (proper header, sections, spacing, no decorative elements)
-- [ ] `resume.json` written, matches `resume.md` content, and conforms to JSON Resume schema
+- [ ] `resume.json` matches `resume.md` content and conforms to JSON Resume schema
 - [ ] Output honors all applicable presentation preferences (global + resume-specific)
 
 ## Reference Files

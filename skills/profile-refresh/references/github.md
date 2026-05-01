@@ -172,7 +172,11 @@ Extract `items` array from the response, then pick `title`, `html_url`,
 ### Extraction rules
 
 - Only include merged PRs to repos the user does not own.
-- Project name is the last path segment of `repository_url`.
+- Project name is the **last two path segments** of `repository_url` joined
+  with `/` — i.e., `owner/repo` (e.g., `camunda/connectors`,
+  `NoriginMedia/Norigin-Spatial-Navigation`). Bare repo names like
+  `connectors` are ambiguous out of context; `owner/repo` uniquely
+  identifies the project.
 - The search API returns at most 1000 results; 30 per page is a reasonable
   default for profile purposes.
 
@@ -195,7 +199,7 @@ Extract `items` array from the response, then pick `title`, `html_url`,
 
 | API field | Template field |
 |-----------|---------------|
-| last path segment of `repository_url` | `project` |
+| `owner/repo` from `repository_url` (last two path segments) | `project` |
 | `html_url` | `url` |
 | `title` | `description` |
 | (always PR) | `type`: `"PR"` |

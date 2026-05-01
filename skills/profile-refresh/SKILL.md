@@ -203,6 +203,13 @@ using language + topics + README extraction (see "Combining into `tech_stack`
 for a new project" in `references/github.md`). For new blog entries and
 contributions, populate all factual fields from the API.
 
+While merging, **track the set of tech_stack entries newly introduced to
+the section** — that is, every tech in a new project's `tech_stack`, plus
+any tech added during opt-in re-enrichment of an existing project. This
+set is used by Section 8 to surface skills suggestions. Default refresh of
+an existing project introduces no new tech (its `tech_stack` is untouched),
+so the set stays empty for that case.
+
 **Open source — existing entries are not refreshed by default.**
 
 For open_source projects and contributions that already exist in the section
@@ -329,6 +336,35 @@ anything changed:
 - Any sources that failed to fetch, with the error (e.g., "GitHub: 403 rate
   limit exceeded", "Hashnode: no publication found for handle 'xyz'").
 
+**Skills suggestions (only when new tech_stack entries were introduced):**
+
+If the "newly introduced tech" set tracked in Section 5 is non-empty, surface
+candidates the user might want to add to their `skills` section. Steps:
+
+1. Read `sections/skills.json` (if it exists). Collect every entry in
+   `skills.categories[*].items` plus `skills.soft` into a single set,
+   normalized to lowercase.
+2. For each tech in the newly introduced set, check whether it already
+   appears in that set (case-insensitively, ignoring punctuation/spacing
+   differences — `Next.js`, `nextjs`, and `next-js` all match).
+3. Anything not already present is a candidate.
+
+Report candidates grouped by their source project, in plain prose:
+
+> **Skills suggestions:** Project `claude-session-profiler` introduced new
+> tech not in your skills section: **Python**, **asciinema**, **uv**.
+> Want me to add any of these via `profile-section`? You can also tell me
+> which to skip (some build-tool entries may not be worth listing as
+> skills).
+
+If `sections/skills.json` does not exist, skip this step — the user has
+not built their skills section yet, and `/profile-init` or `profile-section`
+will populate it from scratch.
+
+Do **not** modify `sections/skills.json` from this skill. Suggestions are
+advisory; the user (or a follow-up `profile-section` call) is the authority
+on what becomes a claimed skill.
+
 ## Error Handling
 
 API calls can fail for various reasons. Handle these gracefully:
@@ -366,6 +402,7 @@ Before finishing, verify:
 - [ ] If the merged content equals the existing file: no rewrite, no `last_updated` bump, no-op reported
 - [ ] If content changed: section file written to the correct `sections/` path (`.json` extension) and `last_updated` bumped in `profile-index.json`
 - [ ] Change summary reported to the user (per the Section 8 templates)
+- [ ] If new tech_stack entries were introduced: skills suggestions surfaced (candidates not already in `sections/skills.json`); `skills.json` was not modified
 
 ## Reference Files
 
