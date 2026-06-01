@@ -38,7 +38,7 @@ The project follows a **separation of schema and workflow**:
 
 1. **Init** — `/profile-init` command collects data from user sources (resume, GitHub, LinkedIn, blog platforms), generates `profile-index.json` early (with data sources and an empty sections array that is populated incrementally), builds all section files, verifies source coverage (cross-references generated sections against original sources to catch missing information), and validates the output against the template schema. Dynamic section refresh is not automatic — init configures the data sources and informs the user to run `profile-refresh` when ready. This is the entry point for new users. Can be re-run to rebuild from scratch.
 2. **Maintain** — `profile-section` builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `contributions` (work done) and `impact` (quantifiable outcomes), date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms (if source configuration exists in `profile-index.json`). `profile-refresh` can also be invoked directly by the user at any time.
-3. **Assemble** — `profile-assemble` reads JSON section files, renders them through the `profile-layout.md` template, and produces a single `profile.md` on demand (e.g., before generating a resume or export).
+3. **Assemble** — `profile-assemble` reads JSON section files, renders them through the `profile-layout.md` template, and produces a single human-readable `profile.md` on demand. This is an **optional side-branch, not a prerequisite for anything**: every generate and review skill reads `sections/*.json` directly (discovered via `profile-index.json`) and none of them consume `profile.md`. Assemble only when the user explicitly wants the whole profile as one document to read or share.
 
 ### Key Files
 
@@ -68,6 +68,7 @@ profile-index-template.md          — JSON schema for profile-index.json
 commands/profile-init.md           — /profile-init command (interactive onboarding)
 commands/profile-validate.md       — /profile-validate command (validate & fix profile docs)
 commands/linkedin-rec.md           — /linkedin-rec command (generate recommendation request message)
+skills/profile-guide/              — Orientation & how-to guidance; recommends next step from project state (advise-only)
 skills/profile-preferences/        — Add/update/remove presentation preferences
 skills/profile-section/            — Generate/update a single section
 skills/profile-refresh/            — Fetch latest data from external platforms for dynamic sections
@@ -92,6 +93,9 @@ Skills use YAML frontmatter with `name` and `description` (third-person, with tr
 - `/linkedin-rec` — Generate a recommendation request message for a former colleague. Takes `[Name], [Company], [optional: project]` as arguments. Reads experience, identity, summary, and preferences to craft a personalized, concise message.
 
 ### Skill Categories
+
+**Guidance layer** (orientation — advise-only, never runs other skills):
+- `profile-guide` — inspects the project's actual current state and recommends the single best next step, and explains how the pieces fit together. Points to the right skill/command but never invokes it. Triggers on how-to and "what should I do next / which skill for X" questions, NOT on concrete action requests (those belong to the dedicated skill).
 
 **Data layer** (profile as source of truth):
 - `profile-section`, `profile-refresh`, `profile-assemble`
