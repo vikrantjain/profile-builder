@@ -36,7 +36,7 @@ fields:
 
   avatar_url:
     required: false
-    description: "URL to profile photo or avatar. Retained as a data field for non-Markdown consumers (e.g. LinkedIn, GitHub profile generators); not rendered in this Markdown layout."
+    description: "URL to profile photo or avatar. Consumed by resume-generate as JSON Resume `basics.image` in resume.json. Omitted from resume.md and the Markdown layout, which stay photo-free for ATS and readability."
 
   # ── Online Presence ─────────────────────────────────────
   github:
@@ -94,7 +94,11 @@ fields:
       type:          { required: false, description: "Employment type: Full-time / Part-time / Contract / Freelance" }
       start_date:    { required: true,  description: "Start month and year, e.g. Jan 2021" }
       end_date:      { required: false, description: "End month and year. Omit if current role" }
-      description:   { required: true,  description: "Key responsibilities and achievements. Use bullet points." }
+      description:
+        required: true
+        type: list
+        description: "Key responsibilities and achievements as a list of bullet strings. Captures role-level bullets not tied to a specific project. Use ['TBD'] if none can be extracted."
+        default: ["TBD"]
       projects:
         required: false
         type: list

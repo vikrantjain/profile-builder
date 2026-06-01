@@ -18,7 +18,9 @@
 ### {{title}} — {{company}}{{#location}} · {{location}}{{/location}}
 *{{start_date}} – {{end_date | default "Present"}}*{{#type}} · {{type}}{{/type}}
 
-{{description}}
+{{#each description}}
+- {{.}}
+{{/each}}
 
 {{#projects}}
 #### Projects

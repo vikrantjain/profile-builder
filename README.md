@@ -24,24 +24,37 @@ Instead of maintaining separate profiles on every platform, you maintain one mas
 
 ## Installation
 
-Clone this repo and add it to your Claude Code plugins:
+Profile Builder is distributed through the **`my-claude-plugins`** marketplace. Install it from within Claude Code:
 
-```bash
-# Clone the plugin
-git clone https://github.com/vikrantjain/profile-builder.git
+```shell
+# 1. Add the marketplace (one-time)
+/plugin marketplace add vikrantjain/my-claude-plugins
 
-# Add to Claude Code (from any project directory)
-claude plugins add /path/to/profile-builder
+# 2. Install the plugin
+/plugin install profile-builder@my-claude-plugins
+
+# 3. Activate it
+/reload-plugins
 ```
 
-Or add it directly to your Claude Code settings file (`~/.claude/settings.json`):
+### Local / development install
 
-```json
-{
-  "plugins": [
-    "/path/to/profile-builder"
-  ]
-}
+To run from a local clone (e.g. while hacking on the plugin), add the marketplace by path:
+
+```shell
+git clone https://github.com/vikrantjain/my-claude-plugins.git
+```
+
+```shell
+# From within Claude Code:
+/plugin marketplace add ./my-claude-plugins
+/plugin install profile-builder@my-claude-plugins
+```
+
+Or load it for a single session without installing:
+
+```bash
+claude --plugin-dir ./my-claude-plugins/plugins/profile-builder
 ```
 
 ## Quick Start
@@ -73,6 +86,7 @@ Or add it directly to your Claude Code settings file (`~/.claude/settings.json`)
 |---|---|
 | `/profile-init` | Interactive onboarding. Collects data sources, builds all sections, generates the profile index. Entry point for new users. |
 | `/profile-validate` | Validate profile documents against the template schema. Checks for missing fields, unfilled placeholders, and structural issues. Offers interactive fixes. |
+| `/linkedin-rec` | Generate a recommendation request message for a former colleague. Takes `[Name], [Company], [optional: project]` as arguments. |
 
 ## Skills
 
@@ -82,7 +96,7 @@ These skills manage the master profile — the structured source of truth.
 
 | Skill | What it does | Example prompts |
 |---|---|---|
-| `profile-section` | Generate or update a single profile section | *"Update my experience section"*, *"Rebuild my skills section"* |
+| `profile-section` | Generate or update a single profile section (writes to the data layer, so it's invoked explicitly) | Run `/profile-section`, then describe the change (e.g. *"add my new certification"*) |
 | `profile-refresh` | Fetch latest data from external platforms (GitHub, Hashnode, Dev.to) | *"Refresh my blog posts"*, *"Sync my open source data"* |
 | `profile-assemble` | Stitch section files into a single `profile.md` | *"Assemble my profile"*, *"Build full profile from sections"* |
 

@@ -75,7 +75,7 @@ condition is met — the user's next step is usually to finish that stage.
 | Stage | What you see | Recommend |
 |---|---|---|
 | **Empty** | No `profile-index.json` and no `sections/` | `/profile-init` to collect sources and build the profile from scratch |
-| **Partial** | Index exists but key sections missing from `sections[]` (e.g. no experience, skills, or summary) | `profile-section` to build each missing section |
+| **Partial** | Index exists but key sections missing from `sections[]` (e.g. no experience, skills, or summary) | `/profile-section` to build each missing section |
 | **Stale dynamic data** | `blogs` / `open_source` sections present, `sources[]` configured, but their `last_updated` is well in the past (rough rule: > ~30 days) | `profile-refresh` to pull latest entries before consuming the profile |
 | **Ready to consume** | Section data exists and is reasonably fresh | A generate or review skill, chosen from what the user wants (see map below) |
 
@@ -142,7 +142,7 @@ link, then give the shortest true path:
   just give the affirmative path.
 - **If section data is missing or sparse** → name the gap plainly ("there's no
   profile data yet") and give the ordered path: build sections
-  (`/profile-init` for a blank project, or `profile-section` for specific
+  (`/profile-init` for a blank project, or `/profile-section` for specific
   ones) → refresh dynamic sources if relevant → the generate skill.
 
 Make the branch you took explicit so the user understands *why* the path is
@@ -163,7 +163,7 @@ reproducing the documentation.
 **Lifecycle:** collect → maintain → consume.
 
 ```
-/profile-init  ──>  profile-section  ──────────────>  generate / review
+/profile-init  ──>  /profile-section  ─────────────>  generate / review
 (collect all)      (maintain one)         ▲           (reads sections/*.json)
                           │                │
                           └── profile-refresh (pull latest blogs / open_source)
@@ -185,8 +185,10 @@ generate a resume, LinkedIn content, a README, or a review.
 - **`/profile-init`** — interactive onboarding. Collects data from resume,
   GitHub, LinkedIn, blogs; builds all sections; writes `profile-index.json`.
   The entry point for an empty project; can be re-run to rebuild.
-- **`profile-section`** — create or update one section's data. Use for targeted
-  edits ("update my current role", "add a certification").
+- **`/profile-section`** — create or update one section's data. Invoked
+  explicitly (it writes the canonical data layer, so it is not auto-triggered):
+  run `/profile-section` for targeted edits like "add a certification" or
+  "update my current role".
 - **`profile-refresh`** — pull latest entries for dynamic sections (`blogs`,
   `open_source`) from configured sources. Additive by default; preserves
   curated fields. Run before consuming if dynamic data is stale.

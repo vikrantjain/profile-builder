@@ -1,5 +1,12 @@
 {
   "name": "profile-builder",
-  "version": "0.1.0",
-  "description": "Profile management skills for generating, updating, and assembling professional profiles from a structured template."
+  "version": "1.0.0",
+  "description": "Profile management skills for generating, updating, and assembling professional profiles from a structured template.",
+  "author": {
+    "name": "Vikrant Jain"
+  },
+  "homepage": "https://github.com/vikrantjain/profile-builder",
+  "repository": "https://github.com/vikrantjain/profile-builder",
+  "license": "MIT",
+  "keywords": ["profile", "resume", "linkedin", "github", "hashnode", "career", "cv"]
 }

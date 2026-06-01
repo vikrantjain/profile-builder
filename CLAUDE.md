@@ -37,7 +37,7 @@ The project follows a **separation of schema and workflow**:
 ### Profile Lifecycle
 
 1. **Init** — `/profile-init` command collects data from user sources (resume, GitHub, LinkedIn, blog platforms), generates `profile-index.json` early (with data sources and an empty sections array that is populated incrementally), builds all section files, verifies source coverage (cross-references generated sections against original sources to catch missing information), and validates the output against the template schema. Dynamic section refresh is not automatic — init configures the data sources and informs the user to run `profile-refresh` when ready. This is the entry point for new users. Can be re-run to rebuild from scratch.
-2. **Maintain** — `profile-section` builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `contributions` (work done) and `impact` (quantifiable outcomes), date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms (if source configuration exists in `profile-index.json`). `profile-refresh` can also be invoked directly by the user at any time.
+2. **Maintain** — `profile-section` (invoked explicitly via `/profile-section`; it is `disable-model-invocation: true` to protect the data layer) builds or updates individual sections. It includes an intelligent field mapping step that scans input for all template fields (required and optional) using semantic matching — e.g., "Action/Achievement" bullets → `contributions` (work done) and `impact` (quantifiable outcomes), date ranges → `duration`, technology lists → `tech_stack`. Required fields with no extractable data get a `TBD` placeholder default. For dynamic sections (blogs, open_source) it calls `profile-refresh` to fetch latest data from configured platforms (if source configuration exists in `profile-index.json`). `profile-refresh` can also be invoked directly by the user at any time.
 3. **Assemble** — `profile-assemble` reads JSON section files, renders them through the `profile-layout.md` template, and produces a single human-readable `profile.md` on demand. This is an **optional side-branch, not a prerequisite for anything**: every generate and review skill reads `sections/*.json` directly (discovered via `profile-index.json`) and none of them consume `profile.md`. Assemble only when the user explicitly wants the whole profile as one document to read or share.
 
 ### Key Files
@@ -99,6 +99,7 @@ Skills use YAML frontmatter with `name` and `description` (third-person, with tr
 
 **Data layer** (profile as source of truth):
 - `profile-section`, `profile-refresh`, `profile-assemble`
+- **Invocation policy:** `profile-section` is `disable-model-invocation: true` — it writes to the canonical `sections/*.json` source of truth, so it is invoked **explicitly** (`/profile-section`) to prevent accidental data corruption from a misread intent. It is never auto-triggered and is not invoked programmatically by other skills. Do not re-enable model invocation on it. `profile-refresh` stays model-invocable (safe-by-default additive merge, no-op detection) and can still be called by `profile-section` for dynamic sections once the user has explicitly run it. `/profile-init` (a command) is the other explicit data writer.
 
 **Preferences layer** (persistent presentation directives):
 - `profile-preferences` — manages `preferences.md`; consumed by export and review skills
@@ -170,6 +171,6 @@ Some skills include reference docs and scripts:
 
 ### External Dependencies
 
-- **Playwright MCP** — configured in `.mcp.json` inside the `linkedin-review` skill directory; required by `linkedin-review` for fetching LinkedIn profiles via browser automation
+- **Playwright MCP** — configured in `.mcp.json` at the plugin root (auto-loaded for the plugin); required by `linkedin-review` for fetching LinkedIn profiles via browser automation
 - **`gh` CLI** — used by `github-review` and `profile-refresh` for fetching GitHub profile data
 - **Hashnode GraphQL API** — public API at `gql.hashnode.com`, used by `hashnode-review` and `profile-refresh` via WebFetch (no authentication required)

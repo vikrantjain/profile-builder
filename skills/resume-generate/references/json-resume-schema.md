@@ -19,6 +19,7 @@ with `title`, `company`, `projects[].contributions`, `projects[].impact`, etc. a
 |------------------------|-----------------------------|-------------------------------------------------|
 | `name`                 | `identity.full_name`        | Direct map                                      |
 | `label`                | `identity.title`            | Current role or target role title                |
+| `image`                | `identity.avatar_url`       | Profile photo URL; omit if absent. `resume.json` only — `resume.md` stays photo-free for ATS |
 | `email`                | `identity.email`            | Direct map                                      |
 | `phone`                | `identity.phone`            | Omit if absent                                  |
 | `url`                  | `identity.website`          | Personal website URL                            |
@@ -53,14 +54,14 @@ in the identity section.
 | `url`             | (not in profile schema)      | Omit — no company URL field exists       |
 | `startDate`       | `experience[].start_date`    | ISO 8601: "YYYY-MM" or "YYYY-MM-DD"     |
 | `endDate`         | `experience[].end_date`      | ISO 8601; omit if current role           |
-| `summary`         | `experience[].description`   | Brief role overview (1 sentence)         |
-| `highlights[]`    | `experience[].description` (parsed bullets) and/or aggregated from `experience[].projects[].contributions` + `experience[].projects[].impact` | Array of achievement strings. Skip any `TBD` values. If all items are `TBD`, omit the array. |
+| `summary`         | (no direct source)           | Optional in JSON Resume; omit — role detail lives in `highlights[]` |
+| `highlights[]`    | `experience[].description` list items, aggregated with `experience[].projects[].contributions` + `experience[].projects[].impact` | Array of achievement strings. Skip any `TBD` values. If all items are `TBD`, omit the array. |
 
 The profile schema has `contributions` and `impact` on nested projects
 (`experience[].projects[].contributions` and `experience[].projects[].impact`),
 not on experience entries directly. To populate `work[].highlights[]` in JSON Resume:
 
-1. Parse the role's `description` into bullet points.
+1. Take the role's `description` list items directly — they are already bullet strings.
 2. Aggregate non-TBD `contributions` from the role's projects.
 3. Aggregate `impact` items from the role's projects — these are high-value
    bullets with quantifiable outcomes and should be prioritized.
@@ -139,8 +140,8 @@ intellectual property with identifiers, dates, and issuing bodies).
 | JSON Resume Field | Profile Source                | Notes                                  |
 |-------------------|------------------------------|----------------------------------------|
 | `name`            | `patents[].title`            | Patent title                           |
-| `publisher`       | `"United States Patent and Trademark Office"` or appropriate office | Issuing patent office |
-| `releaseDate`     | `patents[].grant_date`       | ISO 8601; use grant date if available  |
+| `publisher`       | derive from `patents[].jurisdiction` | Issuing patent office: `US` → "United States Patent and Trademark Office", `EU` → "European Patent Office", `WO` → "World Intellectual Property Organization". Default to USPTO only when `jurisdiction` is absent |
+| `releaseDate`     | `patents[].granted`          | ISO 8601 (`YYYY`); the grant year. Omit if pending |
 | `url`             | `patents[].url` or construct from patent number | e.g., `https://patents.google.com/patent/US10585682B2` |
 | `summary`         | `patents[].patent_number`    | Include patent number (e.g., "US Patent US10585682B2") |
 
