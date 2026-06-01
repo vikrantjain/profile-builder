@@ -24,37 +24,37 @@ Instead of maintaining separate profiles on every platform, you maintain one mas
 
 ## Installation
 
-Profile Builder is distributed through the **`my-claude-plugins`** marketplace. Install it from within Claude Code:
+Profile Builder ships as a **standalone plugin repository** — [`vikrantjain/profile-builder`](https://github.com/vikrantjain/profile-builder), containing a `plugin.json` plus skills and commands, with no bundled marketplace. Add it to your own setup one of two ways.
+
+### Option 1 — Load from a local clone (quickest)
 
 ```shell
-# 1. Add the marketplace (one-time)
-/plugin marketplace add vikrantjain/my-claude-plugins
+git clone https://github.com/vikrantjain/profile-builder.git
+```
 
-# 2. Install the plugin
-/plugin install profile-builder@my-claude-plugins
+```shell
+# Load it for the current Claude Code session:
+claude --plugin-dir ./profile-builder
+```
 
-# 3. Activate it
+Plugin skills/commands are namespaced — they appear as `/profile-builder:profile-init`, `/profile-builder:profile-section`, etc. (the short `/profile-init` form also works when the name is unambiguous). Run `/reload-plugins` to pick up edits if you modify the plugin.
+
+### Option 2 — Add it to your own marketplace (persistent)
+
+If you maintain a marketplace (any repo with a `.claude-plugin/marketplace.json`), add Profile Builder as a GitHub-sourced plugin entry:
+
+```json
+{
+  "name": "profile-builder",
+  "source": { "source": "github", "repo": "vikrantjain/profile-builder" }
+}
+```
+
+Then install it from within Claude Code and activate:
+
+```shell
+/plugin install profile-builder@<your-marketplace>
 /reload-plugins
-```
-
-### Local / development install
-
-To run from a local clone (e.g. while hacking on the plugin), add the marketplace by path:
-
-```shell
-git clone https://github.com/vikrantjain/my-claude-plugins.git
-```
-
-```shell
-# From within Claude Code:
-/plugin marketplace add ./my-claude-plugins
-/plugin install profile-builder@my-claude-plugins
-```
-
-Or load it for a single session without installing:
-
-```bash
-claude --plugin-dir ./my-claude-plugins/plugins/profile-builder
 ```
 
 ## Quick Start
