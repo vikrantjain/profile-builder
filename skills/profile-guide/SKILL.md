@@ -80,9 +80,10 @@ condition is met — the user's next step is usually to finish that stage.
 | **Ready to consume** | Section data exists and is reasonably fresh | A generate or review skill, chosen from what the user wants (see map below) |
 
 A separate **"wants the full document"** situation: if the user asks to read,
-share, or eyeball their entire profile as one file, recommend `profile-assemble`
+share, or eyeball their entire profile as one file, recommend `/profile-assemble`
 to produce `profile.md`. This is its own goal, not a step toward generating a
-resume/LinkedIn/etc. — those never need `profile.md`.
+resume/LinkedIn/etc. — those never need `profile.md`. It is invoked explicitly
+(not auto-triggered), so point the user to the command and let them run it.
 
 Staleness is a heuristic, not a gate. The ~30-day rule for dynamic data is a
 nudge, not a rule — surface it ("your blogs were last refreshed on
@@ -168,7 +169,7 @@ reproducing the documentation.
                           │                │
                           └── profile-refresh (pull latest blogs / open_source)
 
-         profile-assemble ──> profile.md   (optional: a single readable
+         /profile-assemble ──> profile.md  (optional: a single readable
                                             document to view or share)
 ```
 
@@ -192,10 +193,11 @@ generate a resume, LinkedIn content, a README, or a review.
 - **`profile-refresh`** — pull latest entries for dynamic sections (`blogs`,
   `open_source`) from configured sources. Additive by default; preserves
   curated fields. Run before consuming if dynamic data is stale.
-- **`profile-assemble`** — render the section JSON files into a single
-  human-readable `profile.md`. Use only when the user wants the whole profile
-  as one document to read or share. Not a prerequisite for any generate or
-  review skill — those read `sections/*.json` directly.
+- **`/profile-assemble`** — render the section JSON files into a single
+  human-readable `profile.md`. Invoked explicitly (not auto-triggered): run
+  `/profile-assemble` only when the user wants the whole profile as one
+  document to read or share. Not a prerequisite for any generate or review
+  skill — those read `sections/*.json` directly.
 
 *Preferences*
 - **`profile-preferences`** — save/update/remove persistent presentation

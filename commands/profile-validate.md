@@ -213,8 +213,8 @@ After all fixes are applied (or skipped), present a final summary:
 - Number of errors found and fixed.
 - Number of warnings found and resolved.
 - Remaining issues that need manual attention.
-- Suggest running `profile-assemble` if section files were modified to
-  regenerate `profile.md`.
+- Suggest running `/profile-assemble` if section files were modified and the
+  user wants to regenerate `profile.md`.
 
 ## Scope Boundary
 

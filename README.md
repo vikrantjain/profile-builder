@@ -98,7 +98,7 @@ These skills manage the master profile — the structured source of truth.
 |---|---|---|
 | `profile-section` | Generate or update a single profile section (writes to the data layer, so it's invoked explicitly) | Run `/profile-section`, then describe the change (e.g. *"add my new certification"*) |
 | `profile-refresh` | Fetch latest data from external platforms (GitHub, Hashnode, Dev.to) | *"Refresh my blog posts"*, *"Sync my open source data"* |
-| `profile-assemble` | Stitch section files into a single `profile.md` | *"Assemble my profile"*, *"Build full profile from sections"* |
+| `profile-assemble` | Stitch section files into a single `profile.md` (optional output, invoked explicitly) | Run `/profile-assemble` when you want the whole profile as one readable document |
 
 ### Preferences
 
@@ -136,7 +136,7 @@ These skills fetch your live profile from a platform, compare it against the mas
                                                       ↓
                                             sections/*.json files
                                                       ↓
-                              profile-assemble  →  profile.md (optional)
+                             /profile-assemble  →  profile.md (optional)
                                                       ↓
                               Generate / Review skills consume sections/*.json directly
 ```
