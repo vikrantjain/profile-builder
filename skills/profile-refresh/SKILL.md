@@ -84,7 +84,8 @@ to their index.
 ### 2. Determine Target
 
 Accept a section name from the user (e.g., `blogs`, `open_source`)
-or `all` to refresh every dynamic section.
+or `all` to refresh every dynamic section. If the user does not name a
+target (e.g., just "refresh my sources"), default to `all`.
 
 If the user says `all`, iterate through each unique section listed in the
 `feeds` arrays. Otherwise, filter the `sources` array to entries whose `feeds`
@@ -349,16 +350,16 @@ Report candidates grouped by their source project, in plain prose:
 
 > **Skills suggestions:** Project `claude-session-profiler` introduced new
 > tech not in your skills section: **Python**, **asciinema**, **uv**.
-> Want me to add any of these via `profile-section`? You can also tell me
+> Run `/profile-section` if you want to add any of these. You can also tell me
 > which to skip (some build-tool entries may not be worth listing as
 > skills).
 
 If `sections/skills.json` does not exist, skip this step — the user has
-not built their skills section yet, and `/profile-init` or `profile-section`
+not built their skills section yet, and `/profile-init` or `/profile-section`
 will populate it from scratch.
 
 Do **not** modify `sections/skills.json` from this skill. Suggestions are
-advisory; the user (or a follow-up `profile-section` call) is the authority
+advisory; the user (or a follow-up `/profile-section` run) is the authority
 on what becomes a claimed skill.
 
 ## Error Handling

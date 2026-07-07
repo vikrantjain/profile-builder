@@ -95,7 +95,7 @@ and access fields from the `data` object.
 | `sections/blogs.json` | Posts the README could surface |
 
 If key section files don't exist, inform the user and suggest running
-`/profile-init` or `profile-section` to generate them. The review can still
+`/profile-init` or `/profile-section` to generate them. The review can still
 proceed as a general quality assessment, but master-profile-informed
 insights will be limited.
 

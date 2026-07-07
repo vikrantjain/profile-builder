@@ -88,7 +88,7 @@ Key sections and what they provide:
 - `sections/patents.json` — patents (if user wants to highlight)
 
 If required section JSON files do not exist, inform the user and suggest
-running `/profile-init` or `profile-section` to generate them.
+running `/profile-init` or `/profile-section` to generate them.
 
 ### 3. Apply Presentation Preferences
 

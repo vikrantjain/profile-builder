@@ -73,7 +73,7 @@ Read the relevant profile section JSON files from `sections/`. Consult
 Parse each JSON file and access fields directly from the `data` object.
 
 If required section JSON files do not exist, inform the user and suggest
-running `/profile-init` or `profile-section` to generate them.
+running `/profile-init` or `/profile-section` to generate them.
 
 Key sections and what they provide:
 

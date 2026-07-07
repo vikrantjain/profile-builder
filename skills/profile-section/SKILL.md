@@ -58,8 +58,8 @@ single section of their profile. Common scenarios:
 - User asks to regenerate a section from scratch
 
 For first-time setup of all sections at once, use the `/profile-init` command.
-For rendering section files into a full Markdown document, use the
-`profile-assemble` skill.
+For rendering section files into a full Markdown document, run
+`/profile-assemble`.
 
 ## Available Sections
 
@@ -108,8 +108,9 @@ by `profile-assemble`. Do not load or process other sections' fields.
 
 ### 4. Gather Data
 
-**Dynamic sections (blogs, open_source):** Check if `profile-index.json` exists
-and contains a `sources` array. If it does and the target section appears in
+**Dynamic sections (blogs, open_source):** Check whether `profile-index.json`
+(already confirmed to exist in the pre-flight step) contains a `sources`
+array. If it does and the target section appears in
 any source's `feeds` list, invoke the `profile-refresh` skill first to fetch
 the latest data from configured platforms and update the section file. Then read
 the updated section file as the baseline for any additional user-provided data.

@@ -122,7 +122,7 @@ file and access fields from the `data` object.
 | `sections/languages.json` | Languages — benchmark for Languages |
 
 If key section files don't exist, inform the user and suggest running
-`/profile-init` or `profile-section` to generate them. The review can
+`/profile-init` or `/profile-section` to generate them. The review can
 still proceed for LinkedIn-only sections and general quality assessment,
 but master-profile-informed insights will be limited.
 

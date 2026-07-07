@@ -90,6 +90,12 @@ Then install it from within Claude Code and activate:
 
 ## Skills
 
+### Guidance
+
+| Skill | What it does | Example prompts |
+|---|---|---|
+| `profile-guide` | Inspects your project's current state and recommends the single best next step; explains how the pieces fit together (advise-only — never runs other skills) | *"How do I use this plugin?"*, *"What should I do next?"*, *"What do I need before I can generate a resume?"* |
+
 ### Data Layer
 
 These skills manage the master profile — the structured source of truth.
@@ -204,21 +210,29 @@ Preferences are saved to `preferences.md` and grouped by scope (Global, LinkedIn
 commands/
   profile-init.md                      ← /profile-init command
   profile-validate.md                  ← /profile-validate command
+  linkedin-rec.md                      ← /linkedin-rec command
 skills/
+  profile-guide/SKILL.md               ← Orientation & next-step guidance
   profile-section/SKILL.md             ← Generate/update a single section
   profile-refresh/SKILL.md             ← Fetch latest from external platforms
+    references/                        ← Fetch recipes (github.md, hashnode.md, devto.md)
   profile-assemble/SKILL.md            ← Stitch sections into full profile
   profile-preferences/SKILL.md         ← Manage presentation preferences
   linkedin-generate/SKILL.md           ← Generate LinkedIn content
+    references/                        ← LinkedIn field limits and formatting rules
   resume-generate/SKILL.md             ← Generate tailored resume
+    references/                        ← Resume conventions + JSON Resume schema mapping
   github-generate/SKILL.md             ← Generate GitHub README
+    references/                        ← README conventions and badge syntax
   hashnode-generate/SKILL.md           ← Generate Hashnode content
+    references/                        ← Hashnode field limits and formatting rules
   linkedin-review/SKILL.md             ← Review LinkedIn profile
+    references/                        ← Playwright scrape recipe
   github-review/SKILL.md               ← Review GitHub profile
   hashnode-review/SKILL.md             ← Review Hashnode profile
 profile-template.md                    ← Canonical profile schema
-profile-layout.md                     ← Markdown rendering template (used by profile-assemble)
-profile-index-template.md             ← JSON schema for profile-index.json
+profile-layout.md                      ← Markdown rendering template (used by profile-assemble)
+profile-index-template.md              ← JSON schema for profile-index.json
 CLAUDE.md                              ← Project instructions for Claude Code
 .mcp.json                              ← MCP server config (Playwright)
 ```

@@ -38,7 +38,7 @@
 | `sections/experience.json` → each entry | Experience | One entry per role |
 | `sections/education.json` → each entry | Education | One entry per degree |
 | `sections/skills.json` → categories.items | Skills | Curate, prioritize by impact, and normalize; see Skills Strategy |
-| `sections/certifications.json` → each entry | Licenses & Certifications | |
+| `sections/certifications.json` → each entry | Licenses & Certifications | `id` → Credential ID field; `url` → Credential URL field |
 | `sections/open-source.json` → projects | Projects | Map open_source.projects to LinkedIn Projects section |
 | `sections/patents.json` → each entry | Patents | LinkedIn has a dedicated patents section |
 | `sections/languages.json` → each entry | Languages | |

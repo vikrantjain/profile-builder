@@ -102,6 +102,10 @@ job description, reorder categories and keywords to front-load JD matches.
 | `date`            | `certifications[].year`      | ISO 8601; convert year to "YYYY"       |
 | `url`             | `certifications[].url`       | Verification URL; omit if absent       |
 
+Note: the profile's `certifications[].id` (credential number) has no
+corresponding field in the JSON Resume schema — omit it. This is deliberate,
+not a lost mapping.
+
 ### languages (array) — one entry per language
 
 | JSON Resume Field | Profile Source               | Notes                                   |

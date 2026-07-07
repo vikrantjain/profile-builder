@@ -103,7 +103,7 @@ Then read the relevant section JSON files from `sections/`. Parse each JSON file
 and access fields directly from the `data` object.
 
 If required section JSON files do not exist, inform the user and suggest running
-`/profile-init` or `profile-section` to generate them. At minimum, read:
+`/profile-init` or `/profile-section` to generate them. At minimum, read:
 
 - `sections/identity.json` — name, contact info
 - `sections/summary.json` — professional bio

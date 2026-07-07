@@ -29,7 +29,7 @@ reference.
 
 Check if `sections/` contains any `.md` files (legacy format). If found,
 report them as warnings: "These sections are in the old Markdown format.
-Run `profile-section` to regenerate them in JSON format, or run
+Run `/profile-section` to regenerate them in JSON format, or run
 `/profile-init` to rebuild all sections."
 
 ### 2. Validate Profile Index
@@ -146,10 +146,12 @@ Group all issues into two categories:
 - **Errors** — missing required section files, invalid JSON, missing
   envelope keys, missing required fields, type mismatches.
 - **Warnings** — orphan files, legacy `.md` files, stale `last_updated`
-  dates (older than 90 days), missing optional sections, `profile.md` out
-  of sync or absent, `TBD` placeholder values (signals incomplete data
-  that will be silently skipped by export skills), Markdown formatting
-  in JSON string values.
+  dates (older than 90 days), missing optional sections, `profile.md`
+  older than the most recently updated section file (out of sync — an
+  absent `profile.md` is normal, not a warning; it is generated on demand
+  by `profile-assemble`), `TBD` placeholder values (signals incomplete
+  data that will be silently skipped by export skills), Markdown
+  formatting in JSON string values.
 
 Present a summary first:
 
@@ -209,10 +211,10 @@ Examples of fixable issues:
 
 For **non-fixable** issues (missing data that requires user input), provide
 actionable guidance:
-- Missing required section → "Run `profile-section` for `<section>` to
+- Missing required section → "Run `/profile-section` for `<section>` to
   generate it."
-- Invalid JSON → "Run `profile-section` for `<section>` to regenerate."
-- Missing required fields within a section → "Run `profile-section` for
+- Invalid JSON → "Run `/profile-section` for `<section>` to regenerate."
+- Missing required fields within a section → "Run `/profile-section` for
   `<section>` with the missing data."
 
 ### 9. Report Summary

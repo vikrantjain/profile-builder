@@ -75,7 +75,7 @@ For example: `data.full_name` from `sections/identity.json`,
 `data.experience` array from `sections/experience.json`.
 
 If required section JSON files do not exist, inform the user and suggest
-running `/profile-init` or `profile-section` to generate them.
+running `/profile-init` or `/profile-section` to generate them.
 
 ### 3. Apply Presentation Preferences
 
@@ -224,8 +224,10 @@ honors only if present in the source data.
 #### Certifications
 
 Include each certification with name, issuing organization, and year. If the
-certification has a verification URL, include it. Order by relevance to the
-user's current professional identity, not chronologically.
+certification has an `id` (credential number), map it to LinkedIn's
+Credential ID field; if it has a verification URL, map it to the Credential
+URL field. Order by relevance to the user's current professional identity,
+not chronologically.
 
 #### Patents
 
