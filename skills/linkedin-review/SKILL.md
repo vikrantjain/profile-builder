@@ -52,7 +52,7 @@ Two phases: scrape the LinkedIn profile, then analyze it locally.
 
 #### Path A: Playwright MCP (preferred)
 
-Use the Playwright MCP tools (configured in `.mcp.json` alongside this skill)
+Use the Playwright MCP tools (configured in the plugin's root `.mcp.json`)
 to extract content one section at a time. Save all extracted content
 to `.profile/tmp/{YYYY-MM-DD}/playwright/` where `{YYYY-MM-DD}` is today's
 date. Create this directory if it does not exist.

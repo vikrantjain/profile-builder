@@ -24,24 +24,37 @@ Instead of maintaining separate profiles on every platform, you maintain one mas
 
 ## Installation
 
-Clone this repo and add it to your Claude Code plugins:
+Profile Builder ships as a **standalone plugin repository** — [`vikrantjain/profile-builder`](https://github.com/vikrantjain/profile-builder), containing a `plugin.json` plus skills and commands, with no bundled marketplace. Add it to your own setup one of two ways.
 
-```bash
-# Clone the plugin
+### Option 1 — Load from a local clone (quickest)
+
+```shell
 git clone https://github.com/vikrantjain/profile-builder.git
-
-# Add to Claude Code (from any project directory)
-claude plugins add /path/to/profile-builder
 ```
 
-Or add it directly to your Claude Code settings file (`~/.claude/settings.json`):
+```shell
+# Load it for the current Claude Code session:
+claude --plugin-dir ./profile-builder
+```
+
+Plugin skills/commands are namespaced — they appear as `/profile-builder:profile-init`, `/profile-builder:profile-section`, etc. (the short `/profile-init` form also works when the name is unambiguous). Run `/reload-plugins` to pick up edits if you modify the plugin.
+
+### Option 2 — Add it to your own marketplace (persistent)
+
+If you maintain a marketplace (any repo with a `.claude-plugin/marketplace.json`), add Profile Builder as a GitHub-sourced plugin entry:
 
 ```json
 {
-  "plugins": [
-    "/path/to/profile-builder"
-  ]
+  "name": "profile-builder",
+  "source": { "source": "github", "repo": "vikrantjain/profile-builder" }
 }
+```
+
+Then install it from within Claude Code and activate:
+
+```shell
+/plugin install profile-builder@<your-marketplace>
+/reload-plugins
 ```
 
 ## Quick Start
@@ -73,6 +86,7 @@ Or add it directly to your Claude Code settings file (`~/.claude/settings.json`)
 |---|---|
 | `/profile-init` | Interactive onboarding. Collects data sources, builds all sections, generates the profile index. Entry point for new users. |
 | `/profile-validate` | Validate profile documents against the template schema. Checks for missing fields, unfilled placeholders, and structural issues. Offers interactive fixes. |
+| `/linkedin-rec` | Generate a recommendation request message for a former colleague. Takes `[Name], [Company], [optional: project]` as arguments. |
 
 ## Skills
 
@@ -82,9 +96,9 @@ These skills manage the master profile — the structured source of truth.
 
 | Skill | What it does | Example prompts |
 |---|---|---|
-| `profile-section` | Generate or update a single profile section | *"Update my experience section"*, *"Rebuild my skills section"* |
+| `profile-section` | Generate or update a single profile section (writes to the data layer, so it's invoked explicitly) | Run `/profile-section`, then describe the change (e.g. *"add my new certification"*) |
 | `profile-refresh` | Fetch latest data from external platforms (GitHub, Hashnode, Dev.to) | *"Refresh my blog posts"*, *"Sync my open source data"* |
-| `profile-assemble` | Stitch section files into a single `profile.md` | *"Assemble my profile"*, *"Build full profile from sections"* |
+| `profile-assemble` | Stitch section files into a single `profile.md` (optional output, invoked explicitly) | Run `/profile-assemble` when you want the whole profile as one readable document |
 
 ### Preferences
 
@@ -122,7 +136,7 @@ These skills fetch your live profile from a platform, compare it against the mas
                                                       ↓
                                             sections/*.json files
                                                       ↓
-                              profile-assemble  →  profile.md (optional)
+                             /profile-assemble  →  profile.md (optional)
                                                       ↓
                               Generate / Review skills consume sections/*.json directly
 ```

@@ -1,18 +1,17 @@
 ---
 name: profile-assemble
 description: >
-  MUST be consulted whenever the user wants to produce a complete profile.md
-  from section JSON files. This skill contains the only correct placeholder
-  substitution rules, section ordering, TBD filtering logic, and layout
-  template references — assembling without it will produce broken output.
-  Trigger on any request to combine, merge, stitch, compile, or render all
-  profile sections into one unified Markdown document — including "put it all
-  together", "generate profile.md", "build the complete profile", "I need the
-  full profile document", "render sections into markdown", or any variation
-  where the user has finished updating individual sections and now wants the
-  single assembled result. Even if the request seems simple, always consult
-  this skill because the rendering pipeline has specific rules that cannot
-  be guessed.
+  Render the canonical sections/*.json files into a single human-readable
+  profile.md, using the placeholder substitution rules, section ordering, TBD
+  filtering, and layout template references that produce correct output.
+  Assembling profile.md is an optional, intentional action — it is NOT a
+  prerequisite for any generate or review skill (those read sections/*.json
+  directly). Because producing the consolidated document is a deliberate choice
+  the user makes explicitly, this skill is invoked explicitly and is NOT
+  auto-triggered: run it with /profile-assemble (canonical:
+  /profile-builder:profile-assemble) when you want the whole profile as one
+  document to read, print, or share.
+disable-model-invocation: true
 ---
 
 # Profile Assemble

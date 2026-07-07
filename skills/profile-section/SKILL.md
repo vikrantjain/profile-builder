@@ -1,21 +1,17 @@
 ---
 name: profile-section
 description: >
-  MUST be consulted whenever the user wants to create, update, or add data to
-  any single profile section. This skill contains the required JSON envelope
-  format, field mapping rules, TBD placeholder conventions, and schema
-  validation logic — writing section data without it will produce invalid
-  output. Sections include experience, skills, education, certifications,
-  patents, blogs, open source, identity, summary, and languages. Trigger on
-  any of these: "update my experience", "add a new job/role/position",
-  "I got promoted", "earned a certification", "add a patent", "update my
-  education", "rebuild my skills", "add an open source project", "I started
-  contributing to...", "regenerate my summary", "update my identity/email/title",
-  or any request where the user provides professional data (resume snippets,
-  job details, skill lists, project info) and wants it captured into their
-  profile. Even seemingly simple additions like "add my new cert" require this
-  skill because the JSON schema, field semantics, and index update rules are
-  non-obvious and must be followed exactly.
+  Create or update a single profile section (experience, skills, education,
+  certifications, patents, blogs, open source, identity, summary, languages)
+  in the canonical sections/*.json data layer. Contains the required JSON
+  envelope format, field-mapping rules, TBD placeholder conventions, and
+  index-update logic — writing section data without these rules produces
+  invalid output. Because it writes to the profile's source of truth, this
+  skill is invoked explicitly and is NOT auto-triggered: run it with
+  /profile-section (canonical: /profile-builder:profile-section) whenever you
+  want to add or change profile data — e.g. "add my new certification",
+  "update my experience", "I got promoted", "rebuild my skills".
+disable-model-invocation: true
 ---
 
 # Profile Section

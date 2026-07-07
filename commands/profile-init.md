@@ -125,8 +125,13 @@ Process sections in this order:
 9. open_source
 10. languages
 
-Skip any section for which no data was collected — do not create empty
-section files.
+Skip any **optional** section for which no data was collected — do not create
+empty section files. The four **required** sections (identity, summary,
+experience, skills) should always be generated: fill what data you have and use
+the `TBD` convention (per the `profile-section` rules) for required fields with
+no extractable data, rather than skipping the section. This keeps the output
+consistent with `/profile-validate`, which treats these four as required and
+flags them as errors when absent.
 
 ### 7. Verify Source Coverage
 

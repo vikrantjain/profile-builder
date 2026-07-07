@@ -417,10 +417,18 @@ Name — Issuer, YYYY
 - **Experience entries**: `### Job Title` as sub-heading, with company, location,
   and dates on the line below in bold/pipe format. Bullets beneath as `-` items.
 - **Skill groups**: Bold category name followed by colon and comma-separated
-  skills on a single line. One line per category. No nested bullets. Separate
-  each category line with a blank line so Markdown renders them as distinct
-  lines — without blank lines, consecutive lines collapse into a single
-  paragraph.
+  skills on a single line. One line per category. No nested bullets. End each
+  category line with a backslash (`\`) continuation — do NOT use blank lines
+  between categories. Backslash continuations render as `<br>` within a single
+  `<p>` element, producing a tight gapless block in PDF output. Blank lines
+  would create separate `<p>` elements with visible gaps even under compact CSS.
+  Example:
+  ```
+  **Languages:** Java, Python, TypeScript\
+  **Frameworks:** Spring Boot, Dropwizard\
+  **Databases:** Oracle DB, MySQL
+  ```
+  (No trailing `\` on the last category line.)
 - **Education**: Compact — degree, field, institution, and year on one or two
   lines. No bullets unless there are notable achievements to list.
 - **White space**: One blank line between sections. No extra blank lines within

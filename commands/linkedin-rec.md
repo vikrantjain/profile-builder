@@ -1,3 +1,11 @@
+---
+name: linkedin-rec
+description: "Generate a personalized LinkedIn recommendation request message for a former colleague"
+argument-hint: "[Name], [Company], [optional: project or area of collaboration]"
+---
+
+# LinkedIn Recommendation Request
+
 Generate a LinkedIn recommendation request message to send to a former colleague.
 
 ## Input
@@ -6,7 +14,7 @@ Format expected: [Colleague Name], [Company], [optional: specific project or are
 
 ## Instructions
 
-1. Read the following profile files to understand the user's experience:
+1. Read `profile-index.json` to confirm the profile exists and to discover the section file paths. If it — or the required sections below — cannot be found, tell the user to run `/profile-init` first, then stop. Otherwise read:
    - `sections/experience.json` — for role details, projects, contributions, and impact at the specified company
    - `sections/identity.json` — for the user's name
    - `sections/summary.json` — for overall profile context

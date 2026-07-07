@@ -89,7 +89,11 @@ For each section entry in the `sections` array:
   - `experience` — `data.experience` is a non-empty array; each entry has
     `title`, `company`, `start_date`, `description`; each project (if
     present) has `name`, `description`, and `contributions` (at minimum
-    `["TBD"]`); `skills` and `impact` are optional
+    `["TBD"]`); `skills` and `impact` are optional. Each entry's
+    `description` must be a list of bullet strings — if it is a single
+    string (legacy format), flag it as a type error and offer to wrap it
+    into a single-item list (auto-fixable; see Interactive Fix). The
+    project-level `description` is a string by design — do not flag or wrap it.
   - `skills` — `data.skills.categories` is a non-empty array with at least
     one item having `name` and `items` fields
 - **No Markdown in values** — scan string values for Markdown formatting
@@ -194,6 +198,11 @@ Examples of fixable issues:
   can judge whether the data should be moved elsewhere first.
 - **Backfill missing required fields** — for new required fields with no
   rename candidate, add them with the TBD default (`"TBD"` or `["TBD"]`).
+- **Wrap a stringified experience description** — if any
+  `data.experience[].description` is a string instead of a list, wrap it into
+  a single-item list (`"Led the platform team…"` → `["Led the platform
+  team…"]`), preserving the text verbatim. Apply only to the experience
+  entry's `description`, never to a project's `description` (a string by design).
 - **Update schema version** — after all drift fixes are applied, update
   `profile_version` in `profile-index.json` to match the current
   `template_version`.
@@ -213,8 +222,8 @@ After all fixes are applied (or skipped), present a final summary:
 - Number of errors found and fixed.
 - Number of warnings found and resolved.
 - Remaining issues that need manual attention.
-- Suggest running `profile-assemble` if section files were modified to
-  regenerate `profile.md`.
+- Suggest running `/profile-assemble` if section files were modified and the
+  user wants to regenerate `profile.md`.
 
 ## Scope Boundary
 
