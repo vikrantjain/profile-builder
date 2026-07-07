@@ -80,13 +80,22 @@ The `sections` mapping in `${CLAUDE_PLUGIN_ROOT}/profile-template.md` defines al
 
 ## Workflow
 
-### 1. Identify the Target Section
+### 1. Pre-flight: Verify the Index Exists
+
+Check that `profile-index.json` exists in the workspace root **before writing
+anything**. If it does not exist, stop and tell the user to run `/profile-init`
+first — it creates the index. Checking now matters because discovering the
+missing index after the section file is written leaves an orphaned file, and
+pointing the user at `/profile-init` at that stage would overwrite the very
+data just captured.
+
+### 2. Identify the Target Section
 
 Determine which section the user wants to generate or update. If ambiguous,
 ask the user to specify. Accept both the section key (e.g., `experience`) and
 natural names (e.g., "work history", "jobs").
 
-### 2. Load Only What Is Needed
+### 3. Load Only What Is Needed
 
 Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` and extract only:
 
@@ -97,7 +106,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` and extract only:
 Do not load the Markdown layout (`profile-layout.md`) — layout is only used
 by `profile-assemble`. Do not load or process other sections' fields.
 
-### 3. Gather Data
+### 4. Gather Data
 
 **Dynamic sections (blogs, open_source):** Check if `profile-index.json` exists
 and contains a `sources` array. If it does and the target section appears in
@@ -118,7 +127,7 @@ For updates (adding entries to a list section like experience or open_source):
 - Merge new entries with existing entries, preserving order (most recent first).
 - Do not duplicate entries.
 
-### 4. Map Input to All Template Fields
+### 5. Map Input to All Template Fields
 
 Systematically map the input data to **every** field defined in the template
 for this section — not just the obvious ones. The user's input may use
@@ -160,7 +169,7 @@ For each field in the template schema (including nested `item_fields`):
    contains information with no matching template field, include it in the closest
    relevant field (usually `description`) and note the mismatch.
 
-### 5. Build the JSON Object
+### 6. Build the JSON Object
 
 Construct a JSON object with the following structure:
 
@@ -214,14 +223,14 @@ A completed `sections/education.json` looks like this:
 Note: `graduation_year` is optional and could be omitted or set to `null` —
 never to `"TBD"`. Required fields with no data would use `"TBD"` instead.
 
-### 6. Write the Output
+### 7. Write the Output
 
 Write the JSON object to the path specified in the `sections` mapping
 (e.g., `sections/experience.json`). Validate the JSON is well-formed before
 writing. If any required fields are missing from the data object (not even
 set to TBD), add them with their TBD default before writing.
 
-### 7. Update the Index
+### 8. Update the Index
 
 After writing the section file, update `profile-index.json`:
 
@@ -235,9 +244,9 @@ After writing the section file, update `profile-index.json`:
   fields from the section data (`full_name`, `title`, `email`, `phone`,
   `location`, `github`, `linkedin`, `website`, `twitter`). This keeps the
   lightweight identity snapshot in sync with `sections/identity.json`.
-- Write the updated JSON back to `profile-index.json`.
-- If `profile-index.json` does not exist, inform the user to run
-  `/profile-init` first to create the index.
+- Write the updated JSON back to `profile-index.json`. (Its existence was
+  verified in the pre-flight step — a missing index stops the workflow before
+  anything is written.)
 
 ## Output Checklist
 

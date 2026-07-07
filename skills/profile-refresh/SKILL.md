@@ -2,18 +2,13 @@
 name: profile-refresh
 description: >
   Pulls new entries from external platforms (GitHub, Hashnode, Dev.to) into
-  the user's profile sections. Use when the user asks to "refresh my blogs",
-  "refresh open source", "fetch latest blog posts", "update blogs from
-  hashnode", "sync my open source data", "pull latest from github", or
-  "refresh sources". By default this is additive: only new entries are
-  added. Existing open_source projects and contributions are preserved
-  exactly as the user curated them — re-refreshing their fields requires an
-  explicit opt-in request (e.g., "rescan readme for {repo}", "update
-  description for {repo} from github"). Existing blog entries get factual
-  fields (title, url, published_on, platform) updated from the API while
-  manually enriched fields like excerpt are preserved. Also called by
-  profile-section when building or updating dynamic sections (blogs,
-  open_source).
+  the user's dynamic profile sections (blogs, open_source). Use when the user
+  asks to "refresh my blogs", "refresh open source", "fetch latest blog
+  posts", "update blogs from hashnode", "sync my open source data", "pull
+  latest from github", "refresh sources", "rescan readme for {repo}", or asks
+  whether their blog or open-source data is up to date. Additive by default —
+  new entries are added and existing curated entries are preserved. Also
+  called by profile-section when building or updating dynamic sections.
 ---
 
 # Profile Refresh
@@ -262,9 +257,10 @@ been removed from the platform but still belongs in the profile. The user
 can manually remove entries (or ask you to remove them) if needed.
 
 **Duplicates across sources** (e.g., same blog post on Hashnode and Dev.to):
-Match by URL. If two entries have the same URL, keep one. If they have
-different URLs but identical titles, keep both — they may be cross-posts with
-platform-specific URLs.
+Match by URL. If two entries have the same URL, keep the richer one — the
+entry with more populated fields (excerpt, tags, etc.); when equally rich,
+keep the existing profile entry. If they have different URLs but identical
+titles, keep both — they may be cross-posts with platform-specific URLs.
 
 ### 6. Build the JSON Object
 

@@ -12,6 +12,10 @@ Generate a LinkedIn recommendation request message to send to a former colleague
 The user will provide: $ARGUMENTS
 Format expected: [Colleague Name], [Company], [optional: specific project or area of collaboration]
 
+If the arguments are empty or missing either the colleague name or the
+company, ask the user for the missing pieces before proceeding — do not
+guess a company from the profile or draft a generic message.
+
 ## Instructions
 
 1. Read `profile-index.json` to confirm the profile exists and to discover the section file paths. If it — or the required sections below — cannot be found, tell the user to run `/profile-init` first, then stop. Otherwise read:

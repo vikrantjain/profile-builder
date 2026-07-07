@@ -77,8 +77,12 @@ Read the provided data sources:
 - **GitHub URL:** Use `gh` CLI or WebFetch to get the user's profile info,
   pinned repos, and bio.
 - **LinkedIn URL:** Note the URL for the identity section. If Playwright MCP
-  is available, fetch profile data. Otherwise, ask the user to provide
-  LinkedIn content as text.
+  is available, fetch profile data — follow the auth-wall handling and
+  expand-and-capture recipe in
+  `${CLAUDE_PLUGIN_ROOT}/skills/linkedin-review/references/scrape-recipe.md`
+  (LinkedIn frequently shows a login wall, and unexpanded sections silently
+  truncate most of the content). Otherwise, ask the user to provide LinkedIn
+  content as text.
 - **Blog platform:** Note the handle for Data Sources configuration. Actual
   blog posts will be fetched during the refresh step.
 
@@ -92,7 +96,10 @@ fine, but no information should be lost. Downstream export skills handle
 tailoring; this step must capture everything.
 
 For each section defined in the `sections` mapping of `${CLAUDE_PLUGIN_ROOT}/profile-template.md`,
-generate the section file using the `profile-section` workflow:
+generate the section file using the `profile-section` workflow. The rules
+referenced below live in
+`${CLAUDE_PLUGIN_ROOT}/skills/profile-section/SKILL.md` — read that file
+before building the first section:
 
 1. Read the field definitions and JSON structure conventions for the section
    from `${CLAUDE_PLUGIN_ROOT}/profile-template.md`.
@@ -100,18 +107,18 @@ generate the section file using the `profile-section` workflow:
    this section. Do not rely on source data remaining in context from step 5 —
    always re-read from disk to avoid context-dependent data loss.
 3. Map input data to all template fields — follow the field mapping rules in
-   the `profile-section` skill (Step 4), including duration extraction for
+   the `profile-section` skill (Step 5), including duration extraction for
    projects and populating required `contributions` (default `["TBD"]` if no
    work items can be extracted). Populate `impact` when quantifiable outcomes
    exist in the source data.
 4. Build the JSON object with the mapped data — follow the JSON building rules
-   in the `profile-section` skill (Step 5).
+   in the `profile-section` skill (Step 6).
 5. Write to the output path (e.g., `sections/experience.json`).
 6. Update `profile-index.json` — add or update the section's entry in the
    `sections` array with `name`, `key`, `file`, and `last_updated`. If the
    section is `identity`, also sync the top-level `identity` object with the
    section data. Follow the index update rules in the `profile-section` skill
-   (Step 7).
+   (Step 8).
 
 Process sections in this order:
 1. identity
@@ -188,8 +195,9 @@ Summarize what was created:
 
 ### 9. Validate Profile
 
-Run the `/profile-validate` workflow to check all generated documents against
-the template schema. Present any errors or warnings found and offer interactive
+Run the `/profile-validate` workflow (defined in
+`${CLAUDE_PLUGIN_ROOT}/commands/profile-validate.md`) to check all generated
+documents against the template schema. Present any errors or warnings found and offer interactive
 fixes before finishing.
 
 ## Scope Boundary

@@ -11,8 +11,6 @@ description: >-
   the user provides a job description or job link and asks to apply, prepare
   application materials, or just says "resume for this". Trigger for any resume
   editing, refinement, or regeneration request — not just first-time generation.
-  When a JD is provided, customize only to the extent that the match is honest
-  and the resume does not read as tailored — a resume is not a cover letter.
 ---
 
 # Resume Generate
@@ -354,93 +352,22 @@ apply formatting and acronym rules.
 for immediate use. Formatting quality matters as much as content quality because
 the user may convert this to PDF and submit it within minutes.
 
-Write the resume to `resume.md` following these formatting rules:
+Write the resume to `resume.md` following the layout structure and formatting
+rules in the "Markdown Layout (resume.md)" section of
+`${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/resume-conventions.md`.
+Read that section before writing the file — it defines the exact header block,
+section heading set, experience entry format, and skill-group formatting.
+The rules most often gotten wrong, worth restating here:
 
-#### Layout Structure
-
-```
-# Full Name
-
-email | location
-
-[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)
-
----
-
-## Professional Summary
-
-2-3 sentence constructed summary.
-
-## Skills
-
-Grouped skill lines: **Category:** Skill1, Skill2, Skill3
-
-## Experience
-
-### Job Title
-**Company** | Location | Mon YYYY - Mon YYYY
-
-- Achievement bullet
-- Achievement bullet
-
-### Job Title
-**Company** | Location | Mon YYYY - Present
-
-- Achievement bullet
-
-## Education
-
-**Degree**, Field — Institution, YYYY
-
-## Certifications
-
-Name — Issuer, YYYY
-```
-
-#### Formatting Rules
-
-- **Header**: Three-line block followed by a horizontal rule `---`:
-  1. `# Full Name` as the document title.
-  2. Contact line: `email | location` (include phone before location only if the
-     user has provided one in their identity section; omit otherwise).
-  3. Profile links line: every profile URL the user has in their identity
-     section, rendered as Markdown links and separated by ` | `. Use the bare
-     domain+path as the link text (no `https://` prefix) so the rendered resume
-     stays scannable while the link remains clickable. Example shape (the
-     specific platforms vary per user — include whatever they have, omit what
-     they don't, and don't restrict to a fixed set):
-     `[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)`.
-     Separate the contact line and the profile links line with a blank line so
-     they render as distinct lines.
-- **Section headings**: `## Section Name` for main sections. Use the standard
-  headings: Professional Summary, Skills, Experience, Education, Certifications.
-- **Experience entries**: `### Job Title` as sub-heading, with company, location,
-  and dates on the line below in bold/pipe format. Bullets beneath as `-` items.
-- **Skill groups**: Bold category name followed by colon and comma-separated
-  skills on a single line. One line per category. No nested bullets. End each
-  category line with a backslash (`\`) continuation — do NOT use blank lines
-  between categories. Backslash continuations render as `<br>` within a single
-  `<p>` element, producing a tight gapless block in PDF output. Blank lines
-  would create separate `<p>` elements with visible gaps even under compact CSS.
-  Example:
-  ```
-  **Languages:** Java, Python, TypeScript\
-  **Frameworks:** Spring Boot, Dropwizard\
-  **Databases:** Oracle DB, MySQL
-  ```
-  (No trailing `\` on the last category line.)
-- **Education**: Compact — degree, field, institution, and year on one or two
-  lines. No bullets unless there are notable achievements to list.
-- **White space**: One blank line between sections. No extra blank lines within
-  sections. Dense but readable.
-- **No personal pronouns**: Never "I", "my", "we".
-- **Tense**: Past tense for previous roles, present tense for current role.
-- **Action verbs**: Every experience bullet starts with a strong action verb.
-- **Length**: Match the user's requested page count. 1 page ≈ 400 words,
-  2 pages ≈ 700-900 words. When the user says "2 page resume", use the full
-  budget — don't produce a thin 1.5 page document.
-- **No decorative elements**: No emoji, no Unicode symbols, no ASCII art.
-  Plain Markdown that renders cleanly in any converter.
+- **Skill groups**: one line per category ending with a backslash (`\`)
+  continuation, no blank lines between categories (blank lines create visible
+  gaps in PDF output). No trailing `\` on the last line.
+- **Header**: `# Full Name`, then `email | location`, then a profile-links
+  line with bare domain+path as link text, then `---`.
+- **Length**: match the requested page count — 1 page ≈ 400 words, 2 pages
+  ≈ 700-900 words. Use the full budget; don't produce a thin document.
+- **No personal pronouns, no decorative elements**; past tense for previous
+  roles, present for the current one; every bullet starts with an action verb.
 
 ### 7. Generate JSON Resume (always — unless user explicitly declines)
 

@@ -45,6 +45,93 @@ This order front-loads the most keyword-rich sections for ATS scoring.
 - **No decorative elements**: No emoji, no Unicode symbols, no ASCII art.
   Plain Markdown that renders cleanly in any converter.
 
+## Markdown Layout (resume.md)
+
+The layout structure and formatting rules for the `resume.md` deliverable.
+Formatting quality matters as much as content quality — the user may convert
+this file to PDF and submit it within minutes.
+
+### Layout Structure
+
+```
+# Full Name
+
+email | location
+
+[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)
+
+---
+
+## Professional Summary
+
+2-3 sentence constructed summary.
+
+## Skills
+
+Grouped skill lines: **Category:** Skill1, Skill2, Skill3
+
+## Experience
+
+### Job Title
+**Company** | Location | Mon YYYY - Mon YYYY
+
+- Achievement bullet
+- Achievement bullet
+
+### Job Title
+**Company** | Location | Mon YYYY - Present
+
+- Achievement bullet
+
+## Education
+
+**Degree**, Field — Institution, YYYY
+
+## Certifications
+
+Name — Issuer, YYYY
+```
+
+### Formatting Rules
+
+- **Header**: Three-line block followed by a horizontal rule `---`:
+  1. `# Full Name` as the document title.
+  2. Contact line: `email | location` (include phone before location only if the
+     user has provided one in their identity section; omit otherwise).
+  3. Profile links line: every profile URL the user has in their identity
+     section, rendered as Markdown links and separated by ` | `. Use the bare
+     domain+path as the link text (no `https://` prefix) so the rendered resume
+     stays scannable while the link remains clickable. Example shape (the
+     specific platforms vary per user — include whatever they have, omit what
+     they don't, and don't restrict to a fixed set):
+     `[domain.com/path](https://domain.com/path) | [other.com/path](https://other.com/path)`.
+     Separate the contact line and the profile links line with a blank line so
+     they render as distinct lines.
+- **Section headings**: `## Section Name` for main sections, using the standard
+  ATS headings listed under "Formatting for ATS" below.
+- **Experience entries**: `### Job Title` as sub-heading, with company, location,
+  and dates on the line below in bold/pipe format. Bullets beneath as `-` items.
+- **Skill groups**: Bold category name followed by colon and comma-separated
+  skills on a single line. One line per category. No nested bullets. End each
+  category line with a backslash (`\`) continuation — do NOT use blank lines
+  between categories. Backslash continuations render as `<br>` within a single
+  `<p>` element, producing a tight gapless block in PDF output. Blank lines
+  would create separate `<p>` elements with visible gaps even under compact CSS.
+  Example:
+  ```
+  **Languages:** Java, Python, TypeScript\
+  **Frameworks:** Spring Boot, Dropwizard\
+  **Databases:** Oracle DB, MySQL
+  ```
+  (No trailing `\` on the last category line.)
+- **Education**: Compact — degree, field, institution, and year on one or two
+  lines. No bullets unless there are notable achievements to list.
+- **White space**: One blank line between sections. No extra blank lines within
+  sections. Dense but readable.
+
+Pronoun, tense, action-verb, length, and no-decoration rules are in "Content
+Guidelines" above and apply to `resume.md` as written.
+
 ## ATS Optimization
 
 Applicant Tracking Systems parse resumes as plain text before scoring content.

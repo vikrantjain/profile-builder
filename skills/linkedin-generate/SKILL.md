@@ -9,7 +9,9 @@ description: >
   "what should my LinkedIn say", "prepare for LinkedIn", "update my LinkedIn",
   or wants any content formatted for LinkedIn's field constraints. Also trigger
   when the user mentions LinkedIn in the context of profile updates, job searching,
-  or professional branding — even if they don't say "generate".
+  or professional branding — even if they don't say "generate". For assessing
+  the quality of the user's live LinkedIn profile and suggesting improvements,
+  use the `linkedin-review` skill instead.
 ---
 
 # LinkedIn Generate
