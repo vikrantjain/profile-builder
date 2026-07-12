@@ -74,7 +74,7 @@ query {
     }
     followersCount
     followingsCount
-    posts(page: 1, pageSize: 10) {
+    posts(page: 1, pageSize: 20) {
       nodes {
         title
         slug
@@ -87,6 +87,13 @@ query {
   }
 }
 ```
+
+The `posts` connection is paginated. If a page returns exactly `pageSize`
+items, fetch the next page (`page: 2`, `page: 3`, …) until a page returns
+fewer than `pageSize` items or 200 posts have been fetched (safety cap).
+Fetching the complete post list matters: the blog sync check in step 5
+compares `sections/blogs.json` against this list, and a partial list would
+falsely flag the user's older posts as deleted.
 
 Save all fetched API responses to `.profile/tmp/{YYYY-MM-DD}/hashnode/`
 where `{YYYY-MM-DD}` is today's date. Create this directory structure if it
@@ -197,8 +204,11 @@ single most-seen field.
 ##### Social links
 
 - Are the high-value links present (GitHub above all, for a technical
-  writer; plus website/LinkedIn)? Are any broken or pointing to dead
-  profiles?
+  writer; plus website/LinkedIn)?
+- If a link looks suspect (typo'd domain, or a handle that does not match
+  the corresponding URL in `identity.json`), spot-check it with WebFetch
+  and flag it if it 404s or resolves to someone else's profile. Do not
+  fetch every link — only the ones with a concrete reason for doubt.
 - **Master profile angle**: Cross-check against `identity.json`.
 
 ##### Overall coherence
@@ -225,7 +235,10 @@ check earns its place here:
 - Posts on Hashnode not yet captured in `sections/blogs.json` → suggest
   running `profile-refresh`.
 - Posts in `sections/blogs.json` attributed to Hashnode but not returned
-  by the API → flag for the user (deleted, unpublished, or moved).
+  by the API → flag for the user (deleted, unpublished, or moved). Run
+  this direction only if the step 1 fetch paginated to completion; if the
+  post list is partial (safety cap hit or a page failed), skip it and note
+  in the report why — a partial list would falsely flag older posts.
 
 Exclude any master profile value that is exactly `"TBD"` or `["TBD"]` —
 these are unfilled placeholders.

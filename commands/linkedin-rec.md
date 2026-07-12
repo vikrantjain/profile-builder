@@ -24,7 +24,7 @@ guess a company from the profile or draft a generic message.
    - `sections/summary.json` — for overall profile context
    - `preferences.md` (if it exists) — for tone and framing directives
 
-2. From the experience data, identify the role and projects at the specified company. If a specific project is mentioned, focus on that. Otherwise, select the 2-3 most impactful projects.
+2. From the experience data, identify the role and projects at the specified company. If a specific project is mentioned, focus on that. Otherwise, select the 2-3 most impactful projects. Silently skip any value that is exactly `"TBD"` or `["TBD"]` — these are unfilled placeholders, not content; never reference them in the message.
 
 3. Generate a recommendation request message that:
    - Is warm but not overly formal — suited for a colleague relationship

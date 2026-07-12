@@ -146,12 +146,19 @@ Group all issues into two categories:
 - **Errors** — missing required section files, invalid JSON, missing
   envelope keys, missing required fields, type mismatches.
 - **Warnings** — orphan files, legacy `.md` files, stale `last_updated`
-  dates (older than 90 days), missing optional sections, `profile.md`
+  dates on the dynamic sections `blogs` and `open_source` (older than
+  90 days — static sections change only when the user provides new data,
+  so their age is never flagged), `profile.md`
   older than the most recently updated section file (out of sync — an
   absent `profile.md` is normal, not a warning; it is generated on demand
   by `profile-assemble`), `TBD` placeholder values (signals incomplete
   data that will be silently skipped by export skills), Markdown
   formatting in JSON string values.
+
+Missing **optional** sections (patents, languages, etc.) are not warnings —
+a user with no patents should not be nagged on every run. Mention them once
+as an informational line at the end of the summary ("Optional sections not
+present: patents, languages") and do not count them in the warning total.
 
 Present a summary first:
 

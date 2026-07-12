@@ -84,7 +84,8 @@ Read the provided data sources:
   truncate most of the content). Otherwise, ask the user to provide LinkedIn
   content as text.
 - **Blog platform:** Note the handle for Data Sources configuration. Actual
-  blog posts will be fetched during the refresh step.
+  blog posts are fetched later, when the user runs `profile-refresh`
+  (see step 8) — not during init.
 
 ### 6. Build All Sections
 

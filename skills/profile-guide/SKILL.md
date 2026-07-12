@@ -4,32 +4,37 @@ description: >
   Orientation and how-to guide for the profile-builder plugin. Inspects the
   current project's actual state and recommends the single best next step.
   Use whenever the user asks how the plugin works or what to do next:
-  "how do I use this plugin", "how does profile-builder work", "where do I
-  start", "I'm new here", "what's the workflow", "what should I do next",
-  "what can this plugin do", "which skill do I use for X", "what does the
-  profile-section skill do", "is my profile ready", "what's missing from my
-  profile", "help me get started with my profile", "I imported this plugin,
-  now what". Especially trigger on goal-directed path questions where the user
-  names a desired output and asks what it takes to get there: "I want to
-  generate my resume, what do I need to do", "what's the path to a LinkedIn
-  update", "what do I need before I can build my GitHub README", "can I
-  generate a resume yet". Also trigger when the user seems lost about the
-  profile workflow, asks an open-ended "help me with my profile / resume /
-  LinkedIn" without naming a concrete action, or wants to understand how the
-  pieces fit together.
-  This skill only advises — it explains and recommends, then lets the user run
-  the recommended skill themselves. Do NOT trigger when the user clearly wants
-  to perform a concrete action (generate a resume, refresh blogs, assemble the
-  profile, review their GitHub, save a preference) — those requests belong to
-  the dedicated skill for that action. This is the map, not the destination.
+  "how do I use this plugin", "where do I start", "what's the workflow",
+  "what should I do next", "what can this plugin do", "which skill do I use
+  for X", "is my profile ready", "what's missing from my profile", "I
+  imported this plugin, now what". Trigger on goal-directed path questions
+  ("I want to generate my resume, what do I need to do", "can I build my
+  GitHub README yet"), and when the user seems lost or asks an open-ended
+  "help me with my profile / resume / LinkedIn" without naming a concrete
+  action.
+  ALSO trigger on requests to change profile data or produce the assembled
+  document — "add my new certification", "update my experience", "I got
+  promoted", "rebuild my skills", "set up my profile", "assemble my
+  profile" — because the skills that write profile data run only as explicit
+  user commands, never via model invocation. For those requests this skill
+  answers with a one-line redirect to the right command (/profile-section,
+  /profile-init, or /profile-assemble); never edit sections/*.json directly
+  instead of redirecting.
+  This skill only advises — it explains, recommends, or redirects; it never
+  performs the action itself. Do NOT trigger for generate, review, refresh,
+  or preference requests ("generate my resume", "refresh my blogs", "review
+  my GitHub", "remember that...") — those have dedicated model-invocable
+  skills. This is the map, not the destination.
 ---
 
 # Profile Guide
 
 This skill helps users find their way around the profile-builder plugin. Its
-two jobs are (1) explain how the plugin works and what each skill is for, and
+three jobs are (1) explain how the plugin works and what each skill is for,
 (2) look at the project's **actual current state** and recommend the one next
-step that moves the user forward.
+step that moves the user forward, and (3) redirect data-change and assemble
+requests to the explicit command that performs them — those commands are
+never model-invoked, so without the redirect the request would go unrouted.
 
 The single most important behavior: **never give generic advice when you can
 give specific advice.** The plugin's whole value is that the profile is a
@@ -155,6 +160,23 @@ from the skill map below, in one or two lines, plus the one prerequisite that
 actually matters (e.g. "resume-generate reads your `sections/*.json` directly,
 so you just need the relevant sections built — refresh first only if dynamic
 data is stale").
+
+**If the user asked for a concrete data change or the assembled document**
+("add my new certification", "update my experience — I got promoted",
+"assemble my profile") — this is a redirect, not a guidance answer. Do not
+perform the change, and do not edit `sections/*.json` directly: the section
+workflow carries the envelope, field-mapping, TBD, and index-update rules
+that ad-hoc edits would miss, which is exactly why those skills only run as
+explicit commands. Answer in one or two lines naming the command and what to
+include when running it:
+
+> That's a `/profile-section` job — run it with the certification details
+> (name, issuer, year) and it will update `sections/certifications.json`
+> and the index.
+
+Route by state and request: `/profile-section` to change one section,
+`/profile-init` when no profile exists yet (check, per Step 1),
+`/profile-assemble` when they want the consolidated `profile.md`.
 
 Keep it tight. This skill earns its keep by being a precise signpost, not by
 reproducing the documentation.

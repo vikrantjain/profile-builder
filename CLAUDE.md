@@ -35,7 +35,7 @@ than re-scraping sources.
 - `profile-index-template.md` — JSON schema for `profile-index.json`, the manifest
   and configuration hub.
 - `preferences.md` — user presentation preferences; consumed by export/review skills
-  only. Created at runtime by `profile-preferences`.
+  and `/linkedin-rec`. Created at runtime by `profile-preferences`.
 - Generated, not checked in: `profile.md`, `profile-index.json`, `sections/*.json`.
 
 ### Data Format
@@ -78,7 +78,11 @@ than re-scraping sources.
 
 - **Guidance** — `profile-guide` inspects current project state and recommends the
   single best next step. Advise-only; never runs other skills. Triggers on how-to and
-  "what next / which skill for X" questions, NOT on concrete action requests.
+  "what next / which skill for X" questions, and on data-change/assemble requests
+  ("add my certification", "assemble my profile") where it redirects to the explicit
+  command — those commands are never model-invoked, so this is the only route. Does
+  NOT trigger on generate/review/refresh/preference actions, which have dedicated
+  model-invocable skills.
 - **Data layer** — `profile-section`, `profile-refresh`, `profile-assemble`.
   - **Invocation policy:** `profile-section` and `profile-assemble` are
     `disable-model-invocation: true` — run only via `/profile-section` and
@@ -108,9 +112,9 @@ called by `profile-assemble` or any export/review skill.
 
 Stored in `preferences.md`, grouped under `## Global` (applies everywhere) or a
 platform heading (`## LinkedIn`, `## Resume`, `## GitHub`, `## Hashnode`). Consumed by
-export and review skills only — data-layer skills (`profile-section`,
-`profile-refresh`, `profile-assemble`) ignore them. Manage via `profile-preferences`
-or by editing the file directly.
+export and review skills, plus `/linkedin-rec` (tone and framing directives) —
+data-layer skills (`profile-section`, `profile-refresh`, `profile-assemble`) ignore
+them. Manage via `profile-preferences` or by editing the file directly.
 
 ## External Dependencies
 

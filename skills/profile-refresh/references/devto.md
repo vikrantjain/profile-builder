@@ -24,5 +24,5 @@ returns fewer items than `per_page` or you reach page 5 (safety cap).
 | `title` | `title` |
 | `url` | `url` |
 | `published_at` | `published_on` (format: `Mon YYYY`) |
-| `description` | `excerpt` |
+| `description` | `excerpt` (truncate to one sentence if longer) |
 | (hardcoded) | `platform`: `"Dev.to"` |

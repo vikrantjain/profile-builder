@@ -37,6 +37,11 @@ Review against that bar — a profile can be complete and still land flat.
 
 ### 1. Fetch GitHub Profile Data
 
+Determine the GitHub username first: read `sections/identity.json` and
+extract the handle from the `github` URL (e.g. `https://github.com/vikrant`
+→ `vikrant`). If the identity section does not exist or has no GitHub URL,
+ask the user for their username.
+
 Use the `gh` CLI (preferred) or WebFetch to gather the live profile state.
 Save all fetched content (API responses, extracted text) to
 `.profile/tmp/{YYYY-MM-DD}/github/` where `{YYYY-MM-DD}` is today's date.
