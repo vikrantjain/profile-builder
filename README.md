@@ -24,9 +24,18 @@ Instead of maintaining separate profiles on every platform, you maintain one mas
 
 ## Installation
 
-Profile Builder ships as a **standalone plugin repository** — [`vikrantjain/profile-builder`](https://github.com/vikrantjain/profile-builder), containing a `plugin.json` plus skills and commands, with no bundled marketplace. Add it to your own setup one of two ways.
+Profile Builder ships as a **standalone plugin repository** — [`vikrantjain/profile-builder`](https://github.com/vikrantjain/profile-builder). It also bundles its own `.claude-plugin/marketplace.json`, so the repo doubles as a single-plugin marketplace — no separate marketplace repo needed. Add it to your own setup one of three ways.
 
-### Option 1 — Load from a local clone (quickest)
+### Option 1 — Add this repo as a marketplace (recommended)
+
+From within Claude Code:
+
+```shell
+/plugin marketplace add vikrantjain/profile-builder
+/plugin install profile-builder@profile-builder
+```
+
+### Option 2 — Load from a local clone (quickest for development)
 
 ```shell
 git clone https://github.com/vikrantjain/profile-builder.git
@@ -39,7 +48,7 @@ claude --plugin-dir ./profile-builder
 
 Plugin skills/commands are namespaced — they appear as `/profile-builder:profile-init`, `/profile-builder:profile-section`, etc. (the short `/profile-init` form also works when the name is unambiguous). Run `/reload-plugins` to pick up edits if you modify the plugin.
 
-### Option 2 — Add it to your own marketplace (persistent)
+### Option 3 — Add it to your own marketplace
 
 If you maintain a marketplace (any repo with a `.claude-plugin/marketplace.json`), add Profile Builder as a GitHub-sourced plugin entry:
 

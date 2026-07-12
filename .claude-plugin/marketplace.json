@@ -1,0 +1,16 @@
+{
+  "name": "profile-builder",
+  "owner": {
+    "name": "Vikrant Jain"
+  },
+  "metadata": {
+    "description": "Self-hosted marketplace for the Profile Builder plugin."
+  },
+  "plugins": [
+    {
+      "name": "profile-builder",
+      "source": "./",
+      "description": "Profile management skills for generating, updating, and assembling professional profiles from a structured template."
+    }
+  ]
+}
