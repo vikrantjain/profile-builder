@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Preference Routing
 
 When the user says "remember that...", "my preference is...", "always...", "never...",
@@ -36,7 +34,6 @@ than re-scraping sources.
   and configuration hub.
 - `preferences.md` — user presentation preferences; consumed by export/review skills
   and `/linkedin-rec`. Created at runtime by `profile-preferences`.
-- Generated, not checked in: `profile.md`, `profile-index.json`, `sections/*.json`.
 
 ### Data Format
 
@@ -63,16 +60,7 @@ than re-scraping sources.
    into `profile.md` on demand. This is an **optional side-branch, not a prerequisite
    for anything** — every generate and review skill reads `sections/*.json` directly.
 
-## Skills and Commands
-
-### Commands
-
-- `/profile-init` — interactive onboarding; collects sources, builds all sections,
-  generates the index. Entry point for new users.
-- `/profile-validate` — validate profile documents against the schema (JSON validity,
-  required fields, types, TBD values, legacy `.md` files); offers interactive fixes.
-- `/linkedin-rec` — draft a recommendation-request message; takes `[Name], [Company],
-  [optional: project]`.
+## Skills
 
 ### Skill Layers
 
