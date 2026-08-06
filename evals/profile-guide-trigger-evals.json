@@ -1,0 +1,102 @@
+[
+  {
+    "query": "i just passed the AWS Solutions Architect Professional exam yesterday, can you add it to my profile",
+    "expected_route": "/profile-section",
+    "should_trigger": false
+  },
+  {
+    "query": "I got promoted to Principal Engineer at Camunda last week, update my experience section to reflect that",
+    "expected_route": "/profile-section",
+    "should_trigger": false
+  },
+  {
+    "query": "rebuild my skills section, it's missing all the AI tooling I've been using this year (claude code, langgraph, mcp)",
+    "expected_route": "/profile-section",
+    "should_trigger": false
+  },
+  {
+    "query": "assemble my profile into one document I can send to a recruiter",
+    "expected_route": "/profile-assemble",
+    "should_trigger": false
+  },
+  {
+    "query": "set up my profile from scratch — my resume is at ~/Documents/vikrant-resume.pdf and my github is github.com/vikrant",
+    "expected_route": "/profile-init",
+    "should_trigger": false
+  },
+  {
+    "query": "I finished my masters at Georgia Tech in may, can you update my education?",
+    "expected_route": "/profile-section",
+    "should_trigger": false
+  },
+  {
+    "query": "just installed this profile-builder plugin, now what",
+    "expected_route": "profile-guide",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to generate my resume for a job application, what do I need to do first?",
+    "expected_route": "profile-guide",
+    "should_trigger": true
+  },
+  {
+    "query": "is my profile ready or is something still missing?",
+    "expected_route": "profile-guide",
+    "should_trigger": true
+  },
+  {
+    "query": "I need the full profile.md so i can print it out for a career fair",
+    "expected_route": "/profile-assemble",
+    "should_trigger": false
+  },
+  {
+    "query": "generate my resume for this JD: Senior Platform Engineer at Datadog, kubernetes and go heavy, 8+ years",
+    "expected_route": "resume-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "update my LinkedIn, it hasn't changed since 2023",
+    "expected_route": "linkedin-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "refresh my blogs from hashnode, I published two new posts this week",
+    "expected_route": "profile-refresh",
+    "should_trigger": false
+  },
+  {
+    "query": "remember that I prefer first person for my LinkedIn about section",
+    "expected_route": "profile-preferences",
+    "should_trigger": false
+  },
+  {
+    "query": "review my github profile and tell me what to improve, im job hunting",
+    "expected_route": "github-review",
+    "should_trigger": false
+  },
+  {
+    "query": "write me a punchy linkedin headline, the current one is just my job title",
+    "expected_route": "linkedin-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "my hashnode tagline sucks, make it better",
+    "expected_route": "hashnode-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "pull my latest open source contributions from github into the profile",
+    "expected_route": "profile-refresh",
+    "should_trigger": false
+  },
+  {
+    "query": "critique my linkedin profile, i'm starting a job search next month",
+    "expected_route": "linkedin-review",
+    "should_trigger": false
+  },
+  {
+    "query": "don't mention my role at Infosys in any of my exports",
+    "expected_route": "profile-preferences",
+    "should_trigger": false
+  }
+]

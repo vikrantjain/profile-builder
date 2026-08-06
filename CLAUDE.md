@@ -65,12 +65,19 @@ than re-scraping sources.
 ### Skill Layers
 
 - **Guidance** — `profile-guide` inspects current project state and recommends the
-  single best next step. Advise-only; never runs other skills. Triggers on how-to and
-  "what next / which skill for X" questions, and on data-change/assemble requests
-  ("add my certification", "assemble my profile") where it redirects to the explicit
-  command — those commands are never model-invoked, so this is the only route. Does
-  NOT trigger on generate/review/refresh/preference actions, which have dedicated
-  model-invocable skills.
+  single best next step. Advise-only; never runs other skills. Triggers on
+  goal-directed prerequisite questions ("what do I need before I can generate my
+  resume"), state questions ("is my profile ready", "what's missing"), and
+  orientation ("how do I use this plugin", "just installed this, now what"). Does NOT
+  trigger when the user names a concrete action — generate, review, refresh,
+  preference, or a data change — those route to their own skill or command.
+  - **It is not a redirector.** Data-change and assemble requests route straight to
+    `/profile-section` / `/profile-assemble` / `/profile-init` from those entries'
+    own descriptions; `profile-guide` is not needed and does not fire. Verified by
+    ablation (`evals/`, 2026-08-06): deleting the skill changed 3 of 20 routing
+    outcomes, all of them guidance questions, none of them data changes. Keep the
+    description scoped to what nothing else handles — the goal-directed
+    prerequisite question is the one case with no other handler.
 - **Data layer** — `profile-section`, `profile-refresh`, `profile-assemble`.
   - **Invocation policy:** `profile-section` and `profile-assemble` are
     `disable-model-invocation: true` — run only via `/profile-section` and
