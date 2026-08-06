@@ -5,7 +5,7 @@
     "should_trigger": false
   },
   {
-    "query": "I got promoted to Principal Engineer at Camunda last week, update my experience section to reflect that",
+    "query": "I got promoted to Principal Engineer at Northwind Systems last week, update my experience section to reflect that",
     "expected_route": "/profile-section",
     "should_trigger": false
   },
@@ -20,12 +20,12 @@
     "should_trigger": false
   },
   {
-    "query": "set up my profile from scratch — my resume is at ~/Documents/vikrant-resume.pdf and my github is github.com/vikrant",
+    "query": "set up my profile from scratch — my resume is at ~/Documents/jordan-rivera-resume.pdf and my github is github.com/jrivera-dev",
     "expected_route": "/profile-init",
     "should_trigger": false
   },
   {
-    "query": "I finished my masters at Georgia Tech in may, can you update my education?",
+    "query": "I finished my masters at Fairmont State University in may, can you update my education?",
     "expected_route": "/profile-section",
     "should_trigger": false
   },
@@ -50,7 +50,7 @@
     "should_trigger": false
   },
   {
-    "query": "generate my resume for this JD: Senior Platform Engineer at Datadog, kubernetes and go heavy, 8+ years",
+    "query": "generate my resume for this JD: Senior Platform Engineer at Meridian Labs, kubernetes and go heavy, 8+ years",
     "expected_route": "resume-generate",
     "should_trigger": false
   },
@@ -95,7 +95,7 @@
     "should_trigger": false
   },
   {
-    "query": "don't mention my role at Infosys in any of my exports",
+    "query": "don't mention my role at Belmont Consulting in any of my exports",
     "expected_route": "profile-preferences",
     "should_trigger": false
   }

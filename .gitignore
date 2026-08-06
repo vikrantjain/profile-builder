@@ -20,5 +20,8 @@ hashnode-review.md
 .profile/
 *-workspace/
 
+# Eval run artifacts (WORK=./out ./run.sh)
+evals/out/
+
 # Claude Code local settings and session data
 .claude/

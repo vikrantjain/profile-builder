@@ -239,12 +239,19 @@ skills/
     references/                        ← Playwright scrape recipe
   github-review/SKILL.md               ← Review GitHub profile
   hashnode-review/SKILL.md             ← Review Hashnode profile
+evals/                                 ← Routing evals for skill descriptions (dev-only)
+  profile-guide-trigger-evals.json     ← Eval queries + expected routes
+  harness.py, run.sh                   ← Build catalog → route → score
 profile-template.md                    ← Canonical profile schema
 profile-layout.md                      ← Markdown rendering template (used by profile-assemble)
 profile-index-template.md              ← JSON schema for profile-index.json
 CLAUDE.md                              ← Project instructions for Claude Code
 .mcp.json                              ← MCP server config (Playwright)
 ```
+
+`evals/` is development tooling, not a runtime component — Claude Code only
+discovers `skills/`, `commands/`, `agents/`, and `hooks/`, so it never enters
+anyone's context. See [`evals/README.md`](evals/README.md).
 
 ## License
 
