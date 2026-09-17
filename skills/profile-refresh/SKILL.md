@@ -98,13 +98,13 @@ platform-specific method below. If a fetch fails, report the error for that
 source and continue with the remaining sources — a single failure should not
 block the entire refresh.
 
-Each platform has a recipe doc in `references/`. Read the relevant doc
+Each platform has a recipe doc in `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/`. Read the relevant doc
 **before issuing any API call** — it carries the parameter choices, filters,
 pagination logic, and field mappings. The summaries below cover only the
 load-bearing decisions a workflow-level reader needs to see; everything else
 lives in the reference.
 
-#### GitHub — see `references/github.md`
+#### GitHub — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`
 
 Feeds `open_source` (projects + contributions). Recipe covers:
 
@@ -155,14 +155,14 @@ refresh would destroy the user's work.
 
 For the README fetch recipe, what to extract, and how to combine it with
 language + topics, see the "README — fetch and tech_stack extraction"
-section of `references/github.md`.
+section of `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`.
 
-#### Hashnode — see `references/hashnode.md`
+#### Hashnode — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`
 
 Feeds `blogs`. Recipe covers the GraphQL query, pagination, the
 custom-domain fallback, and field mapping.
 
-#### Dev.to — see `references/devto.md`
+#### Dev.to — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/devto.md`
 
 Feeds `blogs`. Recipe covers the REST endpoint, pagination, and field
 mapping.
@@ -196,7 +196,7 @@ done on the parsed JSON arrays.
 **New entries** (in source, not in profile): Prepend to the list so the most
 recent items appear first. For new open_source projects, build `tech_stack`
 using language + topics + README extraction (see "Combining into `tech_stack`
-for a new project" in `references/github.md`). For new blog entries and
+for a new project" in `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`). For new blog entries and
 contributions, populate all factual fields from the API.
 
 While merging, **track the set of tech_stack entries newly introduced to
@@ -405,3 +405,6 @@ Before finishing, verify:
 
 - **`profile-index.json`** — Source configuration (`sources` array) and section manifest (`sections` array)
 - **`${CLAUDE_PLUGIN_ROOT}/profile-template.md`** — Field definitions, section mapping, and JSON structure conventions
+- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`** — GitHub fetch recipe: repos, topics, READMEs, contributions, field mapping
+- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`** — Hashnode GraphQL query, pagination, custom-domain fallback, field mapping
+- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/devto.md`** — Dev.to REST endpoint, pagination, field mapping

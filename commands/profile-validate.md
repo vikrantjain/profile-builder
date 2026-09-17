@@ -147,8 +147,9 @@ Group all issues into two categories:
   envelope keys, missing required fields, type mismatches.
 - **Warnings** — orphan files, legacy `.md` files, stale `last_updated`
   dates on the dynamic sections `blogs` and `open_source` (older than
-  90 days — static sections change only when the user provides new data,
-  so their age is never flagged), `profile.md`
+  30 days — the same threshold `profile-guide` uses to suggest a refresh;
+  static sections change only when the user provides new data, so their
+  age is never flagged), `profile.md`
   older than the most recently updated section file (out of sync — an
   absent `profile.md` is normal, not a warning; it is generated on demand
   by `profile-assemble`), `TBD` placeholder values (signals incomplete

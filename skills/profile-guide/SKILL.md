@@ -55,11 +55,12 @@ step.
 |---|---|---|
 | **Empty** | No `profile-index.json`, no `sections/` | `/profile-init` — collect sources and build from scratch |
 | **Partial** | Index exists, key sections missing (experience, skills, summary) | `/profile-section` for each missing section |
-| **Stale dynamic** | `blogs` / `open_source` present and `sources[]` configured, but `last_updated` > ~30 days | `profile-refresh` before consuming |
+| **Stale dynamic** | `blogs` / `open_source` present and `sources[]` configured, but `last_updated` > 30 days | `profile-refresh` before consuming |
 | **Ready** | Section data exists and is reasonably fresh | a generate or review skill, chosen from what the user wants |
 
 Staleness is a nudge, not a gate — surface the date ("your blogs were last
-refreshed on 2026-03-10") and let the user decide. Static sections change only
+refreshed on 2026-03-10") and let the user decide. 30 days is the same
+threshold `/profile-validate` warns at; keep the two in step. Static sections change only
 when the user provides new data, so never flag them as stale by age. If several
 stages apply, lead with the earliest and mention the rest briefly.
 
