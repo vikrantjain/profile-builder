@@ -42,8 +42,15 @@ Use WebFetch to query the Hashnode public GraphQL API at
 `https://gql.hashnode.com`. No authentication is required for public
 profile data.
 
-Determine the Hashnode username from `sections/identity.json` or ask
-the user.
+Determine the Hashnode handle from `profile-index.json` — the entry in
+`sources[]` whose `platform` is `hashnode`. The identity section has no
+Hashnode field, so the handle lives only in the source configuration. If
+there is no such entry, ask the user for their handle.
+
+The handle may be a bare username or a custom domain. `user(username:)`
+below accepts only a bare username; if the handle contains a dot, treat it
+as a custom domain and query `publication(host: "<handle>")` for the posts
+instead, as `profile-refresh` does.
 
 Fetch the profile with a query like:
 

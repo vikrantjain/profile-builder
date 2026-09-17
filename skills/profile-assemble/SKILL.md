@@ -39,8 +39,10 @@ Read and parse `profile-index.json` from the workspace root. This file contains:
 - The **`sections`** array listing all available section files with their paths.
 
 If `profile-index.json` does not exist, inform the user to run `/profile-init`
-or `/profile-section` first. Do not generate the index — it is created
-upstream by `profile-init` and updated by `profile-section`.
+first. Only `/profile-init` creates the index — `/profile-section` stops when
+it is missing, so sending the user there dead-ends. Do not generate the index
+here; it is created upstream by `profile-init` and updated by
+`profile-section`.
 
 ### 2. Read the Layout Template
 
