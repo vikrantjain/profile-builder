@@ -216,6 +216,7 @@ Preferences are saved to `preferences.md` and grouped by scope (Global, LinkedIn
 ```
 .claude-plugin/
   plugin.json                          ← Plugin manifest
+  marketplace.json                     ← Self-hosted single-plugin marketplace
 commands/
   profile-init.md                      ← /profile-init command
   profile-validate.md                  ← /profile-validate command
