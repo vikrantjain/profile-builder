@@ -239,7 +239,9 @@ After writing the section file, update `profile-index.json`:
   whose `key` matches the target section. Update its `last_updated` to the
   current date in YYYY-MM-DD format and ensure its `file` path uses the `.json` extension. If no
   entry exists for this section, add one with `name`, `key`, `file`, and
-  `last_updated`.
+  `last_updated`. Take `name` verbatim from the `name` field of this
+  section's entry in the `sections` mapping of `profile-template.md` — do
+  not title-case the key yourself, or the manifest drifts between runs.
 - **Identity sync:** If the target section is `identity`, also update the
   top-level `identity` object in `profile-index.json` with the corresponding
   fields from the section data (`full_name`, `title`, `email`, `phone`,

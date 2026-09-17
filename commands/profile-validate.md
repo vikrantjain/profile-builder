@@ -39,7 +39,9 @@ Read and parse `profile-index.json`. Verify it is valid JSON, then check:
 - **`identity` object** — `full_name`, `title`, and `email` are present and
   non-empty strings.
 - **`sections` array** — each entry has `name` (string), `key` (string),
-  `file` (string), and `last_updated` (string) fields, all non-empty.
+  `file` (string), and `last_updated` (string) fields, all non-empty. Each
+  `name` matches the `name` defined for that `key` in the `sections` mapping
+  of `profile-template.md`. A mismatch is a warning (auto-fixable).
 - **File paths** — `file` values end in `.json`. Flag any `.md` paths
   as legacy format warnings.
 - **Date validity** — `last_updated` values are valid date strings
@@ -120,6 +122,17 @@ For each section entry in the `sections` array:
 
 Additionally check:
 
+- **Identity sync** — the top-level `identity` object in `profile-index.json`
+  is a snapshot of `sections/identity.json`, kept in sync by `profile-init`
+  and `profile-section`. Nothing enforces that on a hand-edited file, so
+  compare them field by field across `full_name`, `title`, `email`, `phone`,
+  `location`, `github`, `linkedin`, `website`, and `twitter`. Report any
+  differing value as a warning: "`<field>` differs between
+  `profile-index.json` (`<index value>`) and `sections/identity.json`
+  (`<section value>`)." The section file is authoritative — it is the data
+  layer, and the index entry is a derived copy. `avatar_url` and
+  `years_of_experience` are excluded by design: they live only in the
+  section file. Auto-fixable.
 - **Required sections exist** — `identity`, `summary`, `experience`, and
   `skills` must have corresponding section files on disk.
 - **Orphan detection** — scan `sections/` directory for `.json` files not
@@ -213,6 +226,13 @@ Examples of fixable issues:
   a single-item list (`"Led the platform team…"` → `["Led the platform
   team…"]`), preserving the text verbatim. Apply only to the experience
   entry's `description`, never to a project's `description` (a string by design).
+- **Resync the index identity snapshot** — for each field that differs,
+  overwrite the `profile-index.json` value with the one from
+  `sections/identity.json`. Show both values before applying, since a user
+  who edited the index by hand may have meant the change to go the other
+  way.
+- **Correct a section display name** — replace the `name` in the index entry
+  with the `name` defined for that `key` in `profile-template.md`.
 - **Update schema version** — after all drift fixes are applied, update
   `profile_version` in `profile-index.json` to match the current
   `template_version`.

@@ -53,7 +53,7 @@ json_structure:
     type: list
     description: "Manifest of generated profile sections. Updated by profile-section and profile-refresh after writing section files."
     item_fields:
-      name:         { required: true, description: "Section display name, e.g. Experience, Skills" }
+      name:         { required: true, description: "Section display name. Copy it verbatim from the `name` field of the matching entry in the `sections` mapping of profile-template.md — that mapping is the only source. Do not invent or title-case the key." }
       key:          { required: true, description: "Section key matching profile-template.md sections block, e.g. experience, skills" }
       file:         { required: true, description: "Relative path to the section JSON file, e.g. sections/experience.json" }
       last_updated: { required: true, description: "Date the section was last generated or updated (YYYY-MM-DD)" }

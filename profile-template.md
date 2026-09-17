@@ -69,6 +69,7 @@ fields:
   # ── Skills ──────────────────────────────────────────────
   skills:
     required: true
+    type: object
     description: "Skills grouped into agent-determined categories"
     categories:
       required: true
@@ -169,6 +170,7 @@ fields:
   # ── Open Source ─────────────────────────────────────────
   open_source:
     required: false
+    type: object
     description: "Open source work — owned/maintained projects and contributions to other projects"
     projects:
       required: false
@@ -226,42 +228,52 @@ json_structure:
 
 sections:
   identity:
+    name: "Identity"
     output: "sections/identity.json"
     fields: [full_name, title, email, phone, location, avatar_url, github, linkedin, website, twitter, years_of_experience]
     description: "Name, title, contact info, online presence links, and years of experience"
   summary:
+    name: "Summary"
     output: "sections/summary.json"
     fields: [summary]
     description: "Professional bio"
   experience:
+    name: "Experience"
     output: "sections/experience.json"
     fields: [experience]
     description: "Work history entries with responsibilities, tech stacks, and notable projects"
   skills:
+    name: "Skills"
     output: "sections/skills.json"
     fields: [skills]
     description: "Technical and soft skills grouped by category"
   education:
+    name: "Education"
     output: "sections/education.json"
     fields: [education]
     description: "Degrees and academic background"
   certifications:
+    name: "Certifications"
     output: "sections/certifications.json"
     fields: [certifications]
     description: "Professional certifications and credentials"
   patents:
+    name: "Patents"
     output: "sections/patents.json"
     fields: [patents]
     description: "Granted and pending patents"
   blogs:
+    name: "Blog Posts"
     output: "sections/blogs.json"
     fields: [blogs]
     description: "Published blog posts and articles"
   open_source:
+    name: "Open Source"
     output: "sections/open-source.json"
     fields: [open_source]
     description: "Open source projects and contributions"
   languages:
+    name: "Languages"
     output: "sections/languages.json"
     fields: [languages]
     description: "Spoken and written languages"

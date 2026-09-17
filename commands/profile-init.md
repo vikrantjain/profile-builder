@@ -28,6 +28,9 @@ Ask the user what data sources they have available. Present these options:
 - **GitHub profile URL** — e.g. `https://github.com/username`
 - **LinkedIn profile URL** — e.g. `https://linkedin.com/in/username`
 - **Blog platform** — Hashnode or Dev.to handle/URL
+- **Profile photo URL** — optional. Consumed only as `basics.image` in
+  `resume.json`; `resume.md` and the Markdown layout stay photo-free for ATS
+  and readability. Ask for it once, accept a skip, and do not chase it.
 - **Additional text** — anything else they want included (patents, projects,
   certifications, etc.)
 
@@ -116,7 +119,9 @@ before building the first section:
    in the `profile-section` skill (Step 6).
 5. Write to the output path (e.g., `sections/experience.json`).
 6. Update `profile-index.json` — add or update the section's entry in the
-   `sections` array with `name`, `key`, `file`, and `last_updated`. If the
+   `sections` array with `name`, `key`, `file`, and `last_updated`. Take
+   `name` verbatim from the `name` field of the section's entry in the
+   `sections` mapping of `profile-template.md`. If the
    section is `identity`, also sync the top-level `identity` object with the
    section data. Follow the index update rules in the `profile-section` skill
    (Step 8).
