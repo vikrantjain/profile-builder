@@ -117,8 +117,13 @@ Combine rendered sections into a single Markdown document:
 - Start with the identity/contact header (rendered from
   `sections/identity.json` through the identity block of the layout).
 - Append each rendered section in canonical order.
-- Insert a horizontal rule (`---`) between every section.
-- Do not insert a trailing `---` after the last section.
+- **Do not insert horizontal rules yourself.** `profile-layout.md` already
+  carries every `---`, each placed inside the conditional block it belongs to
+  so the rule disappears along with the section it follows. Adding a second
+  set produces doubled rules.
+- Drop a trailing `---` if the document ends on one. The rule after Skills is
+  unconditional in the layout, so it trails whenever every section below
+  Skills is absent.
 - Do not duplicate headings or add extra blank lines beyond what the layout
   specifies.
 
@@ -139,7 +144,7 @@ Before finishing, verify:
 - [ ] All JSON section files successfully parsed
 - [ ] No `{{placeholder}}` tokens in the assembled output
 - [ ] No empty sections (headings with no content)
-- [ ] Horizontal rules between sections, none trailing
+- [ ] Horizontal rules come from the layout only — none added, none doubled, none trailing
 - [ ] Sections appear in canonical order
 - [ ] TBD values silently skipped (not rendered in output)
 - [ ] If any TBD values were encountered, warn the user which sections have incomplete data
