@@ -9,7 +9,9 @@ description: >
   "Hashnode makeover", "what should my Hashnode say", or wants copy-paste-ready
   content for their Hashnode profile fields (not blog articles). Also trigger
   when the user mentions Hashnode in the context of developer branding, blog
-  presence, or technical writing visibility — even if they don't say "generate".
+  presence, or technical writing visibility — even if they don't say
+  "generate". For assessing the quality of the user's live Hashnode profile
+  and suggesting improvements, use the `hashnode-review` skill instead.
 ---
 
 # Hashnode Generate

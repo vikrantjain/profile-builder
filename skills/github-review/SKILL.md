@@ -4,8 +4,8 @@ description: >
   Review and assess the quality of the user's live GitHub profile with
   actionable improvement suggestions. Use when the user asks to "review my
   GitHub", "check my GitHub profile", "audit my GitHub", "how does my GitHub
-  look", "is my GitHub good enough", "improve my GitHub profile", "make my
-  GitHub more impressive", "GitHub profile feedback", "critique my GitHub",
+  look", "is my GitHub good enough", "improve my GitHub profile",
+  "GitHub profile feedback", "critique my GitHub",
   "what should I improve on GitHub", "compare GitHub with my profile", or
   wants a quality assessment of their GitHub presence. Also trigger when the
   user mentions GitHub in the context of wanting feedback, improving their

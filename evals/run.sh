@@ -8,7 +8,7 @@
 #   CONDITIONS="current" ./run.sh
 #   WORK=./out ./run.sh         # keep artifacts instead of using a temp dir
 #
-# Costs one model call per query per condition per repeat (40 by default).
+# Costs one model call per query per condition per repeat (48 by default).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -11,7 +11,7 @@ can be measured by deleting it and re-running, rather than assumed.
 
 | File | What it is |
 |---|---|
-| `profile-guide-trigger-evals.json` | 20 user messages, each with the `expected_route` it should take |
+| `profile-guide-trigger-evals.json` | 24 user messages, each with the `expected_route` it should take |
 | `harness.py` | Builds the routing catalog from live frontmatter, writes prompts, scores responses |
 | `run.sh` | End-to-end: build → route → score |
 
@@ -29,6 +29,11 @@ it directly, or a slash command (`/profile-section`) when the model can only tel
 the user to run it. `should_trigger` is the narrower legacy question of whether
 `profile-guide` specifically fires.
 
+Cases `[20]`–`[23]` cover the generate-vs-review split on GitHub and Hashnode.
+The LinkedIn pair was already covered by `[11]` and `[18]`; the other two were
+not, and their descriptions are the ones that overlap most. New cases are
+appended rather than inserted so the query indices cited below stay stable.
+
 ## Running
 
 Requires the `claude` CLI on `PATH`. Python 3 stdlib is enough — `pyyaml` is used
@@ -36,7 +41,7 @@ when present, otherwise a built-in fallback parser handles this repo's
 frontmatter. Both produce a byte-identical catalog.
 
 ```shell
-./run.sh                    # both conditions, 40 model calls
+./run.sh                    # both conditions, 48 model calls
 REPEAT=5 ./run.sh           # 5 runs per query, to surface flaky routing
 CONDITIONS="current" ./run.sh
 WORK=./out ./run.sh         # keep artifacts instead of using a temp dir
@@ -57,7 +62,9 @@ python3 harness.py catalog ablated
 
 ## Result on 2026-08-06
 
-Run against the shipped descriptions, 116 calls across 4 conditions:
+`REPEAT=5 ./run.sh` against the descriptions shipped that day, over the 20
+fixtures that existed then — the four generate-vs-review cases were added
+later and are not in these numbers:
 
 ```
 current    20/20 routed as expected
@@ -76,7 +83,7 @@ so the redirect mandate that description carried was dead weight, and was remove
 
 The three differing cases are all guidance questions. `[07]` is the clearest
 justification for the skill existing: without it, `resume-generate` fires 5/5 and
-generates against possibly-missing data. `[06]` and `[07]` are partial — the
+generates against possibly-missing data. `[06]` and `[08]` are partial — the
 ablated routes (`/profile-init`, `/profile-validate`) are plausible but blind to
 actual project state and staleness.
 

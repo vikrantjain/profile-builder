@@ -98,5 +98,25 @@
     "query": "don't mention my role at Belmont Consulting in any of my exports",
     "expected_route": "profile-preferences",
     "should_trigger": false
+  },
+  {
+    "query": "my github profile page is bare, build me a readme out of my profile data",
+    "expected_route": "github-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "take a look at my actual github and tell me what's weak about it",
+    "expected_route": "github-review",
+    "should_trigger": false
+  },
+  {
+    "query": "write me a new hashnode tagline and bio i can paste in",
+    "expected_route": "hashnode-generate",
+    "should_trigger": false
+  },
+  {
+    "query": "how does my hashnode profile come across to someone landing on it cold",
+    "expected_route": "hashnode-review",
+    "should_trigger": false
   }
 ]

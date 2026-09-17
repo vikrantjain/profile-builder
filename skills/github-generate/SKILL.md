@@ -10,7 +10,8 @@ description: >
   README.md generated from their master profile data. Also trigger when the
   user mentions GitHub in the context of developer branding, open source
   presence, or professional visibility — even if they don't say "generate"
-  or "README".
+  or "README". For assessing the quality of the user's live GitHub profile
+  and suggesting improvements, use the `github-review` skill instead.
 ---
 
 # GitHub Generate
