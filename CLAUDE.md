@@ -1,128 +1,50 @@
 # CLAUDE.md
 
-## Preference Routing
+`profile-builder` is a Claude Code plugin: schema definitions, layout templates, skill
+definitions, and a routing-eval harness. There is no build system, test suite, or runtime —
+do not go looking for one, and do not invent a test command. `README.md` maps the skills and
+commands; `evals/README.md` covers the harness.
 
-When the user says "remember that...", "my preference is...", "always...", "never...",
-or any similar phrasing about how their profile data should be presented, exported,
-or reviewed — **use the `profile-preferences` skill** to save the preference to
-`preferences.md`. Do NOT save these as auto memory entries. Auto memory is for
-operational notes only, not user presentation preferences.
+## Invariants
 
-## Overview
+Breaking any of these produces output that looks correct.
 
-`profile-builder` is a Claude Code plugin for managing professional profiles. It
-collects raw professional data from many sources (resume, LinkedIn, GitHub, blogs),
-generates a structured profile, maintains it with targeted section updates, and
-consumes it to produce downstream outputs (resumes, LinkedIn copy, GitHub READMEs,
-etc.). There is no build system, test suite, or runtime — the project is schema
-definitions, layout templates, skill definitions, and a few utility scripts.
+- **`profile-template.md` is the single source of truth.** It owns which fields belong to
+  which section, each section's display `name` and `.json` output path, and the JSON
+  envelope, TBD, and no-Markdown-in-values conventions. Read it rather than restating it
+  elsewhere. Where a skill and the template disagree, the template wins.
+- **The profile is a canonical data layer.** Sources are collected once into
+  `sections/*.json`, and every downstream consumer reads those files directly. No generate,
+  review, or assemble skill re-scrapes a source or calls `profile-refresh`.
+- **Keep the three templates separate.** `profile-template.md` is declarative — no
+  procedural instructions, no layout. `profile-layout.md` holds layout only and is read
+  solely by `profile-assemble`. `profile-index-template.md` holds the index schema.
+- **`profile-section` and `profile-assemble` are `disable-model-invocation: true`.** Do not
+  re-enable it on either. Both touch the source of truth, so they run only when the user
+  types the command. `profile-refresh` stays model-invocable.
+- **`profile.md` is never a prerequisite.** `/profile-assemble` is an optional side-branch;
+  every generate and review skill reads `sections/*.json`.
+- **Cross-file references use `${CLAUDE_PLUGIN_ROOT}`.** A relative path resolves against the
+  working directory rather than the plugin cache, so the skill silently proceeds without its
+  reference doc.
+- **Source config for dynamic sections lives in the user's `profile-index.json`.** The
+  `sources` array carries platform and handle. Never hardcode either into a plugin template
+  or a skill.
+- **`.profile/tmp/{YYYY-MM-DD}/{source}/` is scratch.** Never write final output there;
+  `/profile-validate` deletes stale folders.
 
-The profile is a **canonical data layer**: sources are collected once into
-`sections/*.json`, and every downstream consumer reads those files directly rather
-than re-scraping sources.
+## Preference routing
 
-## Architecture
+"remember that…", "my preference is…", "always…", "never…" — anything about how profile data
+is presented, exported, or reviewed — **goes to the `profile-preferences` skill**, which
+writes `preferences.md`. Never store these as auto-memory. Export and review skills read
+`preferences.md`, so a preference filed anywhere else is silently never applied. Data-layer
+skills ignore preferences by design.
 
-### Key Files
+## profile-guide's scope
 
-- `profile-template.md` — the canonical field schema: `fields`, `sections` (maps
-  each section to its `.json` output file and dependent fields), `json_structure`,
-  and `placeholder_syntax`. Declarative only — no procedural instructions, no layout.
-- `profile-layout.md` — the Markdown rendering template (`{{placeholder}}` layout).
-  Used exclusively by `profile-assemble`. No field definitions.
-- `profile-index-template.md` — JSON schema for `profile-index.json`, the manifest
-  and configuration hub.
-- `preferences.md` — user presentation preferences; consumed by export/review skills
-  and `/linkedin-rec`. Created at runtime by `profile-preferences`.
-
-### Data Format
-
-- Section files are structured JSON with a `{ "section": "<key>", "data": { ... } }`
-  envelope. Field names match `profile-template.md` exactly.
-- The `sections` mapping in `profile-template.md` is the single source of truth for
-  which fields belong to which section and the `.json` output path.
-- JSON values are raw data — no Markdown formatting (`**`, `##`, `- `) in strings.
-- **TBD convention**: required fields with no extractable data use `"TBD"` or
-  `["TBD"]`; optional fields use `null` or are omitted (never TBD). Data-layer skills
-  write TBD as-is; generate/export skills silently skip any value that is exactly
-  `"TBD"`; `profile-validate` warns about TBD values.
-
-### Lifecycle
-
-1. **Init** — `/profile-init` collects sources, generates `profile-index.json` early
-   (data sources + a `sections` array populated incrementally), builds all section
-   files, verifies source coverage, and validates output. It configures data sources
-   and tells the user to run `profile-refresh` when ready. Entry point; re-runnable.
-2. **Maintain** — `/profile-section` builds or updates one section, using semantic
-   field mapping and TBD defaults for required fields with no data. For dynamic
-   sections it calls `profile-refresh` if sources are configured.
-3. **Assemble** — `/profile-assemble` renders sections through `profile-layout.md`
-   into `profile.md` on demand. This is an **optional side-branch, not a prerequisite
-   for anything** — every generate and review skill reads `sections/*.json` directly.
-
-## Skills
-
-### Skill Layers
-
-- **Guidance** — `profile-guide` inspects current project state and recommends the
-  single best next step. Advise-only; never runs other skills. Triggers on
-  goal-directed prerequisite questions ("what do I need before I can generate my
-  resume"), state questions ("is my profile ready", "what's missing"), and
-  orientation ("how do I use this plugin", "just installed this, now what"). Does NOT
-  trigger when the user names a concrete action — generate, review, refresh,
-  preference, or a data change — those route to their own skill or command.
-  - **It is not a redirector.** Data-change and assemble requests route straight to
-    `/profile-section` / `/profile-assemble` / `/profile-init` from those entries'
-    own descriptions; `profile-guide` is not needed and does not fire. Verified by
-    ablation (`evals/`, 2026-08-06): deleting the skill changed 3 of 20 routing
-    outcomes, all of them guidance questions, none of them data changes. Keep the
-    description scoped to what nothing else handles — the goal-directed
-    prerequisite question is the one case with no other handler.
-- **Data layer** — `profile-section`, `profile-refresh`, `profile-assemble`.
-  - **Invocation policy:** `profile-section` and `profile-assemble` are
-    `disable-model-invocation: true` — run only via `/profile-section` and
-    `/profile-assemble`, never auto-triggered or invoked by other skills. Do not
-    re-enable model invocation on either. `profile-refresh` stays model-invocable and
-    may be called by `profile-section` for dynamic sections. `/profile-init` is the
-    other explicit data writer.
-- **Preferences** — `profile-preferences` manages `preferences.md`.
-- **Generate** (profile → platform content, no external access) — `linkedin-generate`,
-  `resume-generate`, `github-generate`, `hashnode-generate`. Each reads
-  `sections/*.json` and `preferences.md`.
-- **Review** (fetch the live external profile, assess quality, suggest improvements) —
-  `linkedin-review` (Playwright MCP), `github-review` (`gh` CLI / WebFetch),
-  `hashnode-review` (Hashnode GraphQL API). Each reads the live platform and
-  `preferences.md`; the focus is quality and impact, not data sync.
-
-## Dynamic Sections
-
-`blogs` (Hashnode, Dev.to) and `open_source` (GitHub) are **dynamic** — they track
-data that changes on external platforms. All other sections are **static**, updated
-only from user-provided data. Source config (platform + handle) lives in the
-`sources` array of the user's `profile-index.json`, not in the plugin templates.
-`profile-refresh` fetches latest data and updates the section files; it is never
-called by `profile-assemble` or any export/review skill.
-
-## Preferences
-
-Stored in `preferences.md`, grouped under `## Global` (applies everywhere) or a
-platform heading (`## LinkedIn`, `## Resume`, `## GitHub`, `## Hashnode`). Consumed by
-export and review skills, plus `/linkedin-rec` (tone and framing directives) —
-data-layer skills (`profile-section`, `profile-refresh`, `profile-assemble`) ignore
-them. Manage via `profile-preferences` or by editing the file directly.
-
-## External Dependencies
-
-- **Playwright MCP** — configured in `.mcp.json` at the plugin root; required by
-  `linkedin-review`.
-- **`gh` CLI** — used by `github-review` and `profile-refresh`.
-- **Hashnode GraphQL API** — public endpoint `gql.hashnode.com` (no auth); used by
-  `hashnode-review` and `profile-refresh` via WebFetch.
-
-## Conventions
-
-- `.profile/tmp/{YYYY-MM-DD}/{source}/` — temporary/intermediate data, organized by
-  date and source. Never for final output. Cleaned up by `/profile-validate` (folders
-  older than 30 days).
-- Skill frontmatter uses `name` and `description` (third-person, with trigger
-  phrases). Skill bodies use imperative/infinitive style.
+`profile-guide` answers goal-directed prerequisite, state, and orientation questions, and
+nothing else. It is not a redirector: a data-change or assemble request routes to
+`/profile-section` or `/profile-assemble` from those entries' own descriptions. Ablation
+measured the redirect mandate as dead weight, which is why it was removed. Read that result
+in `evals/README.md` before widening the description again.
