@@ -38,7 +38,7 @@ This order front-loads the most keyword-rich sections for ATS scoring.
   users served, throughput, latency reduction)
 - **Relevance**: Prioritize accomplishments relevant to the target role
 - **Recency**: Most detail for recent roles (3-5 bullets), less for older roles
-  (2-3 bullets). For a 1-2 page resume, total experience bullets across all roles
+  (1-2 bullets). For a 1-2 page resume, total experience bullets across all roles
   should be roughly 12-20.
 - **No personal pronouns**: Never use "I", "my", "we"
 - **Tense**: Past tense for previous roles, present tense for current role
@@ -240,4 +240,5 @@ cleanly.
 
 Early-career roles (10+ years ago) should be condensed to 1-2 bullets or a
 single line with title, company, and dates. The detail budget goes to recent
-roles. Consider omitting early roles entirely if they add no relevant signal.
+roles. Keep the role line even when the entry adds no relevant signal —
+condensing is the lever, not omission. See "Career Gaps" above.

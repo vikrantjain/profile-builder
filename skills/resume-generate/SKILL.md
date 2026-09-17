@@ -60,7 +60,7 @@ would fail that test, do not make it. When in doubt, prefer the version that
 reads as the candidate's own resume rather than one written for a JD.
 
 A 20-year career with 8 roles and 30 projects might produce a resume with all
-8 roles listed but only 12-18 bullets across them — recent and relevant roles
+8 roles listed but only 12-20 bullets across them — recent and relevant roles
 get more, older or less-relevant roles get one or two. The craft is in
 choosing which bullets — using the candidate's own words and framing — not in
 rewriting them to echo a JD.
