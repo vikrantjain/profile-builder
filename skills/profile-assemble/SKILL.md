@@ -55,19 +55,10 @@ Also read the `placeholder_syntax` reference from
 
 ### 3. Determine Section Order
 
-Assemble sections in this canonical order (matching the layout in
-`${CLAUDE_PLUGIN_ROOT}/profile-layout.md`):
-
-1. Identity header (from `sections/identity.json`)
-2. Summary
-3. Experience
-4. Skills
-5. Education
-6. Certifications
-7. Patents
-8. Blog Posts
-9. Open Source
-10. Languages
+Assemble sections in the order they appear in
+`${CLAUDE_PLUGIN_ROOT}/profile-layout.md`, starting with the identity header.
+That order matches the template's `sections` mapping. The layout is the
+authority if the two ever disagree, because it is what gets rendered.
 
 ### 4. Read and Validate Section Files
 
@@ -90,17 +81,10 @@ using the corresponding section block from `${CLAUDE_PLUGIN_ROOT}/profile-layout
 1. **Locate the section block** in the layout. Each section block starts with
    its `## Heading` and ends before the next `---` separator or `## Heading`.
 
-2. **Apply placeholder substitution** using the section's JSON data:
-   - `{{field}}` → replace with the string value of the named field
-   - `{{#field}}...{{/field}}` → render the block only if field is non-null
-     and non-empty
-   - `{{^field}}...{{/field}}` → render only if field is null or absent
-   - `{{#each list}}...{{/each}}` → repeat the block for each item in the
-     JSON array
-   - `{{.}}` → current item value inside an `#each` loop
-   - `{{field | join ', '}}` → join array elements as comma-separated string
-   - `{{field | default 'x'}}` → use field value or fallback
-   - `{{field | capitalize}}` → capitalize first letter
+2. **Apply placeholder substitution** using the section's JSON data, per the
+   `placeholder_syntax` block of the template. Treat an empty string or an
+   empty list the same as an absent field. `{{#field}}` blocks render only
+   when the field has a real value.
 
 3. **TBD filtering**: when substituting values, silently skip any string value
    that is exactly `"TBD"`. If all items in a list are `"TBD"`, omit the

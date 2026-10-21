@@ -38,77 +38,52 @@ review them with the weight they carry.
 
 ### 1. Fetch Hashnode Profile Data
 
-Use WebFetch to query the Hashnode public GraphQL API at
-`https://gql.hashnode.com`. No authentication is required for public
-profile data.
+Hashnode retired free GraphQL API access on 2026-05-13. Every request to
+`gql.hashnode.com` now needs a Pro plan. The public profile page and the
+blog's feeds still work without authentication, so they are the default.
 
-Determine the Hashnode handle from `profile-index.json` — the entry in
+Determine the Hashnode handle from `profile-index.json`. Use the entry in
 `sources[]` whose `platform` is `hashnode`. The identity section has no
 Hashnode field, so the handle lives only in the source configuration. If
 there is no such entry, ask the user for their handle.
 
-The handle may be a bare username or a custom domain. `user(username:)`
-below accepts only a bare username; if the handle contains a dot, treat it
-as a custom domain and query `publication(host: "<handle>")` for the posts
-instead, as `profile-refresh` does.
+The handle may be a bare username or a custom domain. A custom domain locates
+the blog but not the profile page. If you only have a domain, ask the user
+for their Hashnode username.
 
-Fetch the profile with a query like:
+**Profile fields.** Fetch `https://hashnode.com/@{username}` with `curl -sL`.
+The page is server-rendered:
 
-```graphql
-query {
-  user(username: "<hashnode-username>") {
-    name
-    username
-    tagline
-    bio {
-      text
-    }
-    profilePicture
-    location
-    availableFor
-    socialMediaLinks {
-      github
-      twitter
-      linkedin
-      website
-      stackoverflow
-      facebook
-      youtube
-    }
-    badges {
-      name
-      description
-    }
-    followersCount
-    followingsCount
-    posts(page: 1, pageSize: 20) {
-      nodes {
-        title
-        slug
-        publishedAt
-        tags {
-          name
-        }
-      }
-    }
-  }
-}
-```
+- The tagline is in the `description` / `og:description` meta tags.
+- The bio, tech stack, social links, and "available for" text are in the
+  page body.
 
-The `posts` connection is paginated. If a page returns exactly `pageSize`
-items, fetch the next page (`page: 2`, `page: 3`, …) until a page returns
-fewer than `pageSize` items or 200 posts have been fetched (safety cap).
-Fetching the complete post list matters: the blog sync check in step 5
-compares `sections/blogs.json` against this list, and a partial list would
-falsely flag the user's older posts as deleted.
+If `curl` returns a bot-check page or the body lacks a field, WebFetch the
+same URL and ask for those fields specifically. If both fail, use the
+Playwright MCP browser if it is available, or ask the user to paste the
+fields. Note in the report which fields you could not read, rather than
+rating them as missing.
 
-Save all fetched API responses to `.profile/tmp/{YYYY-MM-DD}/hashnode/`
-where `{YYYY-MM-DD}` is today's date. Create this directory structure if it
-does not exist.
+**Posts.** Follow the RSS + sitemap recipe in
+`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`:
 
-If the GraphQL API is unreachable, inform the user and suggest they
-provide their Hashnode profile URL for a WebFetch-based fallback
-(scrape the public profile page).
+- The RSS feed gives the 20 most recent posts with metadata.
+- The sitemap gives the complete URL list.
+
+The complete list matters. The blog sync check in step 5 compares
+`sections/blogs.json` against it by `url`, and a partial list would falsely
+flag older posts as deleted. For a review you do not need metadata for every
+post: post titles, plus tags where the page exposes them, are enough to judge
+topic coherence.
+
+**Pro users.** If the user has a Hashnode Pro plan and a token, a single
+GraphQL `user(username:)` query returns tagline, bio, social links, tech
+stack, badges, follower counts, and posts with `url`. Send it with `curl`.
+WebFetch cannot POST. Never write the token to disk.
+
+Save the fetched pages and feeds to `.profile/tmp/{YYYY-MM-DD}/hashnode/`,
+where `{YYYY-MM-DD}` is today's date. Create the directory if it does not
+exist.
 
 ### 2. Read Master Profile
 
@@ -242,10 +217,11 @@ check earns its place here:
 - Posts on Hashnode not yet captured in `sections/blogs.json` → suggest
   running `profile-refresh`.
 - Posts in `sections/blogs.json` attributed to Hashnode but not returned
-  by the API → flag for the user (deleted, unpublished, or moved). Run
-  this direction only if the step 1 fetch paginated to completion; if the
-  post list is partial (safety cap hit or a page failed), skip it and note
-  in the report why — a partial list would falsely flag older posts.
+  in the step 1 post list → flag for the user (deleted, unpublished, or
+  moved). Run this direction only if the complete list was fetched, meaning
+  every sitemap page or GraphQL page succeeded. If the list is partial, skip
+  this direction and say why in the report. A partial list would falsely
+  flag older posts.
 
 Exclude any master profile value that is exactly `"TBD"` or `["TBD"]` —
 these are unfilled placeholders.
@@ -295,7 +271,7 @@ conversation.
 
 Before finishing, verify:
 
-- [ ] Fetched API responses saved to `.profile/tmp/{YYYY-MM-DD}/hashnode/`
+- [ ] Fetched pages and feeds saved to `.profile/tmp/{YYYY-MM-DD}/hashnode/`; any field that could not be read is noted, not rated as missing
 - [ ] Master profile read via `profile-index.json` to discover sections
 - [ ] TBD values excluded from gap analysis
 - [ ] Every field rated (Strong / Needs work / Weak)
@@ -309,3 +285,4 @@ Before finishing, verify:
 ## Reference Files
 
 - **`${CLAUDE_PLUGIN_ROOT}/skills/hashnode-generate/references/hashnode-constraints.md`** — Hashnode profile field limits and formatting rules
+- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`** — Host resolution and the RSS + sitemap post-list recipe

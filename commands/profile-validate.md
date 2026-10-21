@@ -209,9 +209,14 @@ For each **fixable** issue, in order of severity (errors first):
 3. Apply the fix and confirm.
 
 Examples of fixable issues:
-- Remove orphan files from `sections/`.
+- Orphan files in `sections/`: either add the file to the index `sections`
+  array, if it is a valid section, or remove it. Show the file's contents
+  first.
 - Add missing section entries to the index `sections` array.
-- Update stale `last_updated` dates after confirming content is current.
+- **Repair invalid JSON** when the parse error points at a mechanical fault,
+  such as a trailing comma, an unescaped quote, or a missing bracket. Show the
+  error location and the exact fix. If the damage is not mechanical, treat it
+  as non-fixable (below).
 - Update section `file` paths from `.md` to `.json` (if files were migrated).
 - **Rename fields** — for rename candidates identified in schema drift
   detection, rename the JSON key in-place (preserving the value). E.g.,
@@ -237,11 +242,17 @@ Examples of fixable issues:
   `profile_version` in `profile-index.json` to match the current
   `template_version`.
 
+Stale `last_updated` dates on `blogs` / `open_source` are not fixable here.
+The date means "data last changed", so bumping it would hide real staleness.
+Suggest `profile-refresh` instead.
+
 For **non-fixable** issues (missing data that requires user input), provide
 actionable guidance:
 - Missing required section → "Run `/profile-section` for `<section>` to
   generate it."
-- Invalid JSON → "Run `/profile-section` for `<section>` to regenerate."
+- Invalid JSON that is not a mechanical fault → "Run `/profile-section` for
+  `<section>` with your source data." Warn that regenerating replaces the
+  file, so the user should copy out anything worth keeping first.
 - Missing required fields within a section → "Run `/profile-section` for
   `<section>` with the missing data."
 

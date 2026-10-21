@@ -112,7 +112,7 @@ fields:
           tech_stack:  { required: false, description: "Project-specific technologies (e.g. React, GraphQL, PostgreSQL)", type: list }
           skills:      { required: false, description: "Skills personally applied by you in this project — may overlap with tech_stack but limited to what you directly worked with. Include concrete tools (e.g. Python, MCP) and practice-level skills not captured as technologies (e.g. Vibe coding, Prompt Engineering).", type: list }
           contributions: { required: true, description: "What you did — technical work, design decisions, problems solved. Action-oriented bullets describing the work performed. Use 'TBD' as a single-item list if no contributions can be extracted.", type: list, default: ["TBD"] }
-          impact:      { required: false, description: "Quantifiable outcomes — metrics, business results, performance gains, adoption numbers. Numbers-driven bullets. IMPORTANT: Always actively search the source data for measurable outcomes, percentages, scale numbers, time savings, cost reductions, adoption figures, and before/after comparisons. Only omit if genuinely no quantifiable data exists after thorough extraction.", type: list }
+          impact:      { required: false, description: "Quantifiable outcomes — metrics, business results, performance gains, adoption numbers, time or cost savings, before/after comparisons. Numbers-driven bullets.", type: list }
           url:         { required: false, description: "Link to project, repo, or demo (if public)" }
 
   # ── Education ───────────────────────────────────────────
@@ -210,9 +210,9 @@ fields:
 # Modular Section Support
 # ════════════════════════════════════════════════════════════
 #
-# The profile can be generated as a single document (mode: full) or as
-# independent section files (mode: section) for targeted updates,
-# parallel generation, and smaller-context agents.
+# Each section is stored as an independent JSON file, which allows
+# targeted updates, parallel generation, and smaller-context agents.
+# profile.md is an optional rendering of those files, never a source.
 
 json_structure:
   description: "Each section file is a JSON object with two top-level keys"

@@ -40,7 +40,7 @@ sections from external sources:
 Invoke this skill when:
 
 - The user explicitly asks to refresh or sync a dynamic section.
-- The `profile-section` skill is building or updating a dynamic section
+- `profile-section` or `/profile-init` is building a dynamic section
   (blogs, open_source) and needs current data from the source platform.
 
 Do **not** invoke this skill from `profile-assemble` or any export/review
@@ -60,11 +60,17 @@ All other sections are static — maintained from user-provided data only.
 ## Tool Constraints
 
 This skill must **not** use Playwright or any browser automation. All external
-data fetching uses CLI tools and public APIs only:
+data fetching uses CLI tools, public APIs, and public feeds:
 
-- **GitHub** — `gh` CLI (via Bash) or GitHub REST API (via WebFetch)
-- **Hashnode** — GraphQL API at `gql.hashnode.com` (via WebFetch)
-- **Dev.to** — REST API at `dev.to/api` (via WebFetch)
+- **GitHub** — `gh` CLI, or the GitHub REST API via `curl`
+- **Hashnode** — the blog's RSS feed and sitemap via `curl`. The GraphQL API
+  now requires a Pro plan, so it is an opt-in path only.
+- **Dev.to** — REST API at `dev.to/api` via `curl`
+
+Prefer `curl` over WebFetch for API calls. WebFetch returns a model-written
+summary of the response rather than the raw body. A summary can silently drop
+entries from a long list, and a dropped entry is indistinguishable from a
+deleted post.
 
 ## Workflow
 
@@ -108,8 +114,8 @@ lives in the reference.
 
 Feeds `open_source` (projects + contributions). Recipe covers:
 
-- Tool selection: prefer `gh` CLI; fall back to REST API via WebFetch if `gh`
-  is missing or unauthenticated.
+- Tool selection: prefer `gh` CLI; fall back to the REST API via `curl` if
+  `gh` is missing or unauthenticated.
 - Repository fetch (with `--paginate --slurp`), fork/archived filtering,
   star-then-recency sort.
 - Topics fetch — top ~10 repos only.
@@ -121,9 +127,9 @@ Feeds `open_source` (projects + contributions). Recipe covers:
 Two workflow-level constraints to keep in mind without opening the recipe:
 
 - **Topics and README fetches are capped at ~10 repos** to avoid burning API
-  budget.
-- **Unauthenticated WebFetch is rate-limited at 60 req/hour.** If you hit a
-  403, suggest `gh auth login` and continue with what you have.
+  budget. This includes a first population, where every repo is new.
+- **The unauthenticated REST API is rate-limited at 60 req/hour.** If you hit
+  a 403, suggest `gh auth login` and continue with what you have.
 
 ##### README enrichment for tech_stack
 
@@ -159,8 +165,9 @@ section of `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`.
 
 #### Hashnode — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`
 
-Feeds `blogs`. Recipe covers the GraphQL query, pagination, the
-custom-domain fallback, and field mapping.
+Feeds `blogs`. Recipe covers host resolution (bare username or custom
+domain), RSS for recent posts, the sitemap for the complete list, the
+opt-in GraphQL path for Pro users, and field mapping.
 
 #### Dev.to — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/devto.md`
 
@@ -243,9 +250,9 @@ projects only. Two flavors:
 **Blogs — existing entries: update factual fields, preserve enrichments.**
 
 For blog entries that exist in both source and profile, update **factual
-fields** the API is authoritative for: `title`, `url`, `published_on`,
-`platform`. Preserve manually enriched fields (e.g., a hand-edited
-`excerpt`).
+fields** the source is authoritative for: `title`, `published_on`,
+`platform`. (`url` is the match key, so it never changes.) Preserve
+manually enriched fields (e.g., a hand-edited `excerpt`).
 
 Detecting manual enrichments on `excerpt`: if the existing value contains
 content the API value does not (extra sentences, hand-written framing),
@@ -265,26 +272,10 @@ titles, keep both — they may be cross-posts with platform-specific URLs.
 
 ### 6. Build the JSON Object
 
-Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` and extract the field definitions and
-`json_structure` conventions for the target section. Construct a JSON object:
-
-```json
-{
-  "section": "<blogs | open_source>",
-  "data": {
-    "<field_name>": "<merged data>"
-  }
-}
-```
-
-Rules:
-
-- Use field names exactly as defined in `profile-template.md`.
-- List fields → JSON arrays. String fields → JSON strings.
-- No Markdown formatting in values — values are raw data.
-- Required fields with no data → `"TBD"` (string) or `["TBD"]` (list).
-- Optional fields with no data → `null` or omit. Do not set optional fields
-  to `"TBD"`.
+Read `${CLAUDE_PLUGIN_ROOT}/profile-template.md` for the target section's
+field definitions and the `json_structure` block. That block owns the
+envelope (`{"section": ..., "data": {...}}`) and the TBD, null, date, and
+no-Markdown rules. Build the merged object to match it.
 
 ### 7. Write and Update Index
 
@@ -307,7 +298,8 @@ no entries updated), this is a no-op refresh:
   array for this section. Update `last_updated` to the current date in
   YYYY-MM-DD format and ensure `file` uses the `.json` extension. If no entry
   exists for this section, add one with `name`, `key`, `file`, and
-  `last_updated`. Write back to `profile-index.json`.
+  `last_updated`. Take `name` verbatim from the template's `sections`
+  mapping. Write back to `profile-index.json`.
 
 ### 8. Report Changes
 
@@ -373,6 +365,7 @@ API calls can fail for various reasons. Handle these gracefully:
 | **Network error / timeout** | Report the failure. Continue with other sources. |
 | **Empty response** (valid but no data) | This is not an error — the user may have no public repos/posts. Write the section with an empty array. Do not treat it as a failure. |
 | **Malformed response** | Report that the API returned unexpected data. Skip this source and continue. |
+| **HTML where JSON/XML was expected** (redirect, login page, bot checkpoint) | The endpoint has changed or is blocking the request. Report the final URL. Do not parse the page as data. Continue with other sources. |
 
 If **all** sources for a target section fail, do not overwrite the existing
 section file. Inform the user that the refresh could not complete and the

@@ -65,10 +65,9 @@ not on experience entries directly. To populate `work[].highlights[]` in JSON Re
 2. Aggregate non-TBD `contributions` from the role's projects.
 3. Aggregate `impact` items from the role's projects — these are high-value
    bullets with quantifiable outcomes and should be prioritized.
-4. Select the strongest bullets — start with action verbs, include metrics.
-   Where possible, combine a contribution with its impact into a single bullet
-   (e.g., "Built X → resulting in Y% improvement").
-5. Match the tailored content from `resume.md`.
+4. Use exactly the bullets that `resume.md` shows for this role. The
+   selection, combining, and editing happen once, in SKILL.md step 5. This
+   mapping only carries the result across.
 
 ### education (array) — one entry per degree
 
@@ -87,11 +86,11 @@ not on experience entries directly. To populate `work[].highlights[]` in JSON Re
 | JSON Resume Field | Profile Source               | Notes                                   |
 |-------------------|------------------------------|-----------------------------------------|
 | `name`            | Skill category name          | e.g., "Languages", "Cloud & DevOps"     |
-| `level`           | (inferred)                   | "Master", "Advanced", "Intermediate"    |
+| `level`           | (not in profile schema)      | Omit — the profile records no proficiency level, and inventing one is fabrication |
 | `keywords[]`      | Skills in that category      | Array of individual skill strings       |
 
-Group skills by category as they appear in the profile. When tailoring to a
-job description, reorder categories and keywords to front-load JD matches.
+Use the same categories, items, and ordering as the Skills section of
+`resume.md`.
 
 ### certificates (array) — one entry per certification
 
@@ -135,11 +134,12 @@ This array combines two profile sources:
 Only include projects that are relevant to the target role (when a JD is
 provided) or that are significant enough for a general resume.
 
-### publications (array) — for patents
+### publications (array) — for patents and blog posts
 
 The JSON Resume schema has no native `patents` section. Map patents to
 `publications`, which is the closest semantic fit (patents are published
-intellectual property with identifiers, dates, and issuing bodies).
+intellectual property with identifiers, dates, and issuing bodies). Blog
+posts that `resume.md` lists under "Selected Writing" also map here.
 
 | JSON Resume Field | Profile Source                | Notes                                  |
 |-------------------|------------------------------|----------------------------------------|
@@ -149,8 +149,19 @@ intellectual property with identifiers, dates, and issuing bodies).
 | `url`             | `patents[].url` or construct from patent number | e.g., `https://patents.google.com/patent/US10585682B2` |
 | `summary`         | `patents[].patent_number`    | Include patent number (e.g., "US Patent US10585682B2") |
 
-Only include patents that appear in `resume.md`. If resume.md has a Patents
-section, resume.json must have a corresponding `publications` array.
+Blog posts:
+
+| JSON Resume Field | Profile Source                | Notes                                  |
+|-------------------|------------------------------|----------------------------------------|
+| `name`            | `blogs[].title`              | Post title                             |
+| `publisher`       | `blogs[].platform`           | e.g. "Hashnode", "Dev.to"; omit if absent |
+| `releaseDate`     | `blogs[].published_on`       | ISO 8601 (`YYYY-MM`)                   |
+| `url`             | `blogs[].url`                | Direct map                             |
+| `summary`         | `blogs[].excerpt`            | Omit if absent                         |
+
+Only include patents and posts that appear in `resume.md`. If resume.md has a
+Patents or Selected Writing section, resume.json must have matching
+`publications` entries.
 
 ## Sections to Omit
 
@@ -158,7 +169,7 @@ Omit these JSON Resume sections entirely (do not include empty arrays):
 
 - `volunteer` — unless the profile has volunteer data
 - `awards` — unless the profile has awards data
-- `publications` — unless patents are included in the resume (see patents mapping above)
+- `publications` — unless patents or blog posts are included in the resume (see mapping above)
 - `interests` — not typically included in professional resumes
 - `references` — "Available upon request" convention; omit from JSON
 

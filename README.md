@@ -140,7 +140,7 @@ These skills fetch your live profile from a platform, compare it against the mas
 |---|---|---|
 | `linkedin-review` | Playwright MCP (bundled in `.mcp.json`) | *"Review my LinkedIn profile"* |
 | `github-review` | `gh` CLI | *"Review my GitHub profile"* |
-| `hashnode-review` | None (uses public GraphQL API) | *"Review my Hashnode profile"* |
+| `hashnode-review` | None (public profile page and blog RSS/sitemap; GraphQL only with a Hashnode Pro token) | *"Review my Hashnode profile"* |
 
 ## How It Works
 

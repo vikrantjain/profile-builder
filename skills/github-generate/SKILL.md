@@ -254,7 +254,9 @@ or contradicted, revise before proceeding.
 
 ### 7. Write Output
 
-Write the generated README to `github-readme.md`.
+Write the generated README to `github-readme.md`. For a single-section
+request when the file already exists, replace only that section and leave
+the rest as the user last saw it.
 
 ### 8. Present to User
 

@@ -8,8 +8,10 @@ filters here are load-bearing.
 
 Try the `gh` CLI first (via Bash). If it is not installed or not
 authenticated (`gh auth status` fails), fall back to the GitHub REST API
-via WebFetch. Both approaches hit the same endpoints — the only difference
-is the transport.
+with `curl -s` via Bash. Both approaches hit the same endpoints. The only
+difference is the transport. Use WebFetch only when Bash is unavailable:
+it passes responses through a summarizing model, so long JSON arrays can
+come back incomplete, and it cannot show response headers.
 
 To detect availability:
 
@@ -17,12 +19,11 @@ To detect availability:
 gh auth status 2>&1
 ```
 
-If this exits non-zero or the command is not found, use WebFetch for all
+If this exits non-zero or the command is not found, use `curl` for all
 GitHub calls.
 
 **Rate limit note:** Unauthenticated REST API requests are capped at 60/hour
-vs 5000/hour with a token. WebFetch calls are unauthenticated unless custom
-headers are added. If you hit a 403 rate limit via WebFetch, inform the user
+vs 5000/hour with a token. If you hit a 403 rate limit, inform the user
 and suggest installing and authenticating the `gh` CLI (`gh auth login`) for
 higher limits.
 
@@ -44,13 +45,16 @@ Key points about `--paginate` and `--slurp`:
 - Without `--slurp`, each page outputs a separate JSON array — concatenated
   output is not valid JSON.
 
-### With WebFetch (fallback)
+### With `curl` (fallback)
 
-Fetch `https://api.github.com/users/{handle}/repos?per_page=100&sort=updated&direction=desc`.
-The response is a JSON array. If the response includes a `Link` header with
-`rel="next"`, follow it to fetch subsequent pages. Concatenate all page arrays
-into one. Extract the same fields: `name`, `description`, `html_url`,
-`language`, `stargazers_count`, `fork`, `archived`, `updated_at`, `created_at`.
+```bash
+curl -s "https://api.github.com/users/{handle}/repos?per_page=100&sort=updated&direction=desc&page=1"
+```
+
+The response is a JSON array. If it holds exactly 100 items, fetch `&page=2`,
+and so on, until a page returns fewer. Concatenate all page arrays into one.
+Extract the same fields: `name`, `description`, `html_url`, `language`,
+`stargazers_count`, `fork`, `archived`, `updated_at`, `created_at`.
 
 ### Filter and sort
 
@@ -70,15 +74,20 @@ follow-up call since the list endpoint does not return them. Cap at the top
 gh api "/repos/{handle}/{repo_name}/topics" --jq '.names'
 ```
 
-Or via WebFetch: `https://api.github.com/repos/{handle}/{repo_name}/topics`
+Or via `curl -s https://api.github.com/repos/{handle}/{repo_name}/topics`
 (returns `{ "names": [...] }`).
 
 ### README — fetch and tech_stack extraction
 
-Used for **new** projects (always) and **existing** projects (only when the
-user opts in to re-enrichment). The decision of *when* to invoke this lives
-in SKILL.md ("README enrichment for tech_stack"); this section covers *how*
+Used for **new** projects and for **existing** projects only when the
+user opts in to re-enrichment. The decision of *when* to invoke this lives
+in SKILL.md ("README enrichment for tech_stack"). This section covers *how*
 to fetch and *what* to extract.
+
+On a first population every repo is new. Fetch READMEs for the top ~10 by
+the sort order above, and give the rest `[language]` plus topics. Tell the
+user they can ask to enrich the remainder. An uncapped first run can burn
+the whole unauthenticated hourly budget.
 
 #### Fetching — with `gh` CLI
 
@@ -86,10 +95,10 @@ to fetch and *what* to extract.
 gh api -H "Accept: application/vnd.github.raw" "/repos/{handle}/{repo_name}/readme" 2>/dev/null
 ```
 
-#### Fetching — with WebFetch (fallback)
+#### Fetching — with `curl` (fallback)
 
-Try `https://raw.githubusercontent.com/{handle}/{repo_name}/HEAD/README.md`
-first. If that 404s, try `/README.rst` and `/README` (no extension). If all
+`curl -sf https://raw.githubusercontent.com/{handle}/{repo_name}/HEAD/README.md`
+first. Raw content is not counted against the API rate limit. If that 404s, try `/README.rst` and `/README` (no extension). If all
 fail, skip README enrichment for that repo.
 
 If the README fetch fails (404, rate limit, malformed), fall back to
@@ -163,7 +172,7 @@ gh api "/search/issues" \
 Using `-f` flags for query parameters avoids URL-encoding issues with spaces
 and special characters.
 
-### With WebFetch (fallback)
+### With `curl` (fallback)
 
 Fetch `https://api.github.com/search/issues?q=author:{handle}+type:pr+is:merged+-user:{handle}&sort=created&order=desc&per_page=30`.
 Extract `items` array from the response, then pick `title`, `html_url`,

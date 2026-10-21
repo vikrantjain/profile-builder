@@ -110,12 +110,13 @@ output reads those files directly rather than re-scraping.
 | `github-generate` | GitHub profile README |
 | `hashnode-generate` | Copy-paste-ready Hashnode profile fields |
 | `linkedin-review` | Quality review of the live LinkedIn profile (Playwright MCP) |
-| `github-review` | Quality review of the live GitHub profile (`gh` CLI / WebFetch) |
-| `hashnode-review` | Quality review of the live Hashnode profile (GraphQL API) |
+| `github-review` | Quality review of the live GitHub profile (`gh` CLI / REST API) |
+| `hashnode-review` | Quality review of the live Hashnode profile (public profile page + blog feeds) |
 | `/profile-validate` | Check profile files against the schema and offer fixes |
 | `/linkedin-rec` | Draft a recommendation-request message for a colleague |
 
 Prerequisites worth flagging: `profile-refresh` needs `sources[]` configured in
 `profile-index.json` (set up during `/profile-init`); review skills need their
-external access (Playwright MCP / `gh` CLI) and read the live platform, not the
-master profile.
+external access (Playwright MCP / `gh` CLI). They read the live platform and
+benchmark it against `sections/*.json`, so they work best once those sections
+exist.

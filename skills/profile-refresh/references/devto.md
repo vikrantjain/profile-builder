@@ -9,7 +9,9 @@ Read this file before issuing any Dev.to call.
 
 `https://dev.to/api/articles?username={handle}&per_page=100`
 
-Use WebFetch — there is no `gh`-equivalent CLI for Dev.to.
+Use `curl -s` via Bash so you get the raw JSON array. WebFetch passes
+responses through a summarizing model, which can drop items from a long
+array, so use it only when Bash is unavailable.
 
 ## Pagination
 

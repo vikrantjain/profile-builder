@@ -42,17 +42,18 @@ extract the handle from the `github` URL (e.g. `https://github.com/vikrant`
 → `vikrant`). If the identity section does not exist or has no GitHub URL,
 ask the user for their username.
 
-Use the `gh` CLI (preferred) or WebFetch to gather the live profile state.
+Use the `gh` CLI (preferred), or the REST API via `curl`, to gather the live
+profile state.
 Save all fetched content (API responses, extracted text) to
 `.profile/tmp/{YYYY-MM-DD}/github/` where `{YYYY-MM-DD}` is today's date.
 Create the directory if it does not exist.
 
-- **Profile bio and metadata**: `gh api users/<username>` (or `gh api user`
-  for the authenticated user) — bio, name, company, location, blog URL,
-  follower counts.
-- **Profile README**: `gh api repos/<username>/<username>/contents/README.md
-  --jq .content | base64 -d`. A 404 means no profile README exists — that
-  is itself a major finding, not an error.
+- **Profile bio and metadata**: `gh api users/<username>` — bio, name,
+  company, location, blog URL, follower counts.
+- **Profile README**: `gh api -H "Accept: application/vnd.github.raw"
+  repos/<username>/<username>/readme`. The `/readme` endpoint finds the file
+  whatever its casing or extension. A 404 means no profile README exists.
+  That is itself a major finding, not an error.
 - **Pinned repositories** (GraphQL — the REST API does not expose pins):
 
   ```
@@ -80,9 +81,14 @@ Create the directory if it does not exist.
 - **Recent activity** (optional): `gh api users/<username>/events` — enough
   to judge whether the profile looks active.
 
-If the `gh` CLI is unavailable or unauthenticated, fall back to WebFetch on
-the public profile page and note in the report that pinned-repo and topic
-data may be incomplete.
+If the `gh` CLI is unavailable or unauthenticated, use `curl -s` against
+the same REST endpoints (`https://api.github.com/users/<username>`,
+`/repos/<username>/<username>/readme` with the raw Accept header, and
+`/users/<username>/repos?per_page=100`). Unauthenticated calls are limited to
+60 per hour, so fetch topics for only the handful of repos you will discuss.
+GraphQL needs a token, so read pins from the public profile page instead,
+with WebFetch on `https://github.com/<username>`. Note in the report that pin
+data came from the page and may be incomplete.
 
 ### 2. Read Master Profile
 

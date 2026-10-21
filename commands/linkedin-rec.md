@@ -26,7 +26,8 @@ guess a company from the profile or draft a generic message.
 
 2. From the experience data, identify the role and projects at the specified company. If a specific project is mentioned, focus on that. Otherwise, select the 2-3 most impactful projects. Silently skip any value that is exactly `"TBD"` or `["TBD"]` — these are unfilled placeholders, not content; never reference them in the message.
 
-3. Generate a recommendation request message that:
+3. Generate a recommendation request message. The points below are defaults.
+   A tone or framing directive in `preferences.md` overrides them. The message:
    - Is warm but not overly formal — suited for a colleague relationship
    - Keeps an understated, straightforward tone (avoid superlatives and self-promotion)
    - Briefly mentions specific projects/contributions the colleague likely had visibility into

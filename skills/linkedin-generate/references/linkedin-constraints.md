@@ -9,7 +9,7 @@
 | Job Title | 100 | Per experience entry |
 | Company Name | 100 | Per experience entry |
 | Job Description | 2,000 | Per experience entry, supports bullet points via copy-paste |
-| Skills | 50 per skill | Up to 50 skills total, order matters (top 3 shown) |
+| Skills | — | Up to 100 skills in the Skills section; order matters (the top few surface first) |
 | Education - Degree | 100 | e.g. "Bachelor of Science" |
 | Education - Field of Study | 100 | e.g. "Computer Science" |
 | Education - Activities | 500 | Optional |
@@ -56,7 +56,7 @@ LinkedIn skills are not a data dump — they are a positioning tool. The goal is
 select and order skills that define the user's professional identity, match recruiter
 and hiring manager search terms, and are likely to attract endorsements.
 
-### Priority Ordering (within the 50-skill budget)
+### Priority Ordering (slot numbers are a guide for a ~50-skill list)
 
 Order skills by professional impact, not by profile category:
 
@@ -72,7 +72,7 @@ Order skills by professional impact, not by profile category:
    platforms, and methodologies that round out the profile without diluting the
    core identity.
 
-4. **Soft and leadership skills** (slots 41–50, optional): Only include if they
+4. **Soft and leadership skills** (last tier, optional): Only include if they
    are genuinely strong differentiators (e.g., "Team Leadership", "Executive
    Communication") — skip generic ones like "Teamwork" that add no signal.
 
@@ -89,15 +89,16 @@ Use the canonical LinkedIn / industry-standard name, not variations:
 
 ### Curation Rules
 
-- **50-slot budget is finite** — be selective. A shorter, sharper list beats an
+- **Be selective even with 100 slots** — a shorter, sharper list beats an
   exhaustive dump. Drop obscure internal tools, project-specific codenames, and
   legacy technology unless it is genuinely still a key part of the user's work.
 - **Favor searchable skills**: Recruiters search by well-known terms. An obscure
   skill that nobody searches for occupies a slot that a high-value skill could use.
-- **Include AI development tools**: Vendor AI tools like Cursor, Amazon Q,
-  Claude Code, and ChatGPT are increasingly searched by recruiters because they
-  signal hands-on AI-augmented development capability. These belong in the
-  adjacent/supporting tier, not dropped as "usage tools."
+- **Don't drop searchable tools as "mere usage"**: named tools recruiters
+  actively search for, such as current AI development tools, signal hands-on
+  capability. They usually belong in the adjacent/supporting tier. Which tools
+  count changes quickly, so judge by the current market rather than a fixed
+  list.
 - **Avoid redundancy**: Don't add both "JavaScript" and "ES6" — pick the canonical
   one. Don't add both "AWS" and "Amazon EC2", "Amazon S3" unless slots permit.
 - **Recency signal**: Skills from recent roles and projects carry more credibility
@@ -143,7 +144,8 @@ The headline must be a constructed positioning statement, not a trimmed title fi
 - Include 3–5 keywords drawn from the user's core skills and domain that recruiters
   in their target space are likely to search for.
 - Avoid buzzwords with no signal value ("passionate", "innovative", "results-driven").
-- 220-char limit: aim for 160–210 to leave breathing room and avoid truncation.
+- 220-char limit. Most strong headlines use a good share of it, but a sharp
+  shorter headline beats a padded long one.
 
 ## About / Summary Strategy for LinkedIn Impact
 

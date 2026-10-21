@@ -274,9 +274,6 @@ applicable) and current character count:
 <!-- Hashnode Tagline | Limit: 150 chars | Used: 127 chars -->
 ```
 
-Include character count after each constrained field so the user knows
-remaining budget.
-
 ### 8. Present to User
 
 How to present depends on scope:

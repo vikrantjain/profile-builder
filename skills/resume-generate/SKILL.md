@@ -89,8 +89,10 @@ Determine what the user needs:
   request a specific page count (e.g., "2 page resume").
 - **Sections to include/exclude**: by default, include all relevant sections.
 - **ATS priority**: if the user mentions ATS, applicant tracking, or keyword
-  optimization, apply enhanced ATS optimization in step 5. "ATS-friendly"
-  in the request means apply all ATS rules aggressively.
+  optimization, give the ATS pass in step 5 extra care. Be strict on
+  formatting, and run a thorough keyword gap analysis. The honesty limits
+  still apply: ATS emphasis never licenses keywords the candidate cannot
+  defend.
 
 ### 2. Read Profile Data
 
@@ -102,14 +104,15 @@ Read `profile-index.json` to discover available sections and their file paths.
 Then read the relevant section JSON files from `sections/`. Parse each JSON file
 and access fields directly from the `data` object.
 
-If required section JSON files do not exist, inform the user and suggest running
-`/profile-init` or `/profile-section` to generate them. At minimum, read:
+The four required sections are identity, summary, experience, and skills.
+If any of them is missing, inform the user and suggest running `/profile-init`
+or `/profile-section` to generate it. At minimum, read:
 
 - `sections/identity.json` — name, contact info
 - `sections/summary.json` — professional bio
 - `sections/experience.json` — work history
 - `sections/skills.json` — technical and soft skills
-- `sections/education.json` — degrees
+- `sections/education.json` — degrees, if it exists
 
 Also read certifications, open source, patents, blogs, and languages if they
 exist in the index. **Read all available sections by default** — a resume that
@@ -128,7 +131,7 @@ Read `preferences.md` from the workspace root. If it exists:
    highlight patents" → de-emphasize or omit; tone directives → adjust writing
    style accordingly.
 4. Resume-specific preferences take precedence over global if they conflict.
-5. When a preference conflicts with job-description tailoring (step 5),
+5. When a preference conflicts with job-description tailoring (steps 4–5),
    the preference wins — it reflects the user's deliberate intent.
 
 If `preferences.md` does not exist, proceed with default behavior.
@@ -244,10 +247,11 @@ For each role to include:
    from the role's `projects[]`, plus any top-level `description` bullets.
    This is the candidate pool, not the final list.
 
-2. **Score for relevance** — Rate each bullet against the JD requirements
-   mapping from step 4. Bullets that directly address a JD requirement score
-   highest. Bullets with quantifiable impact score next. Generic responsibility
-   statements score lowest.
+2. **Score for relevance** — Rate each bullet against the target from step 4.
+   That target is the JD mapping, the inferred role requirements, or, with no
+   target, the candidate's own trajectory. Bullets that directly address the
+   target score highest. Bullets with quantifiable impact score next. Generic
+   responsibility statements score lowest.
 
 3. **Combine contribution + impact** — Where a contribution and its
    corresponding impact naturally pair, fuse them into a single bullet
@@ -273,9 +277,10 @@ For each role to include:
    adds little to the target position, keep the role line (title, company,
    dates) and reduce it to one or two bullets rather than dropping it.
    Silently omitting a role creates an apparent employment gap, which on an
-   honest resume looks worse than a thin entry. Only drop very early or
-   short roles that the candidate has already pruned from their own profile
-   narrative.
+   honest resume looks worse than a thin entry. A very early or very short
+   role can sometimes go when space is tight, for example a three-month
+   internship twenty years back. Make that call deliberately and name the
+   dropped role in your summary to the user, so it is never silent.
 
 #### Skills Section
 
@@ -346,50 +351,10 @@ candidate does not actually have. A keyword the candidate cannot defend in an
 interview is a liability, not an optimization. When no JD is provided, still
 apply formatting and acronym rules.
 
-### 6. Generate Markdown Resume
+### 6. Verify the Draft
 
-`resume.md` is the primary deliverable — designed for direct conversion to PDF
-for immediate use. Formatting quality matters as much as content quality because
-the user may convert this to PDF and submit it within minutes.
-
-Write the resume to `resume.md` following the layout structure and formatting
-rules in the "Markdown Layout (resume.md)" section of
-`${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/resume-conventions.md`.
-Read that section before writing the file — it defines the exact header block,
-section heading set, experience entry format, and skill-group formatting.
-The rules most often gotten wrong, worth restating here:
-
-- **Skill groups**: one line per category ending with a backslash (`\`)
-  continuation, no blank lines between categories (blank lines create visible
-  gaps in PDF output). No trailing `\` on the last line.
-- **Header**: `# Full Name`, then `email | location`, then a profile-links
-  line with bare domain+path as link text, then `---`.
-- **Length**: match the requested page count — 1 page ≈ 400 words, 2 pages
-  ≈ 700-900 words. Use the full budget; don't produce a thin document.
-- **No personal pronouns, no decorative elements**; past tense for previous
-  roles, present for the current one; every bullet starts with an action verb.
-
-### 7. Generate JSON Resume (always — unless user explicitly declines)
-
-Also write a `resume.json` file in the [JSON Resume](https://jsonresume.org/schema)
-open standard format. This is a secondary output for users who want to import
-into Reactive Resume or other resume builder tools for further visual polish.
-
-Consult `${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/json-resume-schema.md`
-for the complete field mapping from profile data to JSON Resume fields. That
-reference covers all sections (basics, work, education, skills, certificates,
-publications/patents, languages, projects), date formats, and which sections
-to omit.
-
-Key rules:
-- Map the **selected** content — the JSON Resume must match `resume.md`
-  exactly: same bullets, same summary, same skill ordering.
-- Omit empty sections entirely (no empty arrays).
-- Patents map to `publications` (closest semantic fit in JSON Resume schema).
-
-### 8. Verify Before Writing
-
-Before writing output, run these checks and revise content if any fail:
+Before writing either file, check the drafted content and revise it if any
+check fails:
 
 **Content fidelity** — For every quantified claim, verify it exists in the
 source profile data. For every achievement that was qualified in the source
@@ -430,6 +395,47 @@ contradicted, revise before proceeding.
 coherent professional record? Are there jarring jumps, redundant bullets, or
 formatting inconsistencies? The goal is a clear, honest read — not a
 JD-shaped argument.
+
+### 7. Write the Markdown Resume
+
+`resume.md` is the primary deliverable — designed for direct conversion to PDF
+for immediate use. Formatting quality matters as much as content quality because
+the user may convert this to PDF and submit it within minutes.
+
+Write the resume to `resume.md` following the layout structure and formatting
+rules in the "Markdown Layout (resume.md)" section of
+`${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/resume-conventions.md`.
+Read that section before writing the file — it defines the exact header block,
+section heading set, experience entry format, and skill-group formatting.
+The rules most often gotten wrong, worth restating here:
+
+- **Skill groups**: one line per category ending with a backslash (`\`)
+  continuation, no blank lines between categories (blank lines create visible
+  gaps in PDF output). No trailing `\` on the last line.
+- **Header**: `# Full Name`, then `email | location`, then a profile-links
+  line with bare domain+path as link text, then `---`.
+- **Length**: match the requested page count — 1 page ≈ 400 words, 2 pages
+  ≈ 700-900 words. Use the full budget; don't produce a thin document.
+- **No personal pronouns, no decorative elements**; past tense for previous
+  roles, present for the current one; every bullet starts with an action verb.
+
+### 8. Write the JSON Resume (always — unless user explicitly declines)
+
+Also write a `resume.json` file in the [JSON Resume](https://jsonresume.org/schema)
+open standard format. This is a secondary output for users who want to import
+into Reactive Resume or other resume builder tools for further visual polish.
+
+Consult `${CLAUDE_PLUGIN_ROOT}/skills/resume-generate/references/json-resume-schema.md`
+for the complete field mapping from profile data to JSON Resume fields. That
+reference covers all sections (basics, work, education, skills, certificates,
+publications/patents, languages, projects), date formats, and which sections
+to omit.
+
+Key rules:
+- Map the **selected** content — the JSON Resume must match `resume.md`
+  exactly: same bullets, same summary, same skill ordering.
+- Omit empty sections entirely (no empty arrays).
+- Patents map to `publications` (closest semantic fit in JSON Resume schema).
 
 ### 9. Present to User
 

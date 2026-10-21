@@ -34,8 +34,9 @@ are pure positioning: curate aggressively. But experience entries also serve a
 networking function — former colleagues search by company name to reconnect, and
 organization names improve discoverability. This means LinkedIn should include
 all roles from the profile, even early-career ones, while adjusting the depth
-of description by seniority (see Experience section). This is a key difference
-from resume generation, where irrelevant roles are cut entirely.
+of description by seniority (see Experience section). A resume also keeps role
+lines for continuity, but it trims hard for one target. LinkedIn serves every
+future searcher, so its entries can carry more of the career.
 
 ## Workflow
 
@@ -120,9 +121,8 @@ Silently skip any value that is exactly `TBD`. If all items in a list are
 
 For each target LinkedIn field:
 
-- Convert Markdown formatting to plain text (remove `**`, `#`, `-` bullets).
-- Replace Markdown bullet points with `•` characters.
-- Include character count after each field so the user knows remaining budget.
+- Write plain text. LinkedIn renders no Markdown, so use `•` for bullets.
+- Track each field's character count. Step 7 records it in the file header.
 
 #### Headline
 
@@ -131,10 +131,10 @@ Construct the headline from `title`, `summary`, and the most distinctive
 aspects of the user's experience. Apply the Headline Strategy from the
 linkedin-constraints reference: choose a formula pattern, include 3-5
 searchable keywords, lead with role or differentiator in the first ~60 chars.
-The headline should land in the 160-210 char range — short headlines waste
-the most-viewed field on LinkedIn. If the first draft is under 160 chars,
-expand with additional keywords or domain context rather than shipping a
-thin headline.
+Most strong headlines use a good share of the 220 chars. A bare title wastes
+the most-viewed field on LinkedIn. If a draft comes in short, ask whether
+another keyword or domain signal would help a searcher. If the short version
+is already sharp and distinctive, keep it rather than padding it.
 
 #### About
 
@@ -142,8 +142,10 @@ Do not restate `summary.json` in prose. Apply the About Strategy from the
 linkedin-constraints reference: hook (first 2-3 lines must stand alone before
 "see more"), body drawing from experience highlights and domain context,
 optional distinctive positioning, and a concrete call to action. Pull
-achievement highlights from `experience.json`, not just `summary.json`. Use
-the full 2,600-char budget — a thin About is a missed opportunity.
+achievement highlights from `experience.json`, not just `summary.json`. A
+substantial career usually fills most of the 2,600-char budget, and a thin
+About is a missed opportunity. Stop when the story is told, and do not pad to
+reach a count. Respect any length or tone preference the user has set.
 
 #### Experience
 
@@ -153,24 +155,25 @@ names. Dropping a role means losing that reconnection path. This is especially
 true for well-known organizations or roles where meaningful work was done,
 regardless of seniority level.
 
-**Minimum coverage rule**: Every role must reference at least 1 bullet per
-2 projects (rounded up). A role with 5 projects needs at least 3 bullets.
-A role with 2 projects needs at least 1. A role with 1 project needs 1.
-Multiple projects can share a bullet (e.g., "Designed services integration
-layers for financial systems including the Child Trust Fund and GFAS"),
-but every project with quantifiable impact, business results, international
-exposure, or methodology significance must be represented. The role's
-generic `description` field is a fallback only when `projects[]` is empty.
+**Coverage.** Every project with quantifiable impact, business results,
+international exposure, or methodology significance should be visible in its
+role's entry. Lower-signal projects can share a bullet (e.g., "Designed
+services integration layers for financial systems including the Child Trust
+Fund and GFAS"). As a rough guide, a role usually needs about one bullet per
+two projects. Use that figure to catch an under-covered role, not as a quota
+to meet. The role-level `description` bullets are part of the raw material
+too. They hold work that belongs to no single project.
 
-**Character budget**: LinkedIn allows 2,000 chars per entry. An entry under
-500 chars with projects left unrepresented is a red flag — expand before
-moving to the next role.
+**Character budget**: LinkedIn allows 2,000 chars per entry. A short entry
+that leaves notable projects unrepresented usually means something was
+skipped. Check it before moving on. A short entry for a short or early role
+is fine.
 
 For each experience entry:
 
-1. **Flatten** — LinkedIn has no nested project structure. For each project
-   in `projects[]`, extract the best `contributions` and `impact` items and
-   convert into flat bullets. Combine contribution + impact into a single
+1. **Flatten** — LinkedIn has no nested project structure. Take the role's
+   `description` bullets, plus the best `contributions` and `impact` items
+   from each project in `projects[]`, and convert them into flat bullets. Combine contribution + impact into a single
    concise bullet where it reads naturally (e.g., "Designed X, targeting Y%
    improvement"). Multiple lower-impact projects can share a bullet (e.g.,
    "Designed services integration layers for financial systems including the
@@ -180,10 +183,9 @@ For each experience entry:
    (what the whole team used). If `skills` is absent, fall back to
    `tech_stack`. This applies to **every role** including early-career
    entries — do not skip the flatten step for any role.
-2. **Verify coverage** — Count how many source projects have at least one
-   item in the output. If coverage is below the minimum (1 per 2 projects,
-   rounded up), add bullets or merge missing projects into existing bullets
-   before proceeding.
+2. **Check coverage** — Check that every notable project shows up in the
+   output. Add a bullet for any that is missing, or merge it into an existing
+   bullet.
 3. **Order** — Sort the resulting bullets by impact, most impressive first.
    Do not preserve the source order. `impact` bullets (quantifiable outcomes)
    generally rank higher than `contributions` bullets.
@@ -199,17 +201,16 @@ Do not flatten all skills from the profile into the output unchanged. Instead:
    most recent/senior experience. Use this to anchor slot 1-5 choices.
 2. Apply the Skills Strategy from the linkedin-constraints reference: order by
    role-defining → core domain → adjacent → soft/leadership. Drop skills that
-   are obscure, redundant, or unlikely to be searched by recruiters. However,
-   be careful not to over-prune: vendor AI tools (Cursor, Amazon Q, Claude Code,
-   ChatGPT) are actively searched by recruiters in the current market because
-   they signal hands-on AI-augmented development capability — include them in
-   the adjacent/supporting tier. Similarly, soft skills like self-initiated
-   innovation are genuine differentiators in fast-moving domains and should not
-   be dismissed as generic.
+   are obscure, redundant, or unlikely to be searched by recruiters. Do not
+   over-prune named tools that recruiters actively search for, such as
+   current AI development tools. Judge searchability by today's market, not
+   by whether a tool feels like "just a tool". Likewise, a soft skill that is
+   a genuine differentiator in the user's domain is not generic.
 3. Normalize each skill name to the canonical LinkedIn/industry term
    (e.g., "Machine Learning" not "ML", "Node.js" not "NodeJS").
 4. Deduplicate across profile categories before ordering.
-5. Cap at 50. Prefer a tight, high-signal list over an exhaustive one.
+5. LinkedIn allows up to 100 skills. Fill only as many slots as stay
+   high-signal. A sharp list of 30–50 usually beats an exhaustive 100.
 6. Briefly note the curation rationale (e.g., "Prioritized X, Y, Z as
    role-defining; dropped [obscure tool] as low recruiter search value") so
    the user understands the choices and can override if needed.

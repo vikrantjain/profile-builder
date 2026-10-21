@@ -155,15 +155,20 @@ Content issues cause low ranking (resume gets parsed but scored poorly).
 
 ### Keyword Strategy
 
-- Extract exact phrases from the job description — ATS matches are often literal
-  string comparisons, so use the JD's exact terminology
-- Include both acronym and full form on first use
-- Place highest-priority keywords in the Summary and Skills sections (parsed first)
-- Distribute remaining keywords naturally across experience bullets
-- Target at least 2 occurrences of each top-5 to top-10 keyword (naturally, not
-  stuffed — each occurrence should be in a meaningful context)
-- Never fabricate keywords — only include skills the user genuinely possesses
-- When JD says "Kubernetes" don't write "K8s" — match the JD's exact form
+SKILL.md's honesty rules govern here. Keywords follow the evidence. They
+never lead it.
+
+- ATS matching is often literal. When the JD and the profile name the same
+  thing differently ("Kubernetes" / "K8s", "CI/CD" / "continuous delivery"),
+  use the JD's form, or both forms on first use.
+- Include both acronym and full form on first use.
+- Put a keyword where the candidate's real evidence for it lives: the bullet
+  for the project that used it, and the Skills section. A keyword earns a
+  place in the Summary only if it is genuinely central to the candidate's
+  work (see "Proportional emphasis" in SKILL.md).
+- Do not chase an occurrence count. A keyword repeated to raise its score
+  reads as stuffing to the human who reads the resume after the ATS.
+- Never fabricate keywords. Include only skills the user genuinely possesses.
 
 ### Keyword Gap Analysis
 
@@ -172,8 +177,8 @@ After drafting the resume, compare it against the JD:
 1. Extract hard skills, tools, certifications, and role-specific terms from the JD
 2. Compare against the resume content
 3. For each missing keyword that the user genuinely possesses (per the master
-   profile), weave it into an appropriate bullet or skills line using exact-match
-   phrasing from the JD
+   profile), add it to the bullet or skills line where that evidence belongs,
+   using the JD's phrasing when it names the same thing
 4. Do not add keywords the user doesn't actually have — this is fabrication
 
 When no JD is provided, still apply formatting rules and acronym expansion.

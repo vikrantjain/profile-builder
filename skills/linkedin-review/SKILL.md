@@ -32,9 +32,9 @@ review evaluates effectiveness and provides before/after rewrites.
 review or in rewrite suggestions, attribute achievements, tools, and
 skills to the correct role and project. Cross-check each claim against the
 specific `contributions`, `impact`, and `tech_stack` fields in the
-relevant project entry. Do not generalize or merge details across roles —
-e.g., if LangGraph was used in a Red-Team AI Agent project, do not
-attribute it to architecture reviews that used Cursor and MCP.
+relevant project entry. Do not generalize or merge details across roles.
+For example, if a framework was used in one project, do not attribute it to
+a different project in the same role that used other tools.
 
 ## Prerequisites
 
@@ -75,8 +75,9 @@ worth stating here:
 - **Close the browser after scraping** — everything from Phase 2 onward
   works from local files only.
 
-Only fall back to Path B if the user explicitly says they cannot or do not
-want to log in via the browser.
+Use Path B when Playwright MCP is not available, or when the user says they
+cannot or do not want to log in via the browser. Do not switch to Path B just
+because the login wall appeared. The recipe covers that case.
 
 #### Path B: Manual Fallback
 
@@ -171,7 +172,8 @@ this space.
 
 - Does it go beyond a job title to include domain expertise + differentiator?
 - Does it contain keywords recruiters in the user's space would search for?
-- Is it substantive (160–210 chars ideal) without hitting the 220-char limit?
+- Does it use enough of the 220 chars to carry role, differentiator, and
+  keywords? A bare title is thin. A sharp shorter headline is fine.
 - **Master profile angle**: Compare against the user's title, summary, and
   top skills. Is the headline underselling what they actually do?
 
@@ -211,10 +213,10 @@ this space.
 
 - Are the top 3 visible skills strategic and role-defining (not generic)?
 - Is the list comprehensive enough for recruiter search visibility?
-- **AI development tools carry high market signal.** Tools like LangGraph,
-  Claude Code, CrewAI, MCP, Cursor, and Amazon Q are increasingly searched
-  by recruiters and signal hands-on AI-augmented capability. These should
-  be treated as core or adjacent skills, not relegated to "nice to have."
+- Are named tools that recruiters actively search for, such as current AI
+  development tools, listed where the user genuinely uses them? They signal
+  hands-on capability and are easy to under-list. Judge by the current
+  market, not a fixed list.
 - **Master profile angle**: Compare against the full skill inventory. Are
   high-value skills missing? Are obsolete or low-signal skills taking up
   slots that role-defining skills should occupy?

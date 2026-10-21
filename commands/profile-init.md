@@ -43,6 +43,8 @@ From the provided URLs, extract handles for the `sources` array:
 
 - GitHub URL `https://github.com/vikrant` → handle: `vikrant`
 - Hashnode URL `https://vikrant.hashnode.dev` or handle `vikrant` → handle: `vikrant`
+- Hashnode blog on a custom domain, e.g. `https://blog.example.com` → handle:
+  `blog.example.com` (the refresh recipe uses a dotted handle as the host)
 - Dev.to URL `https://dev.to/vikrant` or handle `vikrant` → handle: `vikrant`
 
 Map each platform to the sections it feeds:
@@ -77,8 +79,9 @@ Read the provided data sources:
 - **Resume file:** Read the file and extract structured information for all
   profile fields (identity, experience, education, skills, certifications,
   patents, summary).
-- **GitHub URL:** Use `gh` CLI or WebFetch to get the user's profile info,
-  pinned repos, and bio.
+- **GitHub URL:** Use the `gh` CLI, or the REST API via `curl`, to get the
+  user's profile info and bio for the identity section. Repositories and
+  contributions are fetched in step 6 when `open_source` is built.
 - **LinkedIn URL:** Note the URL for the identity section. If Playwright MCP
   is available, fetch profile data — follow the auth-wall handling and
   expand-and-capture recipe in
@@ -86,9 +89,8 @@ Read the provided data sources:
   (LinkedIn frequently shows a login wall, and unexpanded sections silently
   truncate most of the content). Otherwise, ask the user to provide LinkedIn
   content as text.
-- **Blog platform:** Note the handle for Data Sources configuration. Actual
-  blog posts are fetched later, when the user runs `profile-refresh`
-  (see step 8) — not during init.
+- **Blog platform:** Note the handle for the `sources` array. Posts are
+  fetched in step 6 when `blogs` is built.
 
 ### 6. Build All Sections
 
@@ -126,17 +128,14 @@ before building the first section:
    section data. Follow the index update rules in the `profile-section` skill
    (Step 8).
 
-Process sections in this order:
-1. identity
-2. summary
-3. experience
-4. skills
-5. education
-6. certifications
-7. patents
-8. blogs
-9. open_source
-10. languages
+Process sections in the order of the template's `sections` mapping.
+
+**Dynamic sections (`blogs`, `open_source`):** if a configured source feeds
+the section, build it by following the `profile-refresh` workflow. A missing
+section file counts as initial population, and the recipes cap first-run
+fetches. Then merge in anything the user supplied directly, such as a resume's
+"Projects" list. If a fetch fails, build the section from user-provided data
+alone, or skip it if there is none, and report the failure in step 8.
 
 Skip any **optional** section for which no data was collected — do not create
 empty section files. The four **required** sections (identity, summary,
@@ -195,9 +194,9 @@ Summarize what was created:
 - Number of sections generated.
 - Which data sources were used.
 - Any sections that were skipped due to missing data.
-- Which dynamic sources (blogs, open_source) are configured in the `sources`
-  array. Inform the user they can run `profile-refresh` to fetch latest data
-  from these platforms when ready.
+- Which dynamic sources (blogs, open_source) are configured, what each fetch
+  returned, and anything that a first-run cap left out (e.g. READMEs not yet
+  scanned). Tell the user that `profile-refresh` pulls new entries later.
 
 ### 9. Validate Profile
 

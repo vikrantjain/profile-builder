@@ -43,8 +43,9 @@ later generated. When building or updating a section:
 - **Never apply resume heuristics** such as limiting to recent roles, dropping
   entries to fit a page length, or omitting details deemed unimportant.
 
-If source data is genuinely ambiguous or duplicated, keep both entries and note
-the ambiguity — let the user decide what to remove.
+If source data is genuinely ambiguous or duplicated, keep both entries and tell
+the user about the ambiguity in your reply. The user decides what to remove.
+The JSON has no field for notes, so the reply is the only place to say it.
 
 ## When to Use
 
@@ -63,20 +64,9 @@ For rendering section files into a full Markdown document, run
 
 ## Available Sections
 
-The `sections` mapping in `${CLAUDE_PLUGIN_ROOT}/profile-template.md` defines all valid sections:
-
-| Section | Output File | Key Fields |
-|---------|-------------|------------|
-| identity | `sections/identity.json` | full_name, title, email, phone, location, avatar_url, github, linkedin, website, twitter, years_of_experience |
-| summary | `sections/summary.json` | summary |
-| experience | `sections/experience.json` | experience (list with nested projects) |
-| skills | `sections/skills.json` | skills.categories, skills.soft |
-| education | `sections/education.json` | education (list) |
-| certifications | `sections/certifications.json` | certifications (list) |
-| patents | `sections/patents.json` | patents (list) |
-| blogs | `sections/blogs.json` | blogs (list) |
-| open_source | `sections/open-source.json` | projects, contributions |
-| languages | `sections/languages.json` | languages (list) |
+The `sections` mapping in `${CLAUDE_PLUGIN_ROOT}/profile-template.md` is the
+only list of valid sections. It gives each section's key, display `name`,
+output path, and fields. Read it there rather than from memory.
 
 ## Workflow
 
@@ -108,12 +98,18 @@ by `profile-assemble`. Do not load or process other sections' fields.
 
 ### 4. Gather Data
 
-**Dynamic sections (blogs, open_source):** Check whether `profile-index.json`
-(already confirmed to exist in the pre-flight step) contains a `sources`
-array. If it does and the target section appears in
-any source's `feeds` list, invoke the `profile-refresh` skill first to fetch
-the latest data from configured platforms and update the section file. Then read
-the updated section file as the baseline for any additional user-provided data.
+**Dynamic sections (blogs, open_source):** These can also be fed by a
+configured source in `profile-index.json` `sources`. Decide whether to run
+`profile-refresh` first:
+
+- **Rebuilding the section, or the user wants it current** → refresh first,
+  then use the refreshed file as the baseline for the user's additions.
+- **A targeted manual edit** → skip the refresh. Examples: adding a post from a
+  platform that isn't configured, fixing a description, or adding impact
+  metrics to a project. The refresh is additive and would not change the
+  entry being edited, so it only costs API calls.
+
+If you are unsure, ask the user.
 
 **Static sections (all others):** Collect data from user-provided sources only.
 
@@ -168,7 +164,7 @@ For each field in the template schema (including nested `item_fields`):
 
 5. **Do not silently discard data** that doesn't map to any field. If the input
    contains information with no matching template field, include it in the closest
-   relevant field (usually `description`) and note the mismatch.
+   relevant field (usually `description`) and mention the mismatch to the user.
 
 ### 6. Build the JSON Object
 
@@ -183,23 +179,13 @@ Construct a JSON object with the following structure:
 }
 ```
 
-Rules for building the data object:
+Use field names exactly as the template defines them. Keep nesting as the
+template defines it: `skills.categories`, `open_source.projects`, and so on.
+Lists become arrays.
 
-- Use field names exactly as defined in `profile-template.md` (e.g.,
-  `full_name`, `tech_stack`, `contributions`).
-- **String fields** → JSON string value.
-- **List fields** (`type: list`) → JSON array.
-- **Nested object fields** (e.g., `skills.categories`, `open_source.projects`)
-  → preserve nesting as JSON objects/arrays.
-- **Required fields with no extractable data** → use `"TBD"` (string) or
-  `["TBD"]` (for list fields). Do not use `null` for required fields.
-- **Optional fields with no data** → use `null` or omit the key entirely.
-  Do not set optional fields to `"TBD"`.
-- **Dates** → write as the user provided them (e.g., `"Jan 2021"`). Do not
-  convert to ISO 8601 — that is the responsibility of downstream skills.
-- **No Markdown formatting in values** — values are raw data. Do not include
-  `**bold**`, `## headings`, `- bullets`, or any other Markdown syntax in
-  string values. Just write the plain text.
+The `json_structure.rules` block in the template owns the value conventions.
+Apply them as written there: TBD for required fields only, `null` or omission
+for optional ones, dates as the user wrote them, and no Markdown in values.
 
 ### Example Output
 
@@ -255,11 +241,9 @@ After writing the section file, update `profile-index.json`:
 
 Before finishing, verify:
 
-- [ ] JSON is valid and well-formed (no trailing commas, all strings quoted)
-- [ ] All required fields present — either with real data or TBD convention
-- [ ] Optional fields with no data are `null` or omitted — not set to TBD
-- [ ] No Markdown formatting characters in string values (no `**`, `##`, `- `)
-- [ ] `TBD` defaults used only where no extractable data exists in the input
+- [ ] JSON is valid and well-formed
+- [ ] Every required field present, with real data or TBD; the template's `json_structure.rules` respected
+- [ ] `TBD` used only where the input genuinely has no data for that field
 - [ ] Output contains only the target section — no other sections' fields
 - [ ] Section file written to the correct `sections/` path (`.json` extension)
 - [ ] `profile-index.json` sections array updated with current date

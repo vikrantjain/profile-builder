@@ -75,6 +75,10 @@ extended tech stack, GitHub stats.
 
 Pick one style and use it throughout. Mixing styles looks inconsistent.
 
+Logo names are [Simple Icons](https://simpleicons.org) slugs, and Simple
+Icons removes brand logos from time to time. If a slug does not render, drop
+the `logo=` parameter. A text-only badge is better than a broken one.
+
 ### Common Tech Badge Colors
 
 | Technology | Hex Color | Logo Name |
@@ -117,7 +121,7 @@ Pick one style and use it throughout. Mixing styles looks inconsistent.
 
 ```markdown
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/username)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=flat&logo=twitter&logoColor=white)](https://twitter.com/username)
+[![X](https://img.shields.io/badge/X-000000?style=flat&logo=x&logoColor=white)](https://x.com/username)
 [![Website](https://img.shields.io/badge/Website-000000?style=flat&logo=safari&logoColor=white)](https://example.com)
 ```
 
@@ -145,7 +149,7 @@ contributions to others' repos).
 ### GitHub Streak
 
 ```markdown
-![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=USERNAME)
+![GitHub Streak](https://streak-stats.demolab.com/?user=USERNAME)
 ```
 
 **Guidance on stats widgets:** These are common but can backfire. A streak
