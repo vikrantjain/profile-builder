@@ -90,6 +90,21 @@ actual project state and staleness.
 That measurement is why `profile-guide`'s description is scoped to goal-directed
 prerequisite, state, and orientation questions, and nothing else.
 
+## Result on 2026-10-21
+
+This run covers all 24 fixtures, including the four generate-vs-review cases.
+It was taken after the skill bodies were revised for the Hashnode API change
+and the rigidity pass. No description changed in that revision.
+
+```
+REPEAT=5 CONDITIONS=current   24/24 routed as expected, 0 flaky
+REPEAT=1 (both)               current 24/24, ablated 21/24
+                              differing queries: [6, 7, 8]
+```
+
+Cases `[20]`–`[23]` route correctly 5/5. The ablated run differs on the same
+three guidance queries as the earlier result, so that finding still holds.
+
 ### Caveat
 
 The harness gives the model an explicit `tell_user_to_run` slot that real Claude
