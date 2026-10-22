@@ -5,6 +5,10 @@ definitions, and a routing-eval harness. There is no build system, test suite, o
 do not go looking for one, and do not invent a test command. `README.md` maps the skills and
 commands; `evals/README.md` covers the harness.
 
+This file loads only for sessions inside this repo. It never loads in a project where the
+plugin is installed. A rule that must shape the plugin's behavior for its users belongs in a
+skill, command, or template. Written here, it is silently never applied.
+
 ## Invariants
 
 Breaking any of these produces output that looks correct.
@@ -45,11 +49,11 @@ supports. Name the change and leave it to the user.
 
 ## Preference routing
 
-"remember that…", "my preference is…", "always…", "never…" — anything about how profile data
-is presented, exported, or reviewed — **goes to the `profile-preferences` skill**, which
-writes `preferences.md`. Never store these as auto-memory. Export and review skills read
-`preferences.md`, so a preference filed anywhere else is silently never applied. Data-layer
-skills ignore preferences by design.
+`profile-preferences`' description must keep claiming "remember that…", "always…", and
+"never…" directives, and must keep telling the model to use it instead of auto-memory. That
+description is the only place the rule reaches installed users. Export and review skills read
+only `preferences.md`, so a preference saved as a memory is silently never applied.
+Data-layer skills ignore preferences by design.
 
 ## profile-guide's scope
 

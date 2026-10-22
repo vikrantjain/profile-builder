@@ -125,6 +125,13 @@ The reworded `[12]` names a GitHub Pages blog and still routes to
 `resume-generate`. The ablated run differs on the same three guidance
 queries as before.
 
+A later run followed one more description change. `profile-preferences` now
+says to use it instead of auto-memory. The result was unchanged: current
+22/22 with 0 flaky over 5 runs, and ablated 19/22 on `[6, 7, 8]`. Cases
+`[13]` and `[19]` still route to `profile-preferences`. The catalog does
+not offer auto-memory as a route, so this run cannot measure whether the
+new clause wins against it.
+
 ### Caveat
 
 The harness gives the model an explicit `tell_user_to_run` slot that real Claude

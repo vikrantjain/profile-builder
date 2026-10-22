@@ -12,9 +12,11 @@ description: >
   experience as 20+ years", "use first person for LinkedIn", "forget the
   preference about...", "show my preferences", "remove preference". Trigger
   for any directive about presentation style, personality-driven framing, or
-  data display rules — even without the word "preference". Do not trigger for
-  generating content, updating profile data, assembling documents, or reviewing
-  external profiles.
+  data display rules — even without the word "preference". Use this instead
+  of auto-memory for these directives: exports and reviews read only
+  preferences.md, so a preference saved as a memory is never applied. Do not
+  trigger for generating content, updating profile data, assembling
+  documents, or reviewing external profiles.
 ---
 
 # Profile Preferences
