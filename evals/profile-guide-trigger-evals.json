@@ -60,7 +60,7 @@
     "should_trigger": false
   },
   {
-    "query": "refresh my blogs from hashnode, I published two new posts this week",
+    "query": "refresh my blogs, I published two new posts on my github pages site this week",
     "expected_route": "profile-refresh",
     "should_trigger": false
   },
@@ -80,8 +80,8 @@
     "should_trigger": false
   },
   {
-    "query": "my hashnode tagline sucks, make it better",
-    "expected_route": "hashnode-generate",
+    "query": "my resume summary sucks, make it better",
+    "expected_route": "resume-generate",
     "should_trigger": false
   },
   {
@@ -107,16 +107,6 @@
   {
     "query": "take a look at my actual github and tell me what's weak about it",
     "expected_route": "github-review",
-    "should_trigger": false
-  },
-  {
-    "query": "write me a new hashnode tagline and bio i can paste in",
-    "expected_route": "hashnode-generate",
-    "should_trigger": false
-  },
-  {
-    "query": "how does my hashnode profile come across to someone landing on it cold",
-    "expected_route": "hashnode-review",
     "should_trigger": false
   }
 ]

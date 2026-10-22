@@ -154,7 +154,7 @@ Blog posts:
 | JSON Resume Field | Profile Source                | Notes                                  |
 |-------------------|------------------------------|----------------------------------------|
 | `name`            | `blogs[].title`              | Post title                             |
-| `publisher`       | `blogs[].platform`           | e.g. "Hashnode", "Dev.to"; omit if absent |
+| `publisher`       | `blogs[].platform`           | e.g. "Dev.to", "Medium"; omit if absent |
 | `releaseDate`     | `blogs[].published_on`       | ISO 8601 (`YYYY-MM`)                   |
 | `url`             | `blogs[].url`                | Direct map                             |
 | `summary`         | `blogs[].excerpt`            | Omit if absent                         |

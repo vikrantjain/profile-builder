@@ -20,7 +20,7 @@ description: >
 # Profile Preferences
 
 Manage persistent presentation preferences that shape how profile data is
-presented in exports (LinkedIn, resume, GitHub, Hashnode) and reviews.
+presented in exports (LinkedIn, resume, GitHub) and reviews.
 Preferences control tone, emphasis, framing, inclusions, and exclusions.
 They do NOT affect the raw profile data layer — only downstream output.
 
@@ -85,7 +85,6 @@ Infer the platform from context. Only ask if genuinely ambiguous.
 - "in LinkedIn", "for LinkedIn", "LinkedIn should..." → `## LinkedIn`
 - "in resume", "for resume", "resume should..." → `## Resume`
 - "on GitHub", "GitHub README should..." → `## GitHub`
-- "on Hashnode", "Hashnode profile should..." → `## Hashnode`
 - No platform mentioned → `## Global`
 
 Platform headings map to skills:
@@ -93,7 +92,6 @@ Platform headings map to skills:
 - `## LinkedIn` → `linkedin-generate`, `linkedin-review`
 - `## Resume` → `resume-generate`
 - `## GitHub` → `github-generate`, `github-review`
-- `## Hashnode` → `hashnode-generate`, `hashnode-review`
 
 ### 4. Check for Conflicts
 

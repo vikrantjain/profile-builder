@@ -27,7 +27,7 @@ Ask the user what data sources they have available. Present these options:
 - **Resume file** — path to a resume (PDF, DOCX, or Markdown)
 - **GitHub profile URL** — e.g. `https://github.com/username`
 - **LinkedIn profile URL** — e.g. `https://linkedin.com/in/username`
-- **Blog platform** — Hashnode or Dev.to handle/URL
+- **Blog** — the blog's URL, or a Dev.to handle
 - **Profile photo URL** — optional. Consumed only as `basics.image` in
   `resume.json`; `resume.md` and the Markdown layout stay photo-free for ATS
   and readability. Ask for it once, accept a skip, and do not chase it.
@@ -42,18 +42,19 @@ is built from what is available.
 From the provided URLs, extract handles for the `sources` array:
 
 - GitHub URL `https://github.com/vikrant` → handle: `vikrant`
-- Hashnode URL `https://vikrant.hashnode.dev` or handle `vikrant` → handle: `vikrant`
-- Hashnode blog on a custom domain, e.g. `https://blog.example.com` → handle:
-  `blog.example.com` (the refresh recipe uses a dotted handle as the host)
-- Dev.to URL `https://dev.to/vikrant` or handle `vikrant` → handle: `vikrant`
+- Dev.to URL `https://dev.to/vikrant` or handle `vikrant` → platform `devto`,
+  handle `vikrant`
+- Any other blog URL, e.g. `https://vikrant.github.io` or
+  `https://blog.example.com` → platform `rss`, handle: the URL as given. The
+  refresh recipe finds the feed from the site URL.
 
 Map each platform to the sections it feeds:
 
 | Platform | Feeds |
 |----------|-------|
 | github | open_source |
-| hashnode | blogs |
 | devto | blogs |
+| rss | blogs |
 
 
 ### 4. Generate Profile Index
@@ -89,7 +90,7 @@ Read the provided data sources:
   (LinkedIn frequently shows a login wall, and unexpanded sections silently
   truncate most of the content). Otherwise, ask the user to provide LinkedIn
   content as text.
-- **Blog platform:** Note the handle for the `sources` array. Posts are
+- **Blog:** Note the handle for the `sources` array. Posts are
   fetched in step 6 when `blogs` is built.
 
 ### 6. Build All Sections

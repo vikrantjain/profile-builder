@@ -5,7 +5,6 @@ sections/
 
 # Export outputs
 linkedin/
-hashnode/
 resume.md
 resume.json
 github-readme.md
@@ -14,7 +13,6 @@ preferences.md
 # Review reports
 linkedin-review.md
 github-review.md
-hashnode-review.md
 
 # Temporary/intermediate data
 .profile/

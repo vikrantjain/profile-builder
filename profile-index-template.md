@@ -63,8 +63,8 @@ json_structure:
     type: list
     description: "External platforms that feed dynamic profile sections (blogs, open_source). Used by profile-refresh to fetch latest data."
     item_fields:
-      platform: { required: true, description: "Platform type: github, hashnode, devto" }
-      handle:   { required: true, description: "Username or handle on the platform" }
+      platform: { required: true, description: "Platform type: github, devto, rss" }
+      handle:   { required: true, description: "Username on the platform. For rss, the blog's site or feed URL" }
       feeds:    { required: true, description: "Profile sections this source feeds, e.g. ['open_source', 'blogs']", type: list }
 
 example: |
@@ -86,7 +86,7 @@ example: |
     ],
     "sources": [
       { "platform": "github", "handle": "janedoe", "feeds": ["open_source"] },
-      { "platform": "hashnode", "handle": "janedoe", "feeds": ["blogs"] }
+      { "platform": "rss", "handle": "https://janedoe.github.io", "feeds": ["blogs"] }
     ]
   }
 ---

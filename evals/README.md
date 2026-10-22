@@ -11,7 +11,7 @@ can be measured by deleting it and re-running, rather than assumed.
 
 | File | What it is |
 |---|---|
-| `profile-guide-trigger-evals.json` | 24 user messages, each with the `expected_route` it should take |
+| `profile-guide-trigger-evals.json` | 22 user messages, each with the `expected_route` it should take |
 | `harness.py` | Builds the routing catalog from live frontmatter, writes prompts, scores responses |
 | `run.sh` | End-to-end: build → route → score |
 
@@ -29,10 +29,13 @@ it directly, or a slash command (`/profile-section`) when the model can only tel
 the user to run it. `should_trigger` is the narrower legacy question of whether
 `profile-guide` specifically fires.
 
-Cases `[20]`–`[23]` cover the generate-vs-review split on GitHub and Hashnode.
-The LinkedIn pair was already covered by `[11]` and `[18]`; the other two were
-not, and their descriptions are the ones that overlap most. New cases are
-appended rather than inserted so the query indices cited below stay stable.
+Cases `[20]` and `[21]` cover the generate-vs-review split on GitHub. The
+LinkedIn pair is covered by `[11]` and `[18]`. New cases are appended rather
+than inserted, so the query indices cited below stay stable. When a skill is
+removed, its cases are reworded in place, or deleted if they sit at the end
+of the list. Hashnode support was removed this way: `[16]` now targets
+`resume-generate`, `[12]` names a GitHub Pages blog, and the old `[22]` and
+`[23]` were deleted.
 
 ## Running
 
@@ -41,7 +44,7 @@ when present, otherwise a built-in fallback parser handles this repo's
 frontmatter. Both produce a byte-identical catalog.
 
 ```shell
-./run.sh                    # both conditions, 48 model calls
+./run.sh                    # both conditions, 44 model calls
 REPEAT=5 ./run.sh           # 5 runs per query, to surface flaky routing
 CONDITIONS="current" ./run.sh
 WORK=./out ./run.sh         # keep artifacts instead of using a temp dir
@@ -104,6 +107,23 @@ REPEAT=1 (both)               current 24/24, ablated 21/24
 
 Cases `[20]`–`[23]` route correctly 5/5. The ablated run differs on the same
 three guidance queries as the earlier result, so that finding still holds.
+
+## Result on 2026-10-22
+
+This run followed the removal of `hashnode-generate` and `hashnode-review`.
+It covers the 22 remaining fixtures. `profile-refresh`'s description changed
+to name RSS/Atom feeds in place of Hashnode.
+
+```
+REPEAT=5 CONDITIONS=current   22/22 routed as expected, 0 flaky
+REPEAT=1 (both)               current 22/22, ablated 19/22
+                              differing queries: [6, 7, 8]
+```
+
+The reworded `[12]` names a GitHub Pages blog and still routes to
+`profile-refresh` rather than a GitHub skill. The reworded `[16]` routes to
+`resume-generate`. The ablated run differs on the same three guidance
+queries as before.
 
 ### Caveat
 

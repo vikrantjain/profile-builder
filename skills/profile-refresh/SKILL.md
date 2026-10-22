@@ -1,14 +1,15 @@
 ---
 name: profile-refresh
 description: >
-  Pulls new entries from external platforms (GitHub, Hashnode, Dev.to) into
-  the user's dynamic profile sections (blogs, open_source). Use when the user
-  asks to "refresh my blogs", "refresh open source", "fetch latest blog
-  posts", "update blogs from hashnode", "sync my open source data", "pull
-  latest from github", "refresh sources", "rescan readme for {repo}", or asks
-  whether their blog or open-source data is up to date. Additive by default —
-  new entries are added and existing curated entries are preserved. Also
-  called by profile-section when building or updating dynamic sections.
+  Pulls new entries from external platforms (GitHub, Dev.to, any blog's
+  RSS or Atom feed) into the user's dynamic profile sections (blogs,
+  open_source). Use when the user asks to "refresh my blogs", "refresh open
+  source", "fetch latest blog posts", "sync my blog feed", "sync my open
+  source data", "pull latest from github", "refresh sources", "rescan readme
+  for {repo}", or asks whether their blog or open-source data is up to
+  date. Additive by default — new entries are added and existing curated
+  entries are preserved. Also called by profile-section when building or
+  updating dynamic sections.
 ---
 
 # Profile Refresh
@@ -52,7 +53,7 @@ Only these sections have external sources:
 
 | Section | Typical Sources | Output File |
 |---------|----------------|-------------|
-| blogs | Hashnode, Dev.to | `sections/blogs.json` |
+| blogs | Any RSS/Atom feed, Dev.to | `sections/blogs.json` |
 | open_source | GitHub (projects + contributions) | `sections/open-source.json` |
 
 All other sections are static — maintained from user-provided data only.
@@ -63,8 +64,7 @@ This skill must **not** use Playwright or any browser automation. All external
 data fetching uses CLI tools, public APIs, and public feeds:
 
 - **GitHub** — `gh` CLI, or the GitHub REST API via `curl`
-- **Hashnode** — the blog's RSS feed and sitemap via `curl`. The GraphQL API
-  now requires a Pro plan, so it is an opt-in path only.
+- **RSS** — the blog's RSS or Atom feed, plus its sitemap, via `curl`
 - **Dev.to** — REST API at `dev.to/api` via `curl`
 
 Prefer `curl` over WebFetch for API calls. WebFetch returns a model-written
@@ -79,9 +79,16 @@ deleted post.
 Read and parse `profile-index.json`. Locate the `sources` array. Each entry
 contains:
 
-- **`platform`** — the source type (github, hashnode, devto)
-- **`handle`** — the user's username on that platform
+- **`platform`** — the source type (github, devto, rss)
+- **`handle`** — the user's username on that platform, or the blog URL for
+  `rss`
 - **`feeds`** — array of section keys this source feeds
+
+An older index may still list `platform: hashnode`. Hashnode support was
+removed, but every Hashnode blog publishes an RSS feed. Treat the entry as
+an `rss` source. A handle containing a dot is the blog's host. A bare
+handle means the host is `{handle}.hashnode.dev`. Tell the user, and
+suggest running `/profile-validate` to rewrite the entry.
 
 If `profile-index.json` does not exist or has no `sources` array, inform
 the user to run `/profile-init` first or manually add source configuration
@@ -163,11 +170,10 @@ For the README fetch recipe, what to extract, and how to combine it with
 language + topics, see the "README — fetch and tech_stack extraction"
 section of `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`.
 
-#### Hashnode — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`
+#### RSS — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/rss.md`
 
-Feeds `blogs`. Recipe covers host resolution (bare username or custom
-domain), RSS for recent posts, the sitemap for the complete list, the
-opt-in GraphQL path for Pro users, and field mapping.
+Feeds `blogs`. Recipe covers feed discovery from a site URL, RSS and Atom
+parsing, when to read the sitemap for older posts, and field mapping.
 
 #### Dev.to — see `${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/devto.md`
 
@@ -264,11 +270,16 @@ The user may have intentionally retained historical data, or the item may have
 been removed from the platform but still belongs in the profile. The user
 can manually remove entries (or ask you to remove them) if needed.
 
-**Duplicates across sources** (e.g., same blog post on Hashnode and Dev.to):
-Match by URL. If two entries have the same URL, keep the richer one — the
+**Duplicates across sources** (e.g., same blog post on a personal blog and
+Dev.to): Match by URL. If two entries have the same URL, keep the richer one — the
 entry with more populated fields (excerpt, tags, etc.); when equally rich,
 keep the existing profile entry. If they have different URLs but identical
 titles, keep both — they may be cross-posts with platform-specific URLs.
+
+The exception is a blog that moved. Suppose the existing entries sit on a
+host that no configured source covers anymore, and the new feed has posts
+with the same titles. The posts were most likely migrated. Ask the user
+whether to replace the old URLs with the new ones rather than keeping both.
 
 ### 6. Build the JSON Object
 
@@ -323,7 +334,7 @@ anything changed:
 **Failures (always report regardless of changes):**
 
 - Any sources that failed to fetch, with the error (e.g., "GitHub: 403 rate
-  limit exceeded", "Hashnode: no publication found for handle 'xyz'").
+  limit exceeded", "RSS: no feed found at blog.example.com").
 
 **Skills suggestions (only when new tech_stack entries were introduced):**
 
@@ -361,7 +372,7 @@ API calls can fail for various reasons. Handle these gracefully:
 | Error | Action |
 |-------|--------|
 | **404 / user not found** | Report that the handle may be incorrect. Suggest the user check `profile-index.json` sources. Continue with other sources. |
-| **403 / rate limit** | Report the rate limit. For `gh` CLI, suggest `gh auth status` to check token. For Hashnode/Dev.to, suggest waiting and retrying. Continue with other sources. |
+| **403 / rate limit** | Report the rate limit. For `gh` CLI, suggest `gh auth status` to check token. For Dev.to or a blog host, suggest waiting and retrying. Continue with other sources. |
 | **Network error / timeout** | Report the failure. Continue with other sources. |
 | **Empty response** (valid but no data) | This is not an error — the user may have no public repos/posts. Write the section with an empty array. Do not treat it as a failure. |
 | **Malformed response** | Report that the API returned unexpected data. Skip this source and continue. |
@@ -399,5 +410,5 @@ Before finishing, verify:
 - **`profile-index.json`** — Source configuration (`sources` array) and section manifest (`sections` array)
 - **`${CLAUDE_PLUGIN_ROOT}/profile-template.md`** — Field definitions, section mapping, and JSON structure conventions
 - **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/github.md`** — GitHub fetch recipe: repos, topics, READMEs, contributions, field mapping
-- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/hashnode.md`** — Hashnode GraphQL query, pagination, custom-domain fallback, field mapping
+- **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/rss.md`** — RSS/Atom feed discovery, sitemap backfill, field mapping
 - **`${CLAUDE_PLUGIN_ROOT}/skills/profile-refresh/references/devto.md`** — Dev.to REST endpoint, pagination, field mapping

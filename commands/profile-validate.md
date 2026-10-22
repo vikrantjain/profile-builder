@@ -48,6 +48,9 @@ Read and parse `profile-index.json`. Verify it is valid JSON, then check:
   (YYYY-MM-DD format).
 - **`sources` array** (if present) — each entry has `platform` (string),
   `handle` (string), and `feeds` (array of strings) fields with valid values.
+  Valid platforms are listed in `profile-index-template.md`. A `hashnode`
+  entry is a warning (auto-fixable). Hashnode support was removed, and the
+  blog is now read through its RSS feed.
 - **Schema version** — compare `profile_version` in the index against
   `template_version` in `profile-template.md`. If they differ, flag as a
   warning: "Profile was built with schema vX.X but current template is vY.Y.
@@ -60,7 +63,9 @@ If `preferences.md` exists in the workspace root:
 
 - **Structure** — file has a `## Global` heading.
 - **Valid platform headings** — any `##` headings besides `Global` use valid
-  platform names: `LinkedIn`, `Resume`, `GitHub`, `Hashnode`.
+  platform names: `LinkedIn`, `Resume`, `GitHub`. A `## Hashnode` heading
+  is a warning (auto-fixable). It is left over from the removed Hashnode
+  export, and no skill reads it.
 - **No empty sections** — no `##` heading with zero bullet items under it.
 
 If `preferences.md` does not exist, skip this step (preferences are optional).
@@ -236,6 +241,12 @@ Examples of fixable issues:
   `sections/identity.json`. Show both values before applying, since a user
   who edited the index by hand may have meant the change to go the other
   way.
+- **Rewrite a `hashnode` source** as `rss`. A handle containing a dot
+  becomes `https://{handle}`. A bare handle becomes
+  `https://{handle}.hashnode.dev`. Keep `feeds` as it is. If the user has
+  since moved the blog, ask for its new URL instead.
+- **Remove a `## Hashnode` preferences heading.** Show its bullets first.
+  The user may want some of them moved under `## Global`.
 - **Correct a section display name** — replace the `name` in the index entry
   with the `name` defined for that `key` in `profile-template.md`.
 - **Update schema version** — after all drift fixes are applied, update

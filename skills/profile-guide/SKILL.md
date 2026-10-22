@@ -40,7 +40,7 @@ have nothing built yet. At the workspace root, check:
   `sources[]` (configured platforms for dynamic sections).
 - **`sections/*.json`** — the per-section data files. List them.
 - **Output artifacts** — `resume.md` / `resume.json`, `linkedin/`,
-  `github-readme.md`, `hashnode/`, `*-review.md`: what's already been produced.
+  `github-readme.md`, `*-review.md`: what's already been produced.
 - **`preferences.md`** — presence means presentation directives are set.
 - **`profile.md`** — an optional *output*, never a prerequisite; no generate or
   review skill reads it. Mention only if the user wants the whole document.
@@ -108,10 +108,8 @@ output reads those files directly rather than re-scraping.
 | `resume-generate` | Tailored, ATS-optimized `resume.md` + `resume.json` |
 | `linkedin-generate` | Copy-paste-ready LinkedIn fields |
 | `github-generate` | GitHub profile README |
-| `hashnode-generate` | Copy-paste-ready Hashnode profile fields |
 | `linkedin-review` | Quality review of the live LinkedIn profile (Playwright MCP) |
 | `github-review` | Quality review of the live GitHub profile (`gh` CLI / REST API) |
-| `hashnode-review` | Quality review of the live Hashnode profile (public profile page + blog feeds) |
 | `/profile-validate` | Check profile files against the schema and offer fixes |
 | `/linkedin-rec` | Draft a recommendation-request message for a colleague |
 
