@@ -41,10 +41,10 @@ is built from what is available.
 
 From the provided URLs, extract handles for the `sources` array:
 
-- GitHub URL `https://github.com/vikrant` → handle: `vikrant`
-- Dev.to URL `https://dev.to/vikrant` or handle `vikrant` → platform `devto`,
-  handle `vikrant`
-- Any other blog URL, e.g. `https://vikrant.github.io` or
+- GitHub URL `https://github.com/janedoe` → handle: `janedoe`
+- Dev.to URL `https://dev.to/janedoe` or handle `janedoe` → platform `devto`,
+  handle `janedoe`
+- Any other blog URL, e.g. `https://janedoe.github.io` or
   `https://blog.example.com` → platform `rss`, handle: the URL as given. The
   refresh recipe finds the feed from the site URL.
 

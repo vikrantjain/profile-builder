@@ -13,10 +13,17 @@ Use `curl -sL` via Bash so you get the raw XML. WebFetch passes the page
 through a summarizing model, which can drop or reword items, so use it only
 when Bash is unavailable.
 
+A handle without a scheme gets `https://`. Blogs often redirect, for
+example from `*.github.io` to a custom domain. Take the final URL after
+redirects (`curl -sL -w '%{url_effective}'`) as the blog's real host. The
+feed and post URLs use that host.
+
 ## 1. Find the feed
 
 - **The handle is already a feed** if the response is XML with an `<rss>` or
-  `<feed>` root. Use it.
+  `<feed>` root. Use it. Always identify the format from the root element.
+  A `<link>` tag's `type` attribute is sometimes wrong, so a feed declared
+  as `application/rss+xml` may be Atom.
 - **Otherwise, read the site's HTML `<head>`.** Look for
   `<link rel="alternate" type="application/rss+xml" href="…">` or the
   `application/atom+xml` equivalent. Resolve a relative `href` against the
@@ -28,8 +35,9 @@ when Bash is unavailable.
 - **Still nothing:** ask the user for the feed URL. Do not scrape the blog's
   HTML index instead.
 
-When discovery was needed, tell the user the feed URL you found. Suggest
-storing it as the `handle` so later refreshes skip discovery.
+When discovery was needed, or the handle redirected, tell the user the
+final feed URL. Suggest storing it as the `handle` so later refreshes skip
+discovery and redirects.
 
 ## 2. Read the feed
 
@@ -37,6 +45,9 @@ storing it as the `handle` so later refreshes skip discovery.
 |--------|-------------|-------|-----|------|---------|
 | RSS 2.0 | `<item>` | `title` | `link` | `pubDate` | `description` |
 | Atom | `<entry>` | `title` | `<link rel="alternate">` `href` (or the `<link>` with no `rel`) | `published`, else `updated` | `summary`, else `content` |
+
+Titles and summaries may contain HTML and entities such as `&apos;` or
+`&#8217;`. Decode them to plain text.
 
 Most feeds carry only recent posts. Jekyll's default is 10, and Hashnode's
 is 20. Some feeds embed each post's full HTML in `description` or
@@ -61,14 +72,21 @@ child sitemaps. Follow them and collect every page `<loc>`.
 Keep only post URLs. The feed shows what a post URL looks like on this blog,
 such as `/posts/{slug}`, `/blog/{slug}`, or `/{YYYY}/{MM}/{DD}/{slug}`.
 Keep sitemap URLs with the same shape. Drop the root, tag, category,
-series, pagination, and static pages. If the shape is unclear, show the
-user a sample and ask.
+series, pagination, and static pages.
+
+Some blogs put posts directly under the root as `/{slug}/`. That is the
+same shape as `/about/`, so the URL alone cannot tell them apart. In that
+case, decide from the page itself. A post has `og:type` set to `article`
+and a published time. A static page has `og:type` set to `website`. A
+sitemap entry with no `<lastmod>` is also usually a static page. If you
+still cannot tell, show the user a sample and ask.
 
 For each post URL that is in neither the feed nor `sections/blogs.json`,
 fetch the page and read its `<meta>` tags:
 
 - Title: `og:title`, else `<title>`.
-- Date: `article:published_time`, else a `<time datetime>` in the article,
+- Date: `article:published_time` (some themes write
+  `og:article:published_time`), else a `<time datetime>` in the article,
   else the sitemap `<lastmod>`. A `lastmod` date may be an edit date, so
   tell the user which posts were dated from it.
 - Summary: `og:description`, else `<meta name="description">`.
@@ -92,5 +110,5 @@ can be added by hand with `/profile-section`.
 For `platform`, name the hosting service when the host identifies one, such
 as `Hashnode` (`*.hashnode.dev`), `Medium`, `Substack`, or `Ghost`. For a
 self-hosted blog, including GitHub Pages, use the blog's own name from the
-feed's channel `<title>`. If that title is just the author's name, use
-`Personal blog`.
+feed title. That is `<channel><title>` in RSS and the top-level `<title>` in
+Atom. If that title is just the author's name, use `Personal blog`.
