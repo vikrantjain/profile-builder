@@ -32,6 +32,16 @@ Breaking any of these produces output that looks correct.
   or a skill.
 - **`.profile/tmp/{YYYY-MM-DD}/{source}/` is scratch.** Never write final output there;
   `/profile-validate` deletes stale folders.
+- **Examples use placeholders, never the maintainer's data.** Write `janedoe` and
+  `example.com`, not a real handle, blog, or name. This repo is copied to every installing
+  user's machine, so a real value ships the maintainer's identity and reads as a default.
+  Eval fixtures follow the same rule; see `evals/README.md`.
+
+## Scope
+
+Edit only this repo. The maintainer's own profile workspace lives elsewhere and is managed
+separately. Do not change it from a session here, even to apply something this plugin now
+supports. Name the change and leave it to the user.
 
 ## Preference routing
 
